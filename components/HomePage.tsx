@@ -21,6 +21,11 @@ const services = [
     copy: "Reliable infrastructure design, deployment, and support for high-availability business environments."
   }
 ];
+import { useEffect, useRef } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const services = ["CRM Software", "IT Projects", "Hardware Solutions"];
 
 const trustMetrics = [
   { value: "120+", label: "Enterprise Engagements" },
@@ -29,11 +34,22 @@ const trustMetrics = [
 ];
 
 export function HomePage() {
+const projects = [
+  "Autonomous CRM Intelligence Suite",
+  "Cloud Migration & Cybersecurity Program",
+  "Smart Infrastructure Monitoring Hub",
+  "Enterprise Hardware Lifecycle Platform"
+];
+
+export function HomePage() {
+  const projectGridRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".reveal-blur",
         { opacity: 0, filter: "blur(12px)", y: 30 },
+        { opacity: 0, filter: "blur(14px)", y: 40 },
         {
           opacity: 1,
           filter: "blur(0px)",
@@ -66,6 +82,46 @@ export function HomePage() {
           }
         );
       });
+          duration: 1.2,
+          stagger: 0.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".about-trigger",
+            start: "top 80%"
+          }
+        }
+      );
+
+      gsap.utils.toArray<HTMLElement>(".project-card").forEach((card, index) => {
+        gsap.fromTo(
+          card,
+          { x: index % 2 === 0 ? -45 : 45, opacity: 0.2, filter: "blur(8px)" },
+          {
+            x: 0,
+            opacity: 1,
+            filter: "blur(0px)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 88%",
+              end: "bottom 45%",
+              scrub: true
+            }
+          }
+        );
+      });
+
+      if (projectGridRef.current) {
+        gsap.to(projectGridRef.current, {
+          yPercent: -4,
+          scrollTrigger: {
+            trigger: projectGridRef.current,
+            scrub: 1,
+            start: "top bottom",
+            end: "bottom top"
+          }
+        });
+      }
     });
 
     return () => ctx.revert();
@@ -88,6 +144,16 @@ export function HomePage() {
               Powering the Future of Intelligent Technology
             </h1>
             <p className="mt-6 max-w-2xl text-base text-slate-300 md:text-lg">
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.1, ease: "easeOut" }}
+            className="glass neon-border max-w-3xl rounded-3xl p-10 md:p-14"
+          >
+            <p className="mb-4 text-xs uppercase tracking-[0.3em] text-blue/80">SunEdge IT Solution</p>
+            <h1 className="text-4xl font-semibold leading-tight md:text-6xl">
+              Powering the Future of Intelligent Technology
+            </h1>
+            <p className="mt-6 text-base text-slate-300 md:text-lg">
               CRM Software • IT Projects • Hardware Infrastructure
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
@@ -115,6 +181,15 @@ export function HomePage() {
               >
                 <h3 className="text-xl font-medium">{service.title}</h3>
                 <p className="mt-4 text-sm leading-relaxed text-slate-300">{service.copy}</p>
+                key={service}
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 220, damping: 20 }}
+                className="glass rounded-2xl p-8 transition duration-500 hover:border-purple/60 hover:shadow-glow"
+              >
+                <h3 className="text-xl font-medium">{service}</h3>
+                <p className="mt-4 text-sm text-slate-300">
+                  Enterprise-grade strategy, implementation, and optimization designed for scale.
+                </p>
               </motion.article>
             ))}
           </div>
@@ -134,6 +209,14 @@ export function HomePage() {
             <p className="text-sm leading-relaxed text-slate-300">
               From discovery and planning to deployment and long-term support, SunEdge works as a committed
               technology partner focused on measurable business outcomes.
+              SunEdge IT Solution delivers secure, adaptive, and performance-driven solutions that empower
+              organizations to innovate with confidence.
+            </p>
+          </div>
+          <div className="glass reveal-blur rounded-2xl p-8">
+            <p className="text-sm text-slate-300">
+              From architecture design to deployment and long-term support, our experts align technology
+              operations with measurable business growth.
             </p>
           </div>
         </div>
@@ -143,6 +226,7 @@ export function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-10">
             <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Performance & Trust</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Cred-inspired Trust Layer</p>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               {trustMetrics.map((metric, index) => (
                 <motion.article
@@ -151,6 +235,10 @@ export function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.5 }}
                   transition={{ duration: 0.7, delay: index * 0.1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
                   className="glass rounded-2xl border border-white/10 p-6"
                 >
                   <p className="bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-4xl font-semibold tracking-tight text-transparent md:text-5xl">
@@ -160,6 +248,37 @@ export function HomePage() {
                 </motion.article>
               ))}
             </div>
+          </div>
+
+          <div className="glass neon-border rounded-3xl p-10">
+            <p className="text-xs uppercase tracking-[0.25em] text-pink/80">Affiliate Company</p>
+            <h3 className="mt-4 text-2xl font-semibold md:text-3xl">Perioxia Technologies</h3>
+            <p className="mt-4 max-w-2xl text-slate-300">
+              Accelerating frontier innovation with advanced software engineering, research-driven IT systems,
+              and intelligent automation.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 py-24 md:px-12 lg:px-20">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-12 text-3xl font-semibold md:text-4xl">Project Showcase</h2>
+          <div ref={projectGridRef} className="grid gap-6 md:grid-cols-2">
+            {projects.map((project, index) => (
+              <article
+                key={project}
+                className={`project-card glass rounded-2xl p-8 ${index === 0 || index === 3 ? "md:col-span-2" : ""
+                  }`}
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-blue/80">Case Study {index + 1}</p>
+                <h3 className="mt-3 text-2xl font-medium">{project}</h3>
+                <p className="mt-4 max-w-2xl text-sm text-slate-300">
+                  A premium transformation initiative delivering measurable reliability, speed, and strategic
+                  impact.
+                </p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
