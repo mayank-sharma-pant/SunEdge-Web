@@ -29,27 +29,42 @@ section {
   border: 1px solid rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
 
 .glass-orb {
   position: relative;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), transparent);
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.12), transparent 60%);
   box-shadow:
-    inset 0 0 50px rgba(255, 255, 255, 0.05),
-    inset -10px -10px 30px rgba(123, 92, 255, 0.1),
-    0 0 80px rgba(123, 92, 255, 0.1);
+    inset 0 0 60px rgba(255, 255, 255, 0.06),
+    inset -15px -15px 40px rgba(123, 92, 255, 0.12),
+    0 0 100px rgba(123, 92, 255, 0.1);
   overflow: hidden;
+  cursor: pointer;
 }
 
-.glass-orb::after {
-  content: '';
+.sphere-stripe {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%, rgba(56, 182, 255, 0.05) 100%);
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.shimmer-light {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45), transparent 15%);
+  filter: blur(20px);
+  opacity: 0;
   pointer-events: none;
 }
 
@@ -57,7 +72,7 @@ section {
   position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(123, 92, 255, 0.05), transparent 70%);
+  background: radial-gradient(circle at center, rgba(123, 92, 255, 0.08), transparent 70%);
   filter: blur(60px);
   pointer-events: none;
 }

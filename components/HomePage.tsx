@@ -36,6 +36,25 @@ const trustMetrics = [
   { value: "24/7", label: "Mission-Critical Support" }
 ];
 
+const whyChooseUs = [
+  {
+    title: "Precision-Driven Solutions",
+    desc: "Engineering workflows built for accuracy and long-term operational resilience."
+  },
+  {
+    title: "Modern Technology Approach",
+    desc: "Leveraging adaptive cloud architectures and secure, scalable technical stacks."
+  },
+  {
+    title: "Business-Centric Execution",
+    desc: "Aligning technical milestones with actual business outcomes and project goals."
+  },
+  {
+    title: "Reliable Technical Support",
+    desc: "Dedicated mission-critical support maintaining 99.9% uptime for enterprise clients."
+  }
+];
+
 export function HomePage() {
   const horizontalSectionRef = useRef<HTMLDivElement>(null);
   const horizontalTrackRef = useRef<HTMLDivElement>(null);
@@ -51,29 +70,61 @@ export function HomePage() {
 
       // Hero Glass Orb Motion
       gsap.to(".glass-orb-container", {
-        y: -20,
-        duration: 4,
+        y: -15,
+        duration: 5,
         ease: "sine.inOut",
         repeat: -1,
         yoyo: true
       });
 
-      gsap.to(".glass-orb-inner", {
-        rotate: 360,
-        duration: 20,
+      // Continuous Rotation for Stripe Mesh
+      gsap.to(".sphere-stripe-mesh", {
+        rotateX: 360,
+        rotateY: 360,
+        duration: 30,
         ease: "none",
         repeat: -1
       });
 
-      // Hero Parallax Tracking
+      // Hover Tracking with Micro-Tilt
       const hero = document.querySelector(".hero-section");
       const orb = document.querySelector(".glass-orb-container");
-      if (hero && orb) {
+      const orbInner = document.querySelector(".glass-orb-inner");
+
+      if (hero && orb && orbInner) {
         hero.addEventListener("mousemove", (e: any) => {
           const { clientX, clientY } = e;
-          const x = (clientX - window.innerWidth / 2) * 0.02;
-          const y = (clientY - window.innerHeight / 2) * 0.02;
-          gsap.to(orb, { x, y, duration: 1, ease: "power2.out" });
+          const rect = orb.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+
+          const x = (clientX - centerX) * 0.03;
+          const y = (clientY - centerY) * 0.03;
+
+          const rotateX = (clientY - centerY) * -0.05;
+          const rotateY = (clientX - centerX) * 0.05;
+
+          gsap.to(orb, { x, y, duration: 1.2, ease: "power2.out" });
+          gsap.to(orbInner, { rotateX, rotateY, duration: 1.2, ease: "power2.out" });
+        });
+
+        // Click Interaction (Pulse + Shimmer)
+        orb.addEventListener("click", () => {
+          const tl = gsap.timeline();
+          tl.to(orb, { scale: 1.08, duration: 0.4, ease: "back.out(2)" })
+            .to(orb, { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.5)" }, "-=0.1");
+
+          gsap.fromTo(".shimmer-light",
+            { opacity: 0, x: "-100%", y: "-100%" },
+            { opacity: 0.8, x: "100%", y: "100%", duration: 0.8, ease: "power4.inOut" }
+          );
+
+          gsap.to(".glass-orb", {
+            boxShadow: "0 0 140px rgba(123, 92, 255, 0.3)",
+            duration: 0.3,
+            yoyo: true,
+            repeat: 1
+          });
         });
       }
 
@@ -167,7 +218,26 @@ export function HomePage() {
         }
       );
 
-      // 5) Contact Reveal (Smooth Refined)
+      // 5) Why us Reveal (Cinematic Blur-to-Sharp)
+      gsap.fromTo(
+        ".why-us-card",
+        { opacity: 0, scale: 0.95, y: 30, filter: "blur(15px)" },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1.2,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".why-us-trigger",
+            start: "top 80%"
+          }
+        }
+      );
+
+      // 6) Contact Reveal (Smooth Refined)
       gsap.fromTo(
         ".contact-reveal",
         { opacity: 0, y: 30 },
@@ -223,10 +293,22 @@ export function HomePage() {
           </div>
 
           <div className="relative flex justify-center items-center lg:justify-end">
-            <div className="glass-orb-container relative w-64 h-64 md:w-96 md:h-96">
-              <div className="glass-orb glass-orb-inner w-full h-full shadow-[0_0_100px_rgba(123,92,255,0.2)]">
+            <div className="glass-orb-container relative w-64 h-64 md:w-96 md:h-96" style={{ perspective: "1000px" }}>
+              <div className="glass-orb glass-orb-inner w-full h-full" style={{ transformStyle: "preserve-3d" }}>
+                {/* Stripe Mesh Layer */}
+                <div className="sphere-stripe-mesh absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(0deg)" }} />
+                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(45deg)" }} />
+                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(90deg)" }} />
+                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateY(45deg)" }} />
+                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateY(-45deg)" }} />
+                </div>
+
                 <div className="absolute inset-0 bg-gradient-to-br from-purple/20 via-transparent to-blue/20 opacity-30" />
                 <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-white/5 blur-3xl" />
+
+                {/* Interactive Shimmer Light */}
+                <div className="shimmer-light" />
               </div>
               <div className="haze-bg absolute -inset-20 opacity-40" />
             </div>
@@ -357,7 +439,43 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* 5) CONTACT SECTION */}
+      {/* 5) WHY CHOOSE US SECTION */}
+      <section className="why-us-trigger py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+        <div className="mx-auto max-w-7xl relative z-10">
+          <div className="mb-20">
+            <h2 className="text-4xl font-semibold md:text-6xl tracking-tight mb-8">
+              Why Businesses Choose <br />
+              <span className="text-slate-500">SunEdge IT Solution</span>
+            </h2>
+            <div className="h-1 w-24 bg-gradient-to-r from-purple to-transparent" />
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {whyChooseUs.map((item, i) => (
+              <motion.div
+                key={item.title}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className="why-us-card glass group p-10 rounded-[40px] flex flex-col justify-between border-white/5 hover:border-purple/30 transition-all duration-500"
+              >
+                <div>
+                  <div className="mb-8 text-blue/40 text-xs font-bold uppercase tracking-[0.3em]">Module 0{i + 1}</div>
+                  <h3 className="text-2xl font-semibold mb-6 tracking-tight group-hover:text-white transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-400 leading-relaxed font-light italic">
+                    {item.desc}
+                  </p>
+                </div>
+                <div className="mt-10 h-0.5 w-0 bg-purple group-hover:w-full transition-all duration-700" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+        {/* Subtle background flair */}
+        <div className="absolute left-[30%] top-[40%] w-96 h-96 bg-purple/5 rounded-full blur-[120px] pointer-events-none" />
+      </section>
+
+      {/* 6) CONTACT SECTION */}
       <section className="contact-trigger py-40 px-6 md:px-12 lg:px-20 bg-base/30">
         <div className="mx-auto max-w-7xl">
           <div className="contact-reveal grid gap-20 lg:grid-cols-2">
