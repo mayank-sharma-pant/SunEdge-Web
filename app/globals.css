@@ -17,6 +17,9 @@ body {
   color: #f6f7fb;
   font-family: "Inter", "Segoe UI", sans-serif;
   letter-spacing: 0.01em;
+  font-family: "Outfit", "Inter", sans-serif;
+  letter-spacing: 0.01em;
+  overflow-x: hidden;
 }
 
 section {
@@ -35,6 +38,59 @@ section {
     0 0 0 1px rgba(123, 92, 255, 0.25) inset,
     0 0 30px rgba(123, 92, 255, 0.2),
     0 0 50px rgba(56, 182, 255, 0.15);
+  background: rgba(11, 11, 15, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.neon-border {
+  border: 1px solid rgba(123, 92, 255, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(123, 92, 255, 0.15) inset,
+    0 0 30px rgba(123, 92, 255, 0.1),
+    0 0 50px rgba(56, 182, 255, 0.05);
+}
+
+.neon-glow {
+  text-shadow: 0 0 15px rgba(123, 92, 255, 0.6);
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-neon {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(123, 92, 255, 0.2), 0 0 40px rgba(123, 92, 255, 0.1);
+    opacity: 0.9;
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(123, 92, 255, 0.4), 0 0 80px rgba(56, 182, 255, 0.2);
+    opacity: 1;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradient 8s linear infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .ambient-bg {
@@ -45,4 +101,30 @@ section {
     radial-gradient(circle at 75% 25%, rgba(56, 182, 255, 0.2), transparent 32%),
     radial-gradient(circle at 50% 80%, rgba(255, 79, 216, 0.12), transparent 45%);
   filter: blur(12px);
+}
+    radial-gradient(circle at 15% 15%, rgba(123, 92, 255, 0.15), transparent 45%),
+    radial-gradient(circle at 85% 20%, rgba(56, 182, 255, 0.12), transparent 40%),
+    radial-gradient(circle at 50% 85%, rgba(255, 79, 216, 0.08), transparent 50%);
+  filter: blur(140px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Custom Horizontal Scroll Utility */
+.horizontal-track {
+  display: flex;
+  width: fit-content;
+  will-change: transform;
+}
+
+.product-card {
+  flex-shrink: 0;
+  width: 450px;
+  margin-right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .product-card {
+    width: 320px;
+  }
 }
