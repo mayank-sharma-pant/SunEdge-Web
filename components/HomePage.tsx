@@ -9,6 +9,12 @@ gsap.registerPlugin(ScrollTrigger);
 
 const services = ["CRM Software", "IT Projects", "Hardware Solutions"];
 
+const trustMetrics = [
+  { value: "120+", label: "Enterprise Engagements" },
+  { value: "99.98%", label: "Infrastructure Uptime" },
+  { value: "24/7", label: "Mission-Critical Support" }
+];
+
 const projects = [
   "Autonomous CRM Intelligence Suite",
   "Cloud Migration & Cybersecurity Program",
@@ -145,6 +151,25 @@ export function HomePage() {
 
       <section className="px-6 py-20 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-10">
+            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Cred-inspired Trust Layer</p>
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {trustMetrics.map((metric, index) => (
+                <motion.article
+                  key={metric.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.8, delay: index * 0.1 }}
+                  className="glass rounded-2xl border border-white/10 p-6"
+                >
+                  <p className="bg-gradient-to-r from-white via-slate-300 to-slate-500 bg-clip-text text-4xl font-semibold tracking-tight text-transparent md:text-5xl">
+                    {metric.value}
+                  </p>
+                  <p className="mt-3 text-xs uppercase tracking-[0.18em] text-slate-400">{metric.label}</p>
+                </motion.article>
+              ))}
+            </div>
           <div className="glass neon-border rounded-3xl p-10">
             <p className="text-xs uppercase tracking-[0.25em] text-pink/80">Affiliate Company</p>
             <h3 className="mt-4 text-2xl font-semibold md:text-3xl">Perioxia Technologies</h3>
