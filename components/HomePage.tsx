@@ -170,6 +170,13 @@ export function HomePage() {
                 </motion.article>
               ))}
             </div>
+          <div className="glass neon-border rounded-3xl p-10">
+            <p className="text-xs uppercase tracking-[0.25em] text-pink/80">Affiliate Company</p>
+            <h3 className="mt-4 text-2xl font-semibold md:text-3xl">Perioxia Technologies</h3>
+            <p className="mt-4 max-w-2xl text-slate-300">
+              Accelerating frontier innovation with advanced software engineering, research-driven IT systems,
+              and intelligent automation.
+            </p>
           </div>
         </div>
       </section>
