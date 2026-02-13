@@ -3,6 +3,24 @@
 import { motion } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const services = [
+  {
+    title: "CRM Software",
+    copy: "Custom CRM systems focused on team productivity, automation, and customer lifecycle visibility."
+  },
+  {
+    title: "IT Projects",
+    copy: "End-to-end IT execution for modernization, cloud transformation, and secure enterprise operations."
+  },
+  {
+    title: "Hardware Solutions",
+    copy: "Reliable infrastructure design, deployment, and support for high-availability business environments."
+  }
+];
 import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -15,6 +33,7 @@ const trustMetrics = [
   { value: "24/7", label: "Mission-Critical Support" }
 ];
 
+export function HomePage() {
 const projects = [
   "Autonomous CRM Intelligence Suite",
   "Cloud Migration & Cybersecurity Program",
@@ -29,11 +48,40 @@ export function HomePage() {
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".reveal-blur",
+        { opacity: 0, filter: "blur(12px)", y: 30 },
         { opacity: 0, filter: "blur(14px)", y: 40 },
         {
           opacity: 1,
           filter: "blur(0px)",
           y: 0,
+          duration: 1.1,
+          stagger: 0.15,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".about-trigger",
+            start: "top 82%"
+          }
+        }
+      );
+
+      gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, index) => {
+        gsap.fromTo(
+          card,
+          { y: 26, opacity: 0.3 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.9,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 88%",
+              toggleActions: "play none none reverse"
+            },
+            delay: index * 0.08
+          }
+        );
+      });
           duration: 1.2,
           stagger: 0.2,
           ease: "power3.out",
@@ -86,6 +134,16 @@ export function HomePage() {
       <section className="relative flex min-h-screen items-center px-6 py-24 md:px-12 lg:px-20">
         <div className="mx-auto w-full max-w-6xl">
           <motion.div
+            initial={{ opacity: 0, y: 22 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="glass neon-border max-w-3xl rounded-3xl p-10 md:p-14"
+          >
+            <p className="mb-4 text-xs uppercase tracking-[0.28em] text-blue/80">SunEdge IT Solution</p>
+            <h1 className="text-4xl font-semibold leading-tight md:text-6xl">
+              Powering the Future of Intelligent Technology
+            </h1>
+            <p className="mt-6 max-w-2xl text-base text-slate-300 md:text-lg">
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.1, ease: "easeOut" }}
@@ -116,6 +174,13 @@ export function HomePage() {
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((service) => (
               <motion.article
+                key={service.title}
+                whileHover={{ y: -6 }}
+                transition={{ type: "spring", stiffness: 220, damping: 22 }}
+                className="service-card glass rounded-2xl p-8 transition duration-500 hover:border-purple/60 hover:shadow-glow"
+              >
+                <h3 className="text-xl font-medium">{service.title}</h3>
+                <p className="mt-4 text-sm leading-relaxed text-slate-300">{service.copy}</p>
                 key={service}
                 whileHover={{ y: -8 }}
                 transition={{ type: "spring", stiffness: 220, damping: 20 }}
@@ -136,6 +201,14 @@ export function HomePage() {
           <div className="reveal-blur">
             <h2 className="text-3xl font-semibold md:text-4xl">Trusted by Visionary Enterprises</h2>
             <p className="mt-5 text-slate-300">
+              We help organizations move faster with stable systems, clear architecture, and practical digital
+              strategy that teams can actually maintain.
+            </p>
+          </div>
+          <div className="glass reveal-blur rounded-2xl p-8">
+            <p className="text-sm leading-relaxed text-slate-300">
+              From discovery and planning to deployment and long-term support, SunEdge works as a committed
+              technology partner focused on measurable business outcomes.
               SunEdge IT Solution delivers secure, adaptive, and performance-driven solutions that empower
               organizations to innovate with confidence.
             </p>
@@ -152,11 +225,16 @@ export function HomePage() {
       <section className="px-6 py-20 md:px-12 lg:px-20">
         <div className="mx-auto max-w-6xl">
           <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 md:p-10">
+            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Performance & Trust</p>
             <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Cred-inspired Trust Layer</p>
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               {trustMetrics.map((metric, index) => (
                 <motion.article
                   key={metric.label}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ duration: 0.7, delay: index * 0.1 }}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.5 }}
