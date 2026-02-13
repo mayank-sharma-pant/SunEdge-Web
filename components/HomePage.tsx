@@ -170,6 +170,8 @@ export function HomePage() {
                 </motion.article>
               ))}
             </div>
+          </div>
+
           <div className="glass neon-border rounded-3xl p-10">
             <p className="text-xs uppercase tracking-[0.25em] text-pink/80">Affiliate Company</p>
             <h3 className="mt-4 text-2xl font-semibold md:text-3xl">Perioxia Technologies</h3>
@@ -188,9 +190,8 @@ export function HomePage() {
             {projects.map((project, index) => (
               <article
                 key={project}
-                className={`project-card glass rounded-2xl p-8 ${
-                  index === 0 || index === 3 ? "md:col-span-2" : ""
-                }`}
+                className={`project-card glass rounded-2xl p-8 ${index === 0 || index === 3 ? "md:col-span-2" : ""
+                  }`}
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-blue/80">Case Study {index + 1}</p>
                 <h3 className="mt-3 text-2xl font-medium">{project}</h3>
