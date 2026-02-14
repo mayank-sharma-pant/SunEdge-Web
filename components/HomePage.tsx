@@ -7,18 +7,58 @@ import { useEffect, useRef } from "react";
 
 gsap.registerPlugin(ScrollTrigger);
 
+function CinematicText({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      gsap.fromTo(
+        textRef.current,
+        { opacity: 0, y: 20, filter: "blur(12px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 1.2,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: textRef.current,
+            start: "top 90%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }
+  }, []);
+
+  return <span ref={textRef} className={`text-reveal-cinematic ${className}`}>{children}</span>;
+}
+
+const solutions = [
+  { title: "Enterprise CRM", desc: "Custom-engineered systems for high-volume customer operations." },
+  { title: "Cloud Scale IT", desc: "Resilient infrastructure migrations for modern digital ecosystems." },
+  { title: "Infrastructure Security", desc: "Advanced perimeter hardening and threat detection protocols." }
+];
+
+const approachSteps = [
+  { title: "Assessment", desc: "Rigorous analysis of existing technical architecture and goals." },
+  { title: "Strategy", desc: "Engineering a scalable roadmap for long-term operational impact." },
+  { title: "Execution", desc: "Precision-driven implementation with real-time performance tracking." },
+  { title: "Optimization", desc: "Continuous refinement for maximum stability and speed." }
+];
+
 const services = [
   {
     title: "CRM Software",
-    copy: "Built for sales and support teams that need reliable workflows, clean reporting, and predictable delivery."
+    copy: "Streamlined customer management systems designed for operational efficiency."
   },
   {
     title: "IT Projects",
-    copy: "From migration to modernization, we execute structured IT programs with strong governance and security."
+    copy: "End-to-end technology implementation tailored to business requirements."
   },
   {
     title: "Hardware Solutions",
-    copy: "Design, procurement, deployment, and lifecycle support for enterprise-grade hardware environments."
+    copy: "Professional hardware infrastructure and deployment services."
   }
 ];
 
@@ -38,7 +78,7 @@ const trustMetrics = [
 
 const whyChooseUs = [
   {
-    title: "Precision-Driven Solutions",
+    title: "Precision-Driven Execution",
     desc: "Engineering workflows built for accuracy and long-term operational resilience."
   },
   {
@@ -46,7 +86,7 @@ const whyChooseUs = [
     desc: "Leveraging adaptive cloud architectures and secure, scalable technical stacks."
   },
   {
-    title: "Business-Centric Execution",
+    title: "Business-Centric Solutions",
     desc: "Aligning technical milestones with actual business outcomes and project goals."
   },
   {
@@ -58,14 +98,27 @@ const whyChooseUs = [
 export function HomePage() {
   const horizontalSectionRef = useRef<HTMLDivElement>(null);
   const horizontalTrackRef = useRef<HTMLDivElement>(null);
+  const transitionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1) Hero Reveal (Strong Cinematic)
+      // 1) Hero Reveal (Enhanced Cinematic)
       gsap.fromTo(
         ".hero-content",
-        { opacity: 0, y: 40, filter: "blur(20px)" },
-        { opacity: 1, y: 0, filter: "blur(0px)", duration: 2, ease: "power4.out" }
+        { opacity: 0, y: 60, filter: "blur(25px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 2.5,
+          ease: "expo.out",
+          onStart: () => {
+            gsap.fromTo(".hero-headline",
+              { letterSpacing: "0.2em", opacity: 0 },
+              { letterSpacing: "normal", opacity: 1, duration: 2, ease: "power4.out" }
+            );
+          }
+        }
       );
 
       // Hero Glass Orb Motion
@@ -140,25 +193,71 @@ export function HomePage() {
         }
       });
 
-      // 2) Services Reveal (Energetic)
+      // 2) Services Reveal (Richer)
       gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
         gsap.fromTo(
           card,
-          { opacity: 0, y: 40, scale: 0.98 },
+          { opacity: 0, y: 50, scale: 0.95, filter: "blur(10px)" },
           {
             opacity: 1,
             y: 0,
             scale: 1,
-            duration: 0.8,
-            delay: i * 0.1,
-            ease: "back.out(1.2)",
+            filter: "blur(0px)",
+            duration: 1.2,
+            delay: i * 0.15,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 88%",
+              start: "top 85%",
               toggleActions: "play none none reverse"
             }
           }
         );
+
+        // Hover Micro-Tilt Logic for Cards
+        card.addEventListener("mousemove", (e: any) => {
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - 0.5;
+          const y = (e.clientY - rect.top) / rect.height - 0.5;
+          gsap.to(card, {
+            rotateY: x * 10,
+            rotateX: -y * 10,
+            scale: 1.02,
+            duration: 0.5,
+            ease: "power2.out"
+          });
+          const shimmer = card.querySelector(".card-shimmer");
+          if (shimmer) {
+            gsap.to(shimmer, {
+              opacity: 0.4,
+              x: x * 100 + "%",
+              y: y * 100 + "%",
+              duration: 0.5
+            });
+          }
+        });
+
+        card.addEventListener("mouseleave", () => {
+          gsap.to(card, { rotateY: 0, rotateX: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.3)" });
+          const shimmer = card.querySelector(".card-shimmer");
+          if (shimmer) gsap.to(shimmer, { opacity: 0, duration: 0.5 });
+        });
+      });
+
+      // Section Transitions (Glow Wipe)
+      const sections = gsap.utils.toArray<HTMLElement>("section");
+      sections.forEach((section, i) => {
+        if (i === 0) return;
+        ScrollTrigger.create({
+          trigger: section,
+          start: "top 90%",
+          onEnter: () => {
+            if (transitionRef.current) {
+              transitionRef.current.classList.add("glow-wipe-active");
+              setTimeout(() => transitionRef.current?.classList.remove("glow-wipe-active"), 1500);
+            }
+          }
+        });
       });
 
       // 3) Horizontal Scroll (Dramatic Cinematic)
@@ -258,8 +357,9 @@ export function HomePage() {
   }, []);
 
   return (
-    <main className="relative bg-base text-slate-100 selection:bg-purple/40 selection:text-white">
-      <div className="ambient-bg pointer-events-none fixed opacity-50" />
+    <main className="relative bg-[#07070a] text-slate-100 selection:bg-purple/40 selection:text-white">
+      <div ref={transitionRef} className="glow-wipe-transition" />
+      <div className="ambient-bg" />
 
       {/* 1) HERO SECTION */}
       <section className="hero-section relative flex min-h-screen items-center px-6 md:px-12 lg:px-20 overflow-hidden">
@@ -274,13 +374,16 @@ export function HomePage() {
               Enterprise Engineering
             </motion.p>
             <h1 className="hero-headline text-5xl font-semibold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-              Advanced Technology <br />
+              <CinematicText>Advanced Technology</CinematicText> <br />
               <span className="bg-gradient-to-r from-purple via-blue to-purple bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient">
-                Solutions for Modern Businesses
+                <CinematicText>Solutions for Modern Businesses</CinematicText>
               </span>
             </h1>
             <p className="hero-subtext mt-8 max-w-xl text-lg text-slate-400 md:text-xl leading-relaxed">
               CRM Software • IT Projects • Hardware Infrastructure
+            </p>
+            <p className="text-slate-500 mt-4 text-sm font-medium tracking-wide">
+              Designed for performance, stability, and scalability.
             </p>
             <div className="mt-12 flex flex-wrap gap-6">
               <button className="group relative overflow-hidden rounded-full border border-purple/60 bg-purple/10 px-10 py-4 text-sm font-bold tracking-widest uppercase text-white transition-all hover:bg-purple/20 hover:shadow-glow animate-pulse-neon">
@@ -321,16 +424,19 @@ export function HomePage() {
       <section className="relative py-40 px-6 md:px-12 lg:px-20 z-10">
         <div className="mx-auto max-w-7xl">
           <div className="mb-24 flex items-center gap-10">
-            <h2 className="text-4xl font-semibold md:text-6xl tracking-tight">Core Services</h2>
+            <h2 className="text-4xl font-semibold md:text-6xl tracking-tight">
+              <CinematicText>Core Services</CinematicText>
+            </h2>
             <div className="flex-grow h-px bg-gradient-to-r from-purple/40 to-transparent" />
           </div>
           <div className="grid gap-10 md:grid-cols-3">
             {services.map((service, i) => (
               <motion.article
                 key={service.title}
-                whileHover={{ y: -12, scale: 1.02 }}
-                className="service-card glass group relative rounded-[40px] p-12 transition-all hover:bg-white/[0.04] hover:border-purple/40"
+                className="service-card glass group relative rounded-[40px] p-12 transition-all hover:bg-white/[0.04] hover:border-purple/40 overflow-hidden"
+                style={{ transformStyle: "preserve-3d" }}
               >
+                <div className="card-shimmer absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 pointer-events-none" />
                 <div className="absolute -inset-0.5 rounded-[40px] bg-gradient-to-b from-purple/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <div className="relative z-10">
                   <div className="mb-10 inline-flex rounded-3xl bg-purple/10 p-5 text-purple shadow-glow">
@@ -360,11 +466,34 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* NEW: SOLUTIONS OVERVIEW SECTION */}
+      <section className="relative py-40 px-6 md:px-12 lg:px-20 z-10 bg-[#0a0a0f]">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-20 text-center">
+            <h2 className="text-4xl font-semibold md:text-6xl tracking-tight mb-6">
+              <CinematicText>Strategic Solutions</CinematicText>
+            </h2>
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto">Vertical-specific technology packages designed for scalable business growth.</p>
+          </div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {solutions.map((sol, i) => (
+              <div key={i} className="glass rounded-[40px] p-10 border-white/5 hover:border-blue/30 transition-all duration-700 group">
+                <div className="text-blue/40 text-xs font-bold uppercase tracking-widest mb-6">Package 0{i + 1}</div>
+                <h3 className="text-2xl font-semibold mb-4">{sol.title}</h3>
+                <p className="text-slate-400 font-light italic">{sol.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* 3) HARDWARE PRODUCTS SECTION (HORIZONTAL) */}
-      <section ref={horizontalSectionRef} className="relative bg-base/40 overflow-hidden py-32">
+      <section ref={horizontalSectionRef} className="relative bg-[#09090c] overflow-hidden py-32">
         <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20 mb-20 text-center">
-          <h2 className="text-4xl font-semibold md:text-7xl tracking-tighter">Hardware Infrastructure</h2>
-          <p className="mt-6 text-slate-500 max-w-2xl mx-auto text-xl italic font-light">Cinematic showcase of our enterprise capabilities.</p>
+          <h2 className="text-4xl font-semibold md:text-7xl tracking-tighter">
+            <CinematicText>Hardware Solutions & Infrastructure</CinematicText>
+          </h2>
+          <p className="mt-6 text-slate-500 max-w-2xl mx-auto text-xl italic font-light">Reliable hardware solutions for modern business environments.</p>
         </div>
 
         <div className="relative">
@@ -394,6 +523,25 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* NEW: OPERATIONAL FOCUS / PHILOSOPHY SECTION */}
+      <section className="relative py-60 px-6 md:px-12 lg:px-20 overflow-hidden text-center bg-base">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-purple to-transparent" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-[1px] bg-gradient-to-b from-transparent via-blue to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter text-white/5 select-none absolute -top-20 left-1/2 -translate-x-1/2 w-full">Precision</h2>
+          <div className="space-y-12">
+            <h3 className="text-4xl md:text-7xl font-semibold tracking-tight">
+              <CinematicText>Architecting for Reliability.</CinematicText>
+            </h3>
+            <p className="text-2xl md:text-4xl text-slate-500 font-light max-w-4xl mx-auto leading-tight italic">
+              "We believe technical excellence is the foundation of institutional trust."
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* 4) ABOUT SECTION */}
       <section className="about-trigger py-48 px-6 md:px-12 lg:px-20">
         <div className="mx-auto max-w-7xl">
@@ -404,7 +552,7 @@ export function HomePage() {
                 <span className="text-slate-600">Absolute Trust.</span>
               </h2>
               <p className="text-2xl text-slate-400 leading-relaxed font-light">
-                SunEdge IT Solution delivers high-availability architectures that empower organizations to innovate with absolute confidence and measurable impact.
+                SunEdge delivers high-performance technology architectures that empower organizations to operate with precision, reliability, and measurable impact.
               </p>
 
               <div className="mt-20 grid grid-cols-3 gap-12">
@@ -439,13 +587,76 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* NEW: OUR APPROACH / PROCESS SECTION */}
+      <section className="relative py-40 px-6 md:px-12 lg:px-20 z-10 bg-[#07070a]">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div>
+              <h2 className="text-4xl font-semibold md:text-6xl tracking-tight mb-10">
+                <CinematicText>The Protocol Approach</CinematicText>
+              </h2>
+              <p className="text-slate-400 text-xl leading-relaxed font-light mb-16">
+                Our methodology ensures rigorous quality control and technical accountability at every milestone.
+              </p>
+              <div className="space-y-12">
+                {approachSteps.map((step, i) => (
+                  <div key={i} className="flex gap-8 group">
+                    <div className="text-3xl font-bold text-purple/20 transition-colors group-hover:text-purple">0{i + 1}</div>
+                    <div>
+                      <h4 className="text-xl font-semibold mb-2">{step.title}</h4>
+                      <p className="text-slate-500 font-light">{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="relative">
+              <div className="glass aspect-video rounded-[60px] overflow-hidden border-purple/20 relative group bg-base/40">
+                {/* Visual Pattern for ProtocolPathway */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(123,92,255,0.1),transparent)]" />
+                <div className="absolute inset-x-0 top-1/2 h-px bg-gradient-to-r from-transparent via-purple/20 to-transparent" />
+                <div className="absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-blue/20 to-transparent" />
+
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    <div className="w-48 h-48 rounded-full border border-purple/10 flex items-center justify-center animate-pulse-neon" />
+                    <div className="absolute inset-0 w-48 h-48 rounded-full border border-blue/10 rotate-45" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="0.5" d="M11 4a2 2 0 114 0v1a2 2 0 002 2h1a2 2 0 110 4h-1a2 2 0 00-2 2v1a2 2 0 01-4 0v-1a2 2 0 00-2-2H7a2 2 0 110-4h1a2 2 0 002-2V4z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating "Data Dots" */}
+                {[...Array(20)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: [0, 0.5, 0] }}
+                    transition={{ duration: Math.random() * 3 + 2, repeat: Infinity, delay: Math.random() * 5 }}
+                    className="absolute w-1 h-1 bg-blue rounded-full"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      filter: "blur(1px)"
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-blue/10 rounded-full blur-[100px]" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 5) WHY CHOOSE US SECTION */}
       <section className="why-us-trigger py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
         <div className="mx-auto max-w-7xl relative z-10">
           <div className="mb-20">
             <h2 className="text-4xl font-semibold md:text-6xl tracking-tight mb-8">
-              Why Businesses Choose <br />
-              <span className="text-slate-500">SunEdge IT Solution</span>
+              Why Businesses Choose SunEdge
             </h2>
             <div className="h-1 w-24 bg-gradient-to-r from-purple to-transparent" />
           </div>
@@ -482,7 +693,7 @@ export function HomePage() {
             <div>
               <h2 className="text-4xl font-semibold md:text-6xl tracking-tight mb-8">Let’s Talk About <br /> Your Requirements</h2>
               <p className="text-lg text-slate-400 leading-relaxed mb-12">
-                Whether you're looking for a CRM transformation, managed IT projects, or high-performance hardware architecture, our specialists are ready to consult.
+                Tell us about your project or infrastructure needs.
               </p>
 
               <div className="space-y-8">
@@ -544,7 +755,7 @@ export function HomePage() {
             <div className="relative z-10">
               <h2 className="text-4xl font-semibold md:text-7xl tracking-tighter mb-10">
                 Let’s Build Your <br />
-                <span className="text-slate-500">Technology Foundation</span>
+                Technology Infrastructure
               </h2>
               <button className="group relative rounded-full bg-white px-16 py-6 text-black font-black uppercase tracking-[0.4em] text-xs transition-all hover:scale-105 hover:shadow-glow animate-pulse-neon">
                 Get Consultation
