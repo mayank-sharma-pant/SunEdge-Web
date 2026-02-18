@@ -111,7 +111,54 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode, cla
   );
 }
 
+// Precision Panel — flat glass slab with controlled drift and ultra-subtle rim light
+function PrecisionPanel({
+  className = "",
+  driftX = 4,
+  driftY = 6,
+  delay = 0,
+  duration = 12,
+  rotate = 0,
+}: {
+  className?: string;
+  driftX?: number;
+  driftY?: number;
+  delay?: number;
+  duration?: number;
+  rotate?: number;
+}) {
+  return (
+    <motion.div
+      className={`absolute pointer-events-none ${className}`}
+      initial={{ x: 0, y: 0, rotate }}
+      animate={{
+        x: [0, driftX, 0, -driftX * 0.5, 0],
+        y: [0, -driftY * 0.5, driftY, 0, 0],
+        rotate: [rotate, rotate + 0.4, rotate - 0.3, rotate],
+      }}
+      transition={{
+        duration,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+        times: [0, 0.3, 0.6, 0.85, 1],
+      }}
+    >
+      <div
+        style={{
+          background: "rgba(255,255,255,0.025)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          boxShadow: "inset 0 0 0 1px rgba(123,92,255,0.06), 0 0 20px rgba(56,182,255,0.04)",
+          backdropFilter: "blur(4px)",
+        }}
+        className="w-full h-full rounded-2xl"
+      />
+    </motion.div>
+  );
+}
+
 const solutions = [
+
   { title: "Software Solutions", desc: "Scalable cloud platforms and custom CRM systems." },
   { title: "Hardware", desc: "Enterprise-grade components with structured quality control." },
   { title: "IT Services", desc: "End-to-end consulting and managed technology services." }
@@ -499,9 +546,12 @@ export function HomePage() {
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative">
+      <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+        {/* Subtle ambient depth */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/4 blur-[160px] rounded-full pointer-events-none" />
         <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* LEFT: Typography dominant */}
             <div>
               <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">
                 <CinematicText>Memory Solutions</CinematicText>
@@ -525,30 +575,68 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="surface-tint p-8 border border-white/5">
-                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
-                <h3 className="text-xl font-bold mb-2">DDR4 ECC UDIMM</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">Unbuffered ECC memory for entry-level servers and workstations requiring error correction without registered overhead.</p>
-              </div>
-              <div className="surface-tint p-8 border border-white/5">
-                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
-                <h3 className="text-xl font-bold mb-2">Registered RDIMM</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">Registered DIMMs with buffered architecture for multi-socket server platforms supporting higher memory density.</p>
-              </div>
-              <div className="surface-tint p-8 border border-white/5">
-                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
-                <h3 className="text-xl font-bold mb-2">Load-Reduced DIMM (LRDIMM)</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">Maximum capacity modules with reduced electrical load for high-density compute and data-intensive enterprise workloads.</p>
-              </div>
+            {/* RIGHT: Precision Panel Visual Anchor */}
+            <div className="relative h-[480px] hidden lg:block">
+              {/* Panel composition — staggered glass slabs */}
+              <PrecisionPanel
+                className="w-[260px] h-[340px] top-[10%] left-[5%]"
+                driftX={5} driftY={8} delay={0} duration={14} rotate={-3}
+              />
+              <PrecisionPanel
+                className="w-[180px] h-[220px] top-[30%] left-[38%]"
+                driftX={-4} driftY={6} delay={2} duration={16} rotate={4}
+              />
+              <PrecisionPanel
+                className="w-[140px] h-[160px] bottom-[8%] left-[15%]"
+                driftX={3} driftY={-5} delay={4} duration={18} rotate={-1}
+              />
+              <PrecisionPanel
+                className="w-[200px] h-[120px] top-[5%] right-[5%]"
+                driftX={-3} driftY={7} delay={1} duration={13} rotate={2}
+              />
+
+              {/* Spec labels floating over panels */}
+              <motion.div
+                className="absolute top-[18%] left-[8%] z-10"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 1 }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/50 mb-1">DDR4 / DDR5</div>
+                <div className="text-sm font-bold text-white/70">ECC UDIMM</div>
+              </motion.div>
+              <motion.div
+                className="absolute top-[38%] left-[42%] z-10"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 1 }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400/50 mb-1">Registered</div>
+                <div className="text-sm font-bold text-white/70">RDIMM</div>
+              </motion.div>
+              <motion.div
+                className="absolute bottom-[14%] left-[18%] z-10"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 1 }}
+              >
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/40 mb-1">Load-Reduced</div>
+                <div className="text-sm font-bold text-white/60">LRDIMM</div>
+              </motion.div>
+
+              {/* Thin horizontal rule — precision line */}
+              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/8 to-transparent" />
             </div>
           </div>
         </div>
       </section>
 
       {/* ABOUT SECTION - REFINED CORPORATE */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative">
-        <div className="mx-auto max-w-7xl">
+      <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+        {/* Background precision panels — depth framing, never interfering with text */}
+        <PrecisionPanel
+          className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-60"
+          driftX={3} driftY={5} delay={0} duration={20} rotate={8}
+        />
+        <PrecisionPanel
+          className="w-[200px] h-[280px] bottom-[10%] -left-[3%] opacity-40"
+          driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
+        />
+        <div className="mx-auto max-w-7xl relative z-10">
           <div className="grid lg:grid-cols-12 gap-16 items-start">
             <div className="lg:col-span-12 mb-16">
               <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
