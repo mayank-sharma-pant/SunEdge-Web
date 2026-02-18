@@ -16,22 +16,19 @@ export async function POST(request: Request) {
         // Configure transporter
         // Priority: Environment variables -> Fallback (Log only)
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT || '587'),
-            secure: process.env.SMTP_SECURE === 'true',
+            host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+            port: parseInt(process.env.SMTP_PORT || '465'),
+            secure: process.env.SMTP_SECURE === 'true', // true for port 465
             auth: {
                 user: process.env.SMTP_USER,
                 pass: process.env.SMTP_PASS,
             },
-            tls: {
-                rejectUnauthorized: false
-            }
         });
 
         // Check if configuration exists to actually send
         if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
             console.log('⚠️ SMTP Credentials not found. Mocking email send.');
-            console.log('To: info@sunedgeit.com');
+            console.log('To: sales@sunedgesolution.com');
             console.log(`From: ${name} <${email}>`);
             console.log(`Message: ${message}`);
 
@@ -43,9 +40,9 @@ export async function POST(request: Request) {
 
         // Send email
         await transporter.sendMail({
-            from: `"${name}" <${process.env.SMTP_USER}>`, // Gmail requires user to be sender
+            from: `"${name}" <${process.env.SMTP_USER}>`,
             replyTo: email,
-            to: 'info@sunedgeit.com', // Target email
+            to: 'sales@sunedgesolution.com',
             subject: `New Inquiry from SunEdge Web: ${name}`,
             text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
             html: `

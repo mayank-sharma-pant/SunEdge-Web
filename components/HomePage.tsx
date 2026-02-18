@@ -469,25 +469,42 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="relative">
               <div className="glass aspect-[4/3] rounded-[60px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-3xl" />
+                {/* Richer base gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-purple-900/30 backdrop-blur-3xl" />
 
-                {/* Structured Prism / Crystal Visual - NO IMAGES, NO RANDOM DOTS */}
+                {/* Cinematic light sweep — slow diagonal pass */}
+                <motion.div
+                  className="absolute inset-0 pointer-events-none"
+                  initial={{ x: "-100%", opacity: 0 }}
+                  animate={{ x: ["- 100%", "200%"], opacity: [0, 0.4, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, repeatDelay: 8, ease: "easeInOut" }}
+                >
+                  <div className="absolute inset-y-0 w-[40%] bg-gradient-to-r from-transparent via-blue-400/15 to-transparent transform skew-x-12" />
+                </motion.div>
+
+                {/* Structured Prism / Crystal Visual */}
                 <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                   <motion.div
                     initial={{ rotate: 0 }}
                     animate={{ rotate: 360 }}
                     transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-                    className="relative w-64 h-64"
+                    className="relative w-72 h-72"
                   >
-                    {/* Core Crystal */}
-                    <div className="absolute inset-0 border border-white/20 rounded-[40px] transform rotate-45 backdrop-blur-md bg-white/5 shadow-[0_0_30px_rgba(56,182,255,0.2)]" />
-                    <div className="absolute inset-4 border border-white/10 rounded-[30px] transform -rotate-12 backdrop-blur-sm bg-white/5" />
+                    {/* Core Crystal — stronger glow */}
+                    <div className="absolute inset-0 border border-white/30 rounded-[40px] transform rotate-45 backdrop-blur-md bg-white/8 shadow-[0_0_60px_rgba(56,182,255,0.3),inset_0_0_30px_rgba(123,92,255,0.1)]" />
+                    <div className="absolute inset-4 border border-white/15 rounded-[30px] transform -rotate-12 backdrop-blur-sm bg-white/5 shadow-[0_0_20px_rgba(123,92,255,0.15)]" />
+                    {/* Inner core — depth layer */}
+                    <div className="absolute inset-10 border border-white/10 rounded-[20px] transform rotate-6 bg-blue-500/5" />
 
-                    {/* Light Beams */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent transform -rotate-45" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-purple-400/40 to-transparent transform rotate-12" />
+                    {/* Light Beams — brighter */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[1px] bg-gradient-to-r from-transparent via-blue-400/70 to-transparent transform -rotate-45" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[1px] bg-gradient-to-r from-transparent via-purple-400/60 to-transparent transform rotate-12" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transform rotate-[60deg]" />
                   </motion.div>
                 </div>
+
+                {/* Rim glow accent */}
+                <div className="absolute inset-0 rounded-[60px] shadow-[inset_0_0_60px_rgba(56,182,255,0.08),inset_0_0_120px_rgba(123,92,255,0.06)] pointer-events-none" />
               </div>
             </div>
 
@@ -527,19 +544,16 @@ export function HomePage() {
 
         <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-12 lg:px-20 pb-40">
           {hardwareProducts.map((product, i) => (
-            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/25 transition-all duration-700 hover:shadow-[0_0_80px_rgba(59,130,246,0.12)]">
+            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_100px_rgba(59,130,246,0.18)]">
               {/* Depth glow on hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.06] via-transparent to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
               </div>
               <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
               <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
-              <p className="text-slate-300 leading-relaxed text-lg mb-12 relative z-[2]">{product.desc}</p>
-              <div className="flex items-center gap-4 text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-[-10px] group-hover:translate-x-0">
-                <span className="tracking-[0.2em]">VIEW SPECIFICATIONS</span>
-                <div className="h-px w-10 bg-blue-500" />
-              </div>
+              <p className="text-slate-300 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
             </div>
           ))}
         </div>
@@ -547,8 +561,9 @@ export function HomePage() {
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
       <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
-        {/* Subtle ambient depth */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-600/4 blur-[160px] rounded-full pointer-events-none" />
+        {/* Enhanced ambient depth — purple/blue accent lighting */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
+        <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* LEFT: Typography dominant */}
@@ -575,8 +590,18 @@ export function HomePage() {
               </div>
             </div>
 
-            {/* RIGHT: Precision Panel Visual Anchor */}
+            {/* RIGHT: Precision Panel Visual Anchor — enhanced with accent lighting */}
             <div className="relative h-[480px] hidden lg:block">
+              {/* Cinematic light sweep over panels */}
+              <motion.div
+                className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl"
+                initial={{ x: "-100%" }}
+                animate={{ x: ["- 100%", "200%"] }}
+                transition={{ duration: 5, repeat: Infinity, repeatDelay: 10, ease: "easeInOut" }}
+              >
+                <div className="absolute inset-y-0 w-[30%] bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transform skew-x-12" />
+              </motion.div>
+
               {/* Panel composition — staggered glass slabs */}
               <PrecisionPanel
                 className="w-[260px] h-[340px] top-[10%] left-[5%]"
@@ -595,31 +620,35 @@ export function HomePage() {
                 driftX={-3} driftY={7} delay={1} duration={13} rotate={2}
               />
 
+              {/* Purple/blue accent glow behind panels */}
+              <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-purple-500/8 blur-[60px] rounded-full pointer-events-none" />
+              <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] bg-blue-500/8 blur-[50px] rounded-full pointer-events-none" />
+
               {/* Spec labels floating over panels */}
               <motion.div
                 className="absolute top-[18%] left-[8%] z-10"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 1 }}
               >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/50 mb-1">DDR4 / DDR5</div>
-                <div className="text-sm font-bold text-white/70">ECC UDIMM</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/60 mb-1">DDR4 / DDR5</div>
+                <div className="text-sm font-bold text-white/80">ECC UDIMM</div>
               </motion.div>
               <motion.div
                 className="absolute top-[38%] left-[42%] z-10"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 1 }}
               >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400/50 mb-1">Registered</div>
-                <div className="text-sm font-bold text-white/70">RDIMM</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400/60 mb-1">Registered</div>
+                <div className="text-sm font-bold text-white/80">RDIMM</div>
               </motion.div>
               <motion.div
                 className="absolute bottom-[14%] left-[18%] z-10"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 1 }}
               >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/40 mb-1">Load-Reduced</div>
-                <div className="text-sm font-bold text-white/60">LRDIMM</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/50 mb-1">Load-Reduced</div>
+                <div className="text-sm font-bold text-white/70">LRDIMM</div>
               </motion.div>
 
               {/* Thin horizontal rule — precision line */}
-              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/8 to-transparent" />
+              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
             </div>
           </div>
         </div>
@@ -627,7 +656,7 @@ export function HomePage() {
 
       {/* ABOUT SECTION - REFINED CORPORATE */}
       <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
-        {/* Background precision panels — depth framing, never interfering with text */}
+        {/* Background precision panels — depth framing */}
         <PrecisionPanel
           className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-60"
           driftX={3} driftY={5} delay={0} duration={20} rotate={8}
@@ -637,33 +666,67 @@ export function HomePage() {
           driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
         />
         <div className="mx-auto max-w-7xl relative z-10">
-          <div className="grid lg:grid-cols-12 gap-16 items-start">
-            <div className="lg:col-span-12 mb-16">
-              <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
-                <div className="overflow-hidden"><CinematicText>About SunEdge.</CinematicText></div>
-              </h2>
-            </div>
+          {/* Header */}
+          <div className="mb-20">
+            <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
+              <div className="overflow-hidden"><CinematicText>About SunEdge.</CinematicText></div>
+            </h2>
+          </div>
 
-            <div className="lg:col-span-7 lg:col-start-1">
-              <div className="surface-tint p-12 md:p-16 border border-white/5">
-                <p className="text-xl md:text-3xl text-slate-200 leading-tight font-light mb-8">
-                  <span className="text-blue-500 font-bold">DPIIT Recognized.</span> <span className="text-purple-400 font-bold">MSME Registered.</span> Performance Driven.
-                </p>
-                <div className="space-y-6">
-                  <p className="text-lg text-slate-400 leading-relaxed border-l-2 border-blue-500/30 pl-6">
-                    Delivering reliable, structured, and scalable technology for measurable business impact.
-                  </p>
-                </div>
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
+            {/* LEFT: Precision visual composition */}
+            <div className="relative h-[420px] hidden lg:flex items-center justify-center">
+              {/* Thin geometric lines */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute top-[15%] left-[10%] w-[60%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
+                <div className="absolute top-[50%] left-[5%] w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="absolute top-[80%] left-[20%] w-[50%] h-[1px] bg-gradient-to-r from-transparent via-purple-500/15 to-transparent" />
+                <div className="absolute top-[10%] left-[30%] w-[1px] h-[80%] bg-gradient-to-b from-transparent via-white/8 to-transparent" />
               </div>
+              {/* Glass slab stack */}
+              <PrecisionPanel className="w-[220px] h-[280px] top-[10%] left-[8%]" driftX={4} driftY={6} delay={0} duration={16} rotate={-4} />
+              <PrecisionPanel className="w-[160px] h-[200px] top-[25%] left-[35%]" driftX={-3} driftY={5} delay={2} duration={18} rotate={3} />
+              <PrecisionPanel className="w-[120px] h-[140px] bottom-[12%] left-[20%]" driftX={2} driftY={-4} delay={4} duration={14} rotate={-2} />
+              {/* Authority labels */}
+              <motion.div className="absolute top-[22%] left-[12%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 1 }}>
+                <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-blue-400/50 mb-1">Recognized</div>
+                <div className="text-xs font-bold text-white/60">DPIIT Startup</div>
+              </motion.div>
+              <motion.div className="absolute top-[42%] left-[40%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 1 }}>
+                <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-purple-400/50 mb-1">Registered</div>
+                <div className="text-xs font-bold text-white/60">MSME India</div>
+              </motion.div>
+              <motion.div className="absolute bottom-[18%] left-[24%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0, duration: 1 }}>
+                <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/30 mb-1">HQ</div>
+                <div className="text-xs font-bold text-white/50">New Delhi, India</div>
+              </motion.div>
+              {/* Ambient glow */}
+              <div className="absolute top-1/3 left-1/3 w-[200px] h-[200px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
             </div>
 
-            <div className="lg:col-span-5 space-y-6">
-              {whyChooseUs.map((item, i) => (
-                <div key={i} className="p-6 border-l-[1px] border-white/5 hover:border-blue-500/30 transition-all duration-500">
-                  <h4 className="text-base font-bold mb-1.5">{item.title}</h4>
-                  <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
+            {/* RIGHT: Scan-friendly authority blocks */}
+            <div className="space-y-8">
+              {/* Statement block */}
+              <div className="border-l-2 border-blue-500/40 pl-8 py-2">
+                <p className="text-2xl md:text-3xl font-light text-slate-200 leading-snug">
+                  <span className="text-blue-400 font-bold">DPIIT Recognized.</span>{" "}
+                  <span className="text-purple-400 font-bold">MSME Registered.</span>{" "}
+                  Performance Driven.
+                </p>
+              </div>
+
+              {/* Compact authority items */}
+              <div className="grid grid-cols-1 gap-4 pt-4">
+                {whyChooseUs.map((item, i) => (
+                  <div key={i} className="flex gap-5 items-start group p-5 border border-white/[0.04] rounded-2xl hover:border-blue-500/20 hover:bg-white/[0.02] transition-all duration-500">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-1 tracking-wide">{item.title}</h4>
+                      <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
