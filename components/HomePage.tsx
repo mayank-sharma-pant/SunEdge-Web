@@ -98,7 +98,6 @@ const whyChooseUs = [
 export function HomePage() {
   const horizontalSectionRef = useRef<HTMLDivElement>(null);
   const horizontalTrackRef = useRef<HTMLDivElement>(null);
-  const transitionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -120,66 +119,6 @@ export function HomePage() {
           }
         }
       );
-
-      // Hero Glass Orb Motion
-      gsap.to(".glass-orb-container", {
-        y: -15,
-        duration: 5,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true
-      });
-
-      // Continuous Rotation for Stripe Mesh
-      gsap.to(".sphere-stripe-mesh", {
-        rotateX: 360,
-        rotateY: 360,
-        duration: 30,
-        ease: "none",
-        repeat: -1
-      });
-
-      // Hover Tracking with Micro-Tilt
-      const hero = document.querySelector(".hero-section");
-      const orb = document.querySelector(".glass-orb-container");
-      const orbInner = document.querySelector(".glass-orb-inner");
-
-      if (hero && orb && orbInner) {
-        hero.addEventListener("mousemove", (e: any) => {
-          const { clientX, clientY } = e;
-          const rect = orb.getBoundingClientRect();
-          const centerX = rect.left + rect.width / 2;
-          const centerY = rect.top + rect.height / 2;
-
-          const x = (clientX - centerX) * 0.03;
-          const y = (clientY - centerY) * 0.03;
-
-          const rotateX = (clientY - centerY) * -0.05;
-          const rotateY = (clientX - centerX) * 0.05;
-
-          gsap.to(orb, { x, y, duration: 1.2, ease: "power2.out" });
-          gsap.to(orbInner, { rotateX, rotateY, duration: 1.2, ease: "power2.out" });
-        });
-
-        // Click Interaction (Pulse + Shimmer)
-        orb.addEventListener("click", () => {
-          const tl = gsap.timeline();
-          tl.to(orb, { scale: 1.08, duration: 0.4, ease: "back.out(2)" })
-            .to(orb, { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.5)" }, "-=0.1");
-
-          gsap.fromTo(".shimmer-light",
-            { opacity: 0, x: "-100%", y: "-100%" },
-            { opacity: 0.8, x: "100%", y: "100%", duration: 0.8, ease: "power4.inOut" }
-          );
-
-          gsap.to(".glass-orb", {
-            boxShadow: "0 0 140px rgba(123, 92, 255, 0.3)",
-            duration: 0.3,
-            yoyo: true,
-            repeat: 1
-          });
-        });
-      }
 
       // Hero Parallax Scroll
       gsap.to(".hero-parallax-layer", {
@@ -214,53 +153,9 @@ export function HomePage() {
           }
         );
 
-        // Hover Micro-Tilt Logic for Cards
-        card.addEventListener("mousemove", (e: any) => {
-          const rect = card.getBoundingClientRect();
-          const x = (e.clientX - rect.left) / rect.width - 0.5;
-          const y = (e.clientY - rect.top) / rect.height - 0.5;
-          gsap.to(card, {
-            rotateY: x * 10,
-            rotateX: -y * 10,
-            scale: 1.02,
-            duration: 0.5,
-            ease: "power2.out"
-          });
-          const shimmer = card.querySelector(".card-shimmer");
-          if (shimmer) {
-            gsap.to(shimmer, {
-              opacity: 0.4,
-              x: x * 100 + "%",
-              y: y * 100 + "%",
-              duration: 0.5
-            });
-          }
-        });
-
-        card.addEventListener("mouseleave", () => {
-          gsap.to(card, { rotateY: 0, rotateX: 0, scale: 1, duration: 0.8, ease: "elastic.out(1, 0.3)" });
-          const shimmer = card.querySelector(".card-shimmer");
-          if (shimmer) gsap.to(shimmer, { opacity: 0, duration: 0.5 });
-        });
       });
 
-      // Section Transitions (Glow Wipe)
-      const sections = gsap.utils.toArray<HTMLElement>("section");
-      sections.forEach((section, i) => {
-        if (i === 0) return;
-        ScrollTrigger.create({
-          trigger: section,
-          start: "top 90%",
-          onEnter: () => {
-            if (transitionRef.current) {
-              transitionRef.current.classList.add("glow-wipe-active");
-              setTimeout(() => transitionRef.current?.classList.remove("glow-wipe-active"), 1500);
-            }
-          }
-        });
-      });
-
-      // 3) Horizontal Scroll (Dramatic Cinematic)
+      // 3) Horizontal Scroll
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
         const track = horizontalTrackRef.current;
         const scrollWidth = track.scrollWidth - window.innerWidth + (window.innerWidth * 0.15);
@@ -358,35 +253,34 @@ export function HomePage() {
 
   return (
     <main className="relative bg-[#07070a] text-slate-100 selection:bg-purple/40 selection:text-white">
-      <div ref={transitionRef} className="glow-wipe-transition" />
       <div className="ambient-bg" />
 
       {/* 1) HERO SECTION */}
       <section className="hero-section relative flex min-h-screen items-center px-6 md:px-12 lg:px-20 overflow-hidden">
-        <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-20">
-          <div className="hero-content hero-parallax-layer">
+        <div className="mx-auto w-full max-w-7xl relative z-10 flex items-center justify-center">
+          <div className="hero-content hero-parallax-layer max-w-3xl text-center">
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
               className="mb-6 text-xs font-bold uppercase tracking-[0.6em] text-blue/90"
             >
-              Enterprise Engineering
+              Technology Company
             </motion.p>
             <h1 className="hero-headline text-5xl font-semibold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-              <CinematicText>Advanced Technology</CinematicText> <br />
-              <span className="bg-gradient-to-r from-purple via-blue to-purple bg-[length:200%_auto] bg-clip-text text-transparent animate-gradient">
-                <CinematicText>Solutions for Modern Businesses</CinematicText>
+              <CinematicText>Perioxia</CinematicText> <br />
+              <span className="text-white">
+                <CinematicText>Enterprise Technology Partner</CinematicText>
               </span>
             </h1>
-            <p className="hero-subtext mt-8 max-w-xl text-lg text-slate-400 md:text-xl leading-relaxed">
-              CRM Software • IT Projects • Hardware Infrastructure
+            <p className="hero-subtext mt-8 text-lg text-slate-400 md:text-xl leading-relaxed mx-auto">
+              Product-led technology company building precision systems for institutional trust.
             </p>
             <p className="text-slate-500 mt-4 text-sm font-medium tracking-wide">
-              Designed for performance, stability, and scalability.
+              Built for precision, reliability, and measurable impact.
             </p>
-            <div className="mt-12 flex flex-wrap gap-6">
-              <button className="group relative overflow-hidden rounded-full border border-purple/60 bg-purple/10 px-10 py-4 text-sm font-bold tracking-widest uppercase text-white transition-all hover:bg-purple/20 hover:shadow-glow animate-pulse-neon">
+            <div className="mt-12 flex flex-wrap gap-6 justify-center">
+              <button className="group relative overflow-hidden rounded-full border border-purple/60 bg-purple/10 px-10 py-4 text-sm font-bold tracking-widest uppercase text-white transition-all hover:bg-purple/20 hover:shadow-glow">
                 Explore Solutions
               </button>
               <button className="glass group rounded-full px-10 py-4 text-sm font-bold tracking-widest uppercase transition-all hover:bg-white/5 hover:border-white/20">
@@ -394,30 +288,7 @@ export function HomePage() {
               </button>
             </div>
           </div>
-
-          <div className="relative flex justify-center items-center lg:justify-end">
-            <div className="glass-orb-container relative w-64 h-64 md:w-96 md:h-96" style={{ perspective: "1000px" }}>
-              <div className="glass-orb glass-orb-inner w-full h-full" style={{ transformStyle: "preserve-3d" }}>
-                {/* Stripe Mesh Layer */}
-                <div className="sphere-stripe-mesh absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
-                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(0deg)" }} />
-                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(45deg)" }} />
-                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateX(90deg)" }} />
-                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateY(45deg)" }} />
-                  <div className="sphere-stripe" style={{ transform: "translate(-50%, -50%) rotateY(-45deg)" }} />
-                </div>
-
-                <div className="absolute inset-0 bg-gradient-to-br from-purple/20 via-transparent to-blue/20 opacity-30" />
-                <div className="absolute top-1/4 left-1/4 w-1/2 h-1/2 rounded-full bg-white/5 blur-3xl" />
-
-                {/* Interactive Shimmer Light */}
-                <div className="shimmer-light" />
-              </div>
-              <div className="haze-bg absolute -inset-20 opacity-40" />
-            </div>
-          </div>
         </div>
-        <div className="absolute right-[-15%] top-[15%] w-[70%] h-[70%] rounded-full bg-purple/10 blur-[150px] pointer-events-none opacity-20" />
       </section>
 
       {/* 2) SERVICES SECTION */}
@@ -434,9 +305,7 @@ export function HomePage() {
               <motion.article
                 key={service.title}
                 className="service-card glass group relative rounded-[40px] p-12 transition-all hover:bg-white/[0.04] hover:border-purple/40 overflow-hidden"
-                style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="card-shimmer absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 pointer-events-none" />
                 <div className="absolute -inset-0.5 rounded-[40px] bg-gradient-to-b from-purple/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                 <div className="relative z-10">
                   <div className="mb-10 inline-flex rounded-3xl bg-purple/10 p-5 text-purple shadow-glow">
@@ -619,7 +488,7 @@ export function HomePage() {
 
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="relative">
-                    <div className="w-48 h-48 rounded-full border border-purple/10 flex items-center justify-center animate-pulse-neon" />
+                    <div className="w-48 h-48 rounded-full border border-purple/10 flex items-center justify-center" />
                     <div className="absolute inset-0 w-48 h-48 rounded-full border border-blue/10 rotate-45" />
                     <div className="absolute inset-0 flex items-center justify-center">
                       <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -629,21 +498,6 @@ export function HomePage() {
                   </div>
                 </div>
 
-                {/* Floating "Data Dots" */}
-                {[...Array(20)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: [0, 0.5, 0] }}
-                    transition={{ duration: Math.random() * 3 + 2, repeat: Infinity, delay: Math.random() * 5 }}
-                    className="absolute w-1 h-1 bg-blue rounded-full"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      filter: "blur(1px)"
-                    }}
-                  />
-                ))}
               </div>
               <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-blue/10 rounded-full blur-[100px]" />
             </div>
@@ -757,7 +611,7 @@ export function HomePage() {
                 Let’s Build Your <br />
                 Technology Infrastructure
               </h2>
-              <button className="group relative rounded-full bg-white px-16 py-6 text-black font-black uppercase tracking-[0.4em] text-xs transition-all hover:scale-105 hover:shadow-glow animate-pulse-neon">
+              <button className="group relative rounded-full bg-white px-16 py-6 text-black font-black uppercase tracking-[0.4em] text-xs transition-all hover:scale-105 hover:shadow-glow">
                 Get Consultation
               </button>
             </div>
@@ -805,7 +659,7 @@ export function HomePage() {
       {/* Progress Line */}
       <motion.div
         style={{ scaleX: useScroll().scrollYProgress }}
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple via-blue to-purple origin-left z-[110]"
+        className="fixed top-0 left-0 right-0 h-1 bg-purple/80 origin-left z-[110]"
       />
     </main>
   );

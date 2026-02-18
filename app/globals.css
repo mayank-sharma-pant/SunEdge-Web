@@ -32,51 +32,6 @@ section {
   box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.02);
 }
 
-.glass-orb {
-  position: relative;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.12), transparent 60%);
-  box-shadow:
-    inset 0 0 60px rgba(255, 255, 255, 0.06),
-    inset -15px -15px 40px rgba(123, 92, 255, 0.12),
-    0 0 100px rgba(123, 92, 255, 0.1);
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.sphere-stripe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.shimmer-light {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45), transparent 15%);
-  filter: blur(20px);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.haze-bg {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at center, rgba(123, 92, 255, 0.08), transparent 70%);
-  filter: blur(60px);
-  pointer-events: none;
-}
-
 .neon-border {
   border: 1px solid rgba(123, 92, 255, 0.35);
   box-shadow:
@@ -107,43 +62,6 @@ section {
   text-shadow: 0 0 15px rgba(123, 92, 255, 0.6);
 }
 
-.animate-pulse-neon {
-  animation: pulse-neon 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse-neon {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px rgba(123, 92, 255, 0.15), 0 0 40px rgba(123, 92, 255, 0.05);
-    opacity: 0.95;
-  }
-
-  50% {
-    box-shadow: 0 0 40px rgba(123, 92, 255, 0.3), 0 0 80px rgba(56, 182, 255, 0.15);
-    opacity: 1;
-  }
-}
-
-.animate-gradient {
-  background-size: 200% auto;
-  animation: gradient 12s linear infinite;
-}
-
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 .ambient-bg {
   position: fixed;
   inset: -50% -50%;
@@ -156,40 +74,6 @@ section {
   filter: blur(160px);
   z-index: -1;
   pointer-events: none;
-  animation: ambient-drift 40s ease-in-out infinite;
-  will-change: transform;
-}
-
-@keyframes ambient-drift {
-
-  0%,
-  100% {
-    transform: translate(0, 0) scale(1.1);
-  }
-
-  33% {
-    transform: translate(-5%, 5%) scale(1);
-  }
-
-  66% {
-    transform: translate(5%, -5%) scale(1.1);
-  }
-}
-
-.glow-wipe-transition {
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(123, 92, 255, 0.2), transparent 70%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 50;
-  backdrop-filter: blur(0px);
-  transition: opacity 1.5s cubic-bezier(0.2, 0, 0.2, 1), backdrop-filter 1.5s cubic-bezier(0.2, 0, 0.2, 1);
-}
-
-.glow-wipe-active {
-  opacity: 1;
-  backdrop-filter: blur(10px);
 }
 
 .text-reveal-cinematic {
