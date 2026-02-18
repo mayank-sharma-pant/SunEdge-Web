@@ -106,7 +106,65 @@ export function HomePage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
+<<<<<<< HEAD
       // Horizontal Scroll Animation
+=======
+      // 1) Hero Reveal (Enhanced Cinematic)
+      gsap.fromTo(
+        ".hero-content",
+        { opacity: 0, y: 60, filter: "blur(25px)" },
+        {
+          opacity: 1,
+          y: 0,
+          filter: "blur(0px)",
+          duration: 2.5,
+          ease: "expo.out",
+          onStart: () => {
+            gsap.fromTo(".hero-headline",
+              { letterSpacing: "0.2em", opacity: 0 },
+              { letterSpacing: "normal", opacity: 1, duration: 2, ease: "power4.out" }
+            );
+          }
+        }
+      );
+
+      // Hero Parallax Scroll
+      gsap.to(".hero-parallax-layer", {
+        yPercent: -20,
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".hero-section",
+          start: "top top",
+          end: "bottom top",
+          scrub: true
+        }
+      });
+
+      // 2) Services Reveal (Richer)
+      gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0, y: 50, scale: 0.95, filter: "blur(10px)" },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: "blur(0px)",
+            duration: 1.2,
+            delay: i * 0.15,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+
+      });
+
+      // 3) Horizontal Scroll
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
         const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
 
@@ -162,11 +220,16 @@ export function HomePage() {
   }, []);
 
   return (
+<<<<<<< HEAD
     <main className="min-h-screen bg-[#07070a] text-[#f6f7fb]">
+=======
+    <main className="relative bg-[#07070a] text-slate-100 selection:bg-purple/40 selection:text-white">
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
       <div className="ambient-bg" />
 
       {/* HERO SECTION - SPLIT SCREEN */}
       <section className="hero-section relative flex min-h-screen items-center px-6 md:px-12 lg:px-20 overflow-hidden">
+<<<<<<< HEAD
         <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-10">
           <div className="hero-content-anchor">
             <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue/80 opacity-80">
@@ -191,12 +254,40 @@ export function HomePage() {
             <div className="mt-12 flex flex-wrap gap-6">
               <button className="rounded-full bg-blue-600 px-10 py-5 font-bold tracking-wide transition-all hover:bg-blue-700 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:scale-105 active:scale-95">
                 Explore Services
+=======
+        <div className="mx-auto w-full max-w-7xl relative z-10 flex items-center justify-center">
+          <div className="hero-content hero-parallax-layer max-w-3xl text-center">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mb-6 text-xs font-bold uppercase tracking-[0.6em] text-blue/90"
+            >
+              Technology Company
+            </motion.p>
+            <h1 className="hero-headline text-5xl font-semibold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
+              <CinematicText>Perioxia</CinematicText> <br />
+              <span className="text-white">
+                <CinematicText>Enterprise Technology Partner</CinematicText>
+              </span>
+            </h1>
+            <p className="hero-subtext mt-8 text-lg text-slate-400 md:text-xl leading-relaxed mx-auto">
+              Product-led technology company building precision systems for institutional trust.
+            </p>
+            <p className="text-slate-500 mt-4 text-sm font-medium tracking-wide">
+              Built for precision, reliability, and measurable impact.
+            </p>
+            <div className="mt-12 flex flex-wrap gap-6 justify-center">
+              <button className="group relative overflow-hidden rounded-full border border-purple/60 bg-purple/10 px-10 py-4 text-sm font-bold tracking-widest uppercase text-white transition-all hover:bg-purple/20 hover:shadow-glow">
+                Explore Solutions
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
               </button>
               <button className="rounded-full border border-white/10 glass px-10 py-5 font-bold tracking-wide transition-all hover:bg-white/5 hover:border-white/30 active:scale-95">
                 Contact Us
               </button>
             </div>
           </div>
+<<<<<<< HEAD
 
           <div className="relative flex justify-center items-center h-[500px] md:h-[700px]">
             <div className="parallax-layer absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
@@ -209,6 +300,8 @@ export function HomePage() {
               </Suspense>
             </div>
           </div>
+=======
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
         </div>
       </section>
 
@@ -222,6 +315,43 @@ export function HomePage() {
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent hidden md:block mb-6 md:ml-12" />
           </div>
+<<<<<<< HEAD
+=======
+          <div className="grid gap-10 md:grid-cols-3">
+            {services.map((service, i) => (
+              <motion.article
+                key={service.title}
+                className="service-card glass group relative rounded-[40px] p-12 transition-all hover:bg-white/[0.04] hover:border-purple/40 overflow-hidden"
+              >
+                <div className="absolute -inset-0.5 rounded-[40px] bg-gradient-to-b from-purple/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="relative z-10">
+                  <div className="mb-10 inline-flex rounded-3xl bg-purple/10 p-5 text-purple shadow-glow">
+                    {i === 0 && (
+                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    )}
+                    {i === 1 && (
+                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                      </svg>
+                    )}
+                    {i === 2 && (
+                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+                      </svg>
+                    )}
+                  </div>
+                  <h3 className="text-3xl font-medium tracking-tight mb-5">{service.title}</h3>
+                  <div className="w-12 h-0.5 bg-gradient-to-r from-purple to-transparent mb-6 opacity-40" />
+                  <p className="text-slate-400 leading-relaxed text-lg">{service.copy}</p>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
 
           <div className="grid gap-8 lg:grid-cols-3">
             {solutions.map((item, i) => (
@@ -304,6 +434,7 @@ export function HomePage() {
         </div>
       </section>
 
+<<<<<<< HEAD
       {/* HARDWARE SOLUTIONS (HORIZONTAL) */}
       <section ref={horizontalSectionRef} className="relative overflow-hidden bg-black/40">
         <div className="mx-auto max-w-7xl px-6 py-24 md:px-12 lg:px-20 relative z-10">
@@ -320,6 +451,20 @@ export function HomePage() {
               <div className="flex items-center gap-4 text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-[-10px] group-hover:translate-x-0">
                 <span>VIEW SPECIFICATIONS</span>
                 <div className="h-px w-10 bg-blue-500" />
+=======
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative">
+                    <div className="w-48 h-48 rounded-full border border-purple/10 flex items-center justify-center" />
+                    <div className="absolute inset-0 w-48 h-48 rounded-full border border-blue/10 rotate-45" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="0.5" d="M11 4a2 2 0 114 0v1a2 2 0 002 2h1a2 2 0 110 4h-1a2 2 0 00-2 2v1a2 2 0 01-4 0v-1a2 2 0 00-2-2H7a2 2 0 110-4h1a2 2 0 002-2V4z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
               </div>
             </div>
           ))}
@@ -335,6 +480,7 @@ export function HomePage() {
                 <div className="overflow-hidden"><CinematicText>Precision Engineering.</CinematicText></div>
                 <div className="overflow-hidden text-blue-500"><CinematicText>Absolute Trust.</CinematicText></div>
               </h2>
+<<<<<<< HEAD
             </div>
 
             <div className="lg:col-span-8 lg:col-start-1">
@@ -356,6 +502,11 @@ export function HomePage() {
                   <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
+=======
+              <button className="group relative rounded-full bg-white px-16 py-6 text-black font-black uppercase tracking-[0.4em] text-xs transition-all hover:scale-105 hover:shadow-glow">
+                Get Consultation
+              </button>
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
             </div>
           </div>
         </div>
@@ -451,6 +602,7 @@ export function HomePage() {
         </svg>
       </a>
 
+<<<<<<< HEAD
       <footer className="py-20 px-6 border-t border-white/5 text-slate-500 text-sm">
         <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="text-center md:text-left">
@@ -464,6 +616,13 @@ export function HomePage() {
           </div>
         </div>
       </footer>
+=======
+      {/* Progress Line */}
+      <motion.div
+        style={{ scaleX: useScroll().scrollYProgress }}
+        className="fixed top-0 left-0 right-0 h-1 bg-purple/80 origin-left z-[110]"
+      />
+>>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
     </main>
   );
 }
