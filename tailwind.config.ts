@@ -8,16 +8,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        base: "#07070A",
-        panel: "rgba(17, 17, 24, 0.65)",
+        base: "var(--bg-primary)",
+        panel: "var(--bg-secondary)",
         purple: "#7B5CFF",
         blue: "#38B6FF",
-        pink: "#FF4FD8"
+        pink: "#FF4FD8",
+        // Extended palette for light mode compatibility
+        "text-main": "var(--text-primary)",
+        "text-muted": "var(--text-secondary)",
+        "border-dim": "var(--border-color)",
       },
       boxShadow: {
-        glow: "0 0 30px rgba(123, 92, 255, 0.35)",
-        glowBlue: "0 0 30px rgba(56, 182, 255, 0.3)",
-        glowPink: "0 0 24px rgba(255, 79, 216, 0.25)"
+        glow: "0 0 30px rgba(123, 92, 255, 0.15)",
+        glowBlue: "0 0 30px rgba(56, 182, 255, 0.12)",
+        glowPink: "0 0 24px rgba(255, 79, 216, 0.10)"
       },
       backdropBlur: {
         xl: "20px"

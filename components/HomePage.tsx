@@ -1,9 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useEffect, useRef, Suspense } from "react";
+import { useEffect, useRef, Suspense, useCallback, useState } from "react";
+import { Sun, Moon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
@@ -19,7 +20,7 @@ function CinematicText({ children, className = "" }: { children: React.ReactNode
     if (textRef.current) {
       gsap.fromTo(
         textRef.current,
-        { opacity: 0, y: 20, filter: "blur(12px)" },
+        { opacity: 0, y: 20, filter: "blur(6px)" },
         {
           opacity: 1,
           y: 0,
@@ -39,64 +40,128 @@ function CinematicText({ children, className = "" }: { children: React.ReactNode
   return <span ref={textRef} className={`text-reveal-cinematic ${className}`}>{children}</span>;
 }
 
+// Magnetic button — attracts toward cursor on hover, springs back
+function MagneticButton({ children, className = "", disabled }: { children: React.ReactNode, className?: string, disabled?: boolean }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 250, damping: 20 });
+  const springY = useSpring(y, { stiffness: 250, damping: 20 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!ref.current || disabled) return;
+    const rect = ref.current.getBoundingClientRect();
+    const dx = e.clientX - (rect.left + rect.width / 2);
+    const dy = e.clientY - (rect.top + rect.height / 2);
+    x.set(dx * 0.15);
+    y.set(dy * 0.15);
+  }, [x, y, disabled]);
+
+  const handleMouseLeave = useCallback(() => {
+    x.set(0);
+    y.set(0);
+  }, [x, y]);
+
+  return (
+    <motion.button
+      ref={ref}
+      style={{ x: springX, y: springY }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      disabled={disabled}
+      className={`glow-ripple ${className}`}
+    >
+      {children}
+    </motion.button>
+  );
+}
+
+// Tilt card — subtle rotateX/Y on hover based on cursor position
+function TiltCard({ children, className = "" }: { children: React.ReactNode, className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const springRX = useSpring(rotateX, { stiffness: 200, damping: 25 });
+  const springRY = useSpring(rotateY, { stiffness: 200, damping: 25 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    rotateY.set(px * 6);
+    rotateX.set(-py * 6);
+  }, [rotateX, rotateY]);
+
+  const handleMouseLeave = useCallback(() => {
+    rotateX.set(0);
+    rotateY.set(0);
+  }, [rotateX, rotateY]);
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ rotateX: springRX, rotateY: springRY, transformPerspective: 800 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 const solutions = [
-  { title: "Enterprise CRM", desc: "Custom-engineered systems for high-volume customer operations." },
-  { title: "Cloud Scale IT", desc: "Resilient infrastructure migrations for modern digital ecosystems." },
-  { title: "Infrastructure Security", desc: "Advanced perimeter hardening and threat detection protocols." }
+  { title: "Software Solutions", desc: "Scalable cloud platforms and custom CRM systems." },
+  { title: "Hardware", desc: "Enterprise-grade components with structured quality control." },
+  { title: "IT Services", desc: "End-to-end consulting and managed technology services." }
 ];
 
 const approachSteps = [
-  { title: "Assessment", desc: "Rigorous analysis of existing technical architecture and goals." },
-  { title: "Strategy", desc: "Engineering a scalable roadmap for long-term operational impact." },
-  { title: "Execution", desc: "Precision-driven implementation with real-time performance tracking." },
-  { title: "Optimization", desc: "Continuous refinement for maximum stability and speed." }
-];
-
-const services = [
-  {
-    title: "CRM Software",
-    copy: "Streamlined customer management systems designed for operational efficiency."
-  },
-  {
-    title: "IT Projects",
-    copy: "End-to-end technology implementation tailored to business requirements."
-  },
-  {
-    title: "Hardware Solutions",
-    copy: "Professional hardware infrastructure and deployment services."
-  }
+  { title: "Assessment", desc: "Thorough analysis of existing technical infrastructure and business requirements." },
+  { title: "Strategy", desc: "Designing a practical, implementation-ready roadmap aligned with your objectives." },
+  { title: "Execution", desc: "Precision-driven implementation with structured quality checkpoints at every stage." },
+  { title: "Support", desc: "Reliable after-sales support and continuous optimization for long-term performance." }
 ];
 
 const hardwareProducts = [
-  { title: "Networking Equipment", desc: "Next-gen routing and high-performance switching architectures." },
-  { title: "IT Infrastructure", desc: "Enterprise-grade server stacks and resilient storage clusters." },
-  { title: "Security Devices", desc: "Advanced physical and digital perimeter protection systems." },
-  { title: "Custom Hardware", desc: "Specialized engineering for unique industrial requirements." },
-  { title: "Monitoring Hubs", desc: "Real-time system telemetry and infrastructure control centers." }
+  { title: "RAM Modules (DDR4 / DDR5)", desc: "JEDEC-compliant memory modules with burn-in testing, batch-level traceability, and structured validation for enterprise reliability." },
+  { title: "Storage Devices (SSD / HDD)", desc: "High-performance solid-state and hard disk drives engineered for enterprise workloads, data centers, and mission-critical storage." },
+  { title: "Enterprise Server Hardware", desc: "DDR4 ECC UDIMM, Registered RDIMM, and Load-Reduced DIMM (LRDIMM) solutions for server-grade memory infrastructure." },
+  { title: "Custom Hardware Setup", desc: "Tailored hardware configurations designed for specific industrial, enterprise, and organizational requirements." },
+  { title: "Enterprise Hardware Solutions", desc: "Comprehensive hardware procurement and deployment services covering networking, compute, and peripheral systems." }
 ];
 
 const trustMetrics = [
-  { value: "120+", label: "Enterprise Engagements" },
-  { value: "99.98%", label: "Infrastructure Uptime" },
-  { value: "24/7", label: "Mission-Critical Support" }
+  { value: "DPIIT", label: "Recognized Startup" },
+  { value: "MSME", label: "Registered Enterprise" },
+  { value: "24/7", label: "Technical Support" }
 ];
 
 const whyChooseUs = [
   {
-    title: "Precision-Driven Execution",
-    desc: "Engineering workflows built for accuracy and long-term operational resilience."
+    title: "DPIIT Recognized Startup",
+    desc: "Officially recognized by the Department for Promotion of Industry and Internal Trade, Government of India."
   },
   {
-    title: "Modern Technology Approach",
-    desc: "Leveraging adaptive cloud architectures and secure, scalable technical stacks."
+    title: "MSME Registered",
+    desc: "Registered under the Micro, Small & Medium Enterprises framework for structured business operations."
   },
   {
-    title: "Business-Centric Solutions",
-    desc: "Aligning technical milestones with actual business outcomes and project goals."
+    title: "Enterprise-Focused Solutions",
+    desc: "Technology systems designed specifically for organizational scale, reliability, and measurable business impact."
   },
   {
-    title: "Reliable Technical Support",
-    desc: "Dedicated mission-critical support maintaining 99.9% uptime for enterprise clients."
+    title: "Structured Quality Control",
+    desc: "Rigorous testing, batch-level traceability, and JEDEC compliance across all hardware product lines."
+  },
+  {
+    title: "Reliable After-Sales Support",
+    desc: "Dedicated support infrastructure ensuring consistent performance and timely issue resolution."
+  },
+  {
+    title: "Transparent Business Practices",
+    desc: "Clear documentation, honest communication, and accountable project delivery at every stage."
   }
 ];
 
@@ -104,25 +169,67 @@ export function HomePage() {
   const horizontalSectionRef = useRef<HTMLDivElement>(null);
   const horizontalTrackRef = useRef<HTMLDivElement>(null);
 
+  const [formState, setFormState] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [isDark, setIsDark] = useState(true);
+
+  // Theme Toggle Logic
+  useEffect(() => {
+    const theme = localStorage.getItem("theme");
+    if (theme === "light") {
+      setIsDark(false);
+      document.documentElement.classList.add("light");
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDark) {
+      document.documentElement.classList.add("light");
+      localStorage.setItem("theme", "light");
+      setIsDark(false);
+    } else {
+      document.documentElement.classList.remove("light");
+      localStorage.setItem("theme", "dark");
+      setIsDark(true);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formState),
+      });
+      if (res.ok) {
+        setStatus("success");
+        setFormState({ name: "", email: "", message: "" });
+      } else {
+        setStatus("error");
+      }
+    } catch {
+      setStatus("error");
+    }
+  };
+
   useEffect(() => {
     const ctx = gsap.context(() => {
-<<<<<<< HEAD
-      // Horizontal Scroll Animation
-=======
       // 1) Hero Reveal (Enhanced Cinematic)
       gsap.fromTo(
         ".hero-content",
-        { opacity: 0, y: 60, filter: "blur(25px)" },
+        { opacity: 0, y: 40, filter: "blur(8px)" },
         {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 2.5,
+          duration: 2,
           ease: "expo.out",
           onStart: () => {
             gsap.fromTo(".hero-headline",
-              { letterSpacing: "0.2em", opacity: 0 },
-              { letterSpacing: "normal", opacity: 1, duration: 2, ease: "power4.out" }
+              { letterSpacing: "0.15em", opacity: 0 },
+              { letterSpacing: "normal", opacity: 1, duration: 1.8, ease: "power4.out" }
             );
           }
         }
@@ -144,7 +251,7 @@ export function HomePage() {
       gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
         gsap.fromTo(
           card,
-          { opacity: 0, y: 50, scale: 0.95, filter: "blur(10px)" },
+          { opacity: 0, y: 30, scale: 0.97, filter: "blur(4px)" },
           {
             opacity: 1,
             y: 0,
@@ -160,11 +267,9 @@ export function HomePage() {
             }
           }
         );
-
       });
 
       // 3) Horizontal Scroll
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
         const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
 
@@ -185,9 +290,9 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
-            { scale: 0.85, filter: "blur(8px)", opacity: 0.4 },
+            { scale: 0.92, filter: "blur(3px)", opacity: 0.5 },
             {
-              scale: 1.1,
+              scale: 1.05,
               filter: "blur(0px)",
               opacity: 1,
               ease: "power2.out",
@@ -220,74 +325,49 @@ export function HomePage() {
   }, []);
 
   return (
-<<<<<<< HEAD
     <main className="min-h-screen bg-[#07070a] text-[#f6f7fb]">
-=======
-    <main className="relative bg-[#07070a] text-slate-100 selection:bg-purple/40 selection:text-white">
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
       <div className="ambient-bg" />
 
       {/* HERO SECTION - SPLIT SCREEN */}
       <section className="hero-section relative flex min-h-screen items-center px-6 md:px-12 lg:px-20 overflow-hidden">
-<<<<<<< HEAD
-        <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-10">
-          <div className="hero-content-anchor">
-            <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue/80 opacity-80">
-              SunEdge IT Solution
+        {/* Cinematic ambient light streaks */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[20%] -left-[10%] w-[70%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent transform rotate-[15deg]" />
+          <div className="absolute bottom-[30%] -right-[10%] w-[50%] h-[1px] bg-gradient-to-r from-transparent via-purple-500/20 to-transparent transform -rotate-[12deg]" />
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_20%_50%,rgba(59,130,246,0.08),transparent_60%)]" />
+          <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_30%,rgba(123,92,255,0.06),transparent_60%)]" />
+        </div>
+
+        <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
+          <div className="hero-content">
+            <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/70">
+              SunEdge IT Solution Private Limited
             </p>
-            <h1 className="text-5xl font-bold leading-[1.1] md:text-7xl lg:text-8xl tracking-tight">
+            <h1 className="hero-headline text-5xl font-bold leading-[1.1] md:text-7xl lg:text-8xl tracking-tight">
               <div className="overflow-hidden">
-                <CinematicText>Advanced</CinematicText>
+                <CinematicText>Powering</CinematicText>
               </div>
               <div className="overflow-hidden">
-                <CinematicText>Technology</CinematicText>
+                <CinematicText>Performance.</CinematicText>
               </div>
               <div className="overflow-hidden text-blue-500">
-                <CinematicText>Solutions</CinematicText>
+                <CinematicText>Enabling Innovation.</CinematicText>
               </div>
             </h1>
             <div className="mt-8 max-w-xl">
               <p className="text-lg text-slate-400 md:text-xl leading-relaxed">
-                Engineering high-performance technology architectures designed for performance, stability, and scalability.
+                Powering enterprises with next-generation software and mission-critical hardware infrastructure.
               </p>
             </div>
             <div className="mt-12 flex flex-wrap gap-6">
-              <button className="rounded-full bg-blue-600 px-10 py-5 font-bold tracking-wide transition-all hover:bg-blue-700 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)] hover:scale-105 active:scale-95">
-                Explore Services
-=======
-        <div className="mx-auto w-full max-w-7xl relative z-10 flex items-center justify-center">
-          <div className="hero-content hero-parallax-layer max-w-3xl text-center">
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-              className="mb-6 text-xs font-bold uppercase tracking-[0.6em] text-blue/90"
-            >
-              Technology Company
-            </motion.p>
-            <h1 className="hero-headline text-5xl font-semibold leading-[1.1] tracking-tight md:text-6xl lg:text-7xl">
-              <CinematicText>Perioxia</CinematicText> <br />
-              <span className="text-white">
-                <CinematicText>Enterprise Technology Partner</CinematicText>
-              </span>
-            </h1>
-            <p className="hero-subtext mt-8 text-lg text-slate-400 md:text-xl leading-relaxed mx-auto">
-              Product-led technology company building precision systems for institutional trust.
-            </p>
-            <p className="text-slate-500 mt-4 text-sm font-medium tracking-wide">
-              Built for precision, reliability, and measurable impact.
-            </p>
-            <div className="mt-12 flex flex-wrap gap-6 justify-center">
-              <button className="group relative overflow-hidden rounded-full border border-purple/60 bg-purple/10 px-10 py-4 text-sm font-bold tracking-widest uppercase text-white transition-all hover:bg-purple/20 hover:shadow-glow">
-                Explore Solutions
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
-              </button>
-              <button className="rounded-full border border-white/10 glass px-10 py-5 font-bold tracking-wide transition-all hover:bg-white/5 hover:border-white/30 active:scale-95">
+              <MagneticButton className="rounded-full bg-blue-600 px-10 py-5 font-bold tracking-wide transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] active:scale-[0.97]">
+                Explore Our Solutions
+              </MagneticButton>
+              <MagneticButton className="rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-md px-10 py-5 font-bold tracking-wide transition-all duration-500 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] active:scale-[0.97]">
                 Contact Us
-              </button>
+              </MagneticButton>
             </div>
           </div>
-<<<<<<< HEAD
 
           <div className="relative flex justify-center items-center h-[500px] md:h-[700px]">
             <div className="parallax-layer absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
@@ -300,13 +380,15 @@ export function HomePage() {
               </Suspense>
             </div>
           </div>
-=======
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
         </div>
       </section>
 
+      <div className="section-divider" />
+
       {/* STRATEGIC SOLUTIONS GRID */}
       <section className="py-40 px-6 md:px-12 lg:px-20 relative z-10">
+        {/* Section ambient glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto max-w-7xl">
           <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-2xl">
@@ -315,101 +397,49 @@ export function HomePage() {
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent hidden md:block mb-6 md:ml-12" />
           </div>
-<<<<<<< HEAD
-=======
-          <div className="grid gap-10 md:grid-cols-3">
-            {services.map((service, i) => (
-              <motion.article
-                key={service.title}
-                className="service-card glass group relative rounded-[40px] p-12 transition-all hover:bg-white/[0.04] hover:border-purple/40 overflow-hidden"
-              >
-                <div className="absolute -inset-0.5 rounded-[40px] bg-gradient-to-b from-purple/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                <div className="relative z-10">
-                  <div className="mb-10 inline-flex rounded-3xl bg-purple/10 p-5 text-purple shadow-glow">
-                    {i === 0 && (
-                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    )}
-                    {i === 1 && (
-                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                    )}
-                    {i === 2 && (
-                      <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                      </svg>
-                    )}
-                  </div>
-                  <h3 className="text-3xl font-medium tracking-tight mb-5">{service.title}</h3>
-                  <div className="w-12 h-0.5 bg-gradient-to-r from-purple to-transparent mb-6 opacity-40" />
-                  <p className="text-slate-400 leading-relaxed text-lg">{service.copy}</p>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
-      </section>
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
-
-          <div className="grid gap-8 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-3">
             {solutions.map((item, i) => (
-              <div key={i} className="glass rounded-[40px] p-12 border-white/5 hover:border-purple/30 transition-all duration-700 group relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-8 text-white/5 font-black text-6xl group-hover:text-purple/10 transition-all">0{i + 1}</div>
-                <h3 className="text-3xl font-bold mb-6 group-hover:text-blue-400 transition-all">{item.title}</h3>
-                <p className="text-slate-400 leading-relaxed text-lg">{item.desc}</p>
-                <div className="mt-12 h-px w-0 bg-blue/30 group-hover:w-full transition-all duration-1000" />
-              </div>
+              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-12 bg-black/80 border border-white/[0.06] backdrop-blur-2xl transition-all duration-700 group hover:border-blue-500/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.15)]">
+                {/* Scanner sweep effect on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
+                </div>
+                <div className="absolute top-0 right-0 p-8 text-white/[0.03] font-black text-7xl group-hover:text-blue-500/10 transition-all duration-700">0{i + 1}</div>
+                <h3 className="text-3xl font-bold mb-6 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2]">{item.title}</h3>
+                <p className="text-slate-400 leading-relaxed text-lg relative z-[2]">{item.desc}</p>
+                <div className="mt-12 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-blue-400/0 group-hover:w-full transition-all duration-1000 ease-out" />
+              </TiltCard>
             ))}
           </div>
         </div>
       </section>
 
-      {/* OPERATIONAL PHILOSOPHY */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 bg-[#07070a]/80 backdrop-blur-3xl relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-white to-transparent" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-[1px] bg-gradient-to-b from-transparent via-white to-transparent" />
-        </div>
-        <div className="mx-auto max-w-7xl relative z-10 text-center">
-          <h2 className="text-6xl font-bold tracking-tighter md:text-9xl mb-12 opacity-90">
-            <div className="overflow-hidden"><CinematicText>PRECISION</CinematicText></div>
-            <div className="overflow-hidden text-blue-500"><CinematicText>& RELIABILITY</CinematicText></div>
-          </h2>
-          <div className="mx-auto max-w-3xl">
-            <p className="text-xl md:text-2xl text-slate-400 leading-relaxed font-light">
-              Engineering is not just about code or hardware. It is about building systems that withstand the pressure of massive scale and mission-critical demands.
-            </p>
-          </div>
-          <div className="mt-24 grid grid-cols-2 md:grid-cols-3 gap-12 max-w-4xl mx-auto">
-            {trustMetrics.map((m, i) => (
-              <div key={i} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2">{m.value}</div>
-                <div className="text-xs uppercase tracking-widest text-slate-500 font-bold">{m.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
       <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
         <div className="mx-auto max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-20 items-center">
             <div className="relative">
-              <div className="glass aspect-[4/3] rounded-[60px] overflow-hidden border-purple/20 relative group bg-[#07070a]/60">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(123,92,255,0.05),transparent_70%)]" />
-                <div className="absolute inset-0 p-12 flex items-center justify-center">
-                  <div className="relative w-full h-full">
-                    {/* Abstract Protocol Animation Placeholder */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-[1px] border-white/10 rounded-full animate-[spin_20s_linear_infinite]" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-[1px] border-white/5 rounded-full animate-[spin_30s_linear_infinite_reverse]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_20px_rgba(56,182,255,0.8)]" />
-                      <div className="absolute w-12 h-[1px] bg-gradient-to-r from-blue-500 to-transparent origin-left rotate-45" />
-                    </div>
-                  </div>
+              <div className="glass aspect-[4/3] rounded-[60px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-3xl" />
+
+                {/* Structured Prism / Crystal Visual - NO IMAGES, NO RANDOM DOTS */}
+                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+                  <motion.div
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                    className="relative w-64 h-64"
+                  >
+                    {/* Core Crystal */}
+                    <div className="absolute inset-0 border border-white/20 rounded-[40px] transform rotate-45 backdrop-blur-md bg-white/5 shadow-[0_0_30px_rgba(56,182,255,0.2)]" />
+                    <div className="absolute inset-4 border border-white/10 rounded-[30px] transform -rotate-12 backdrop-blur-sm bg-white/5" />
+
+                    {/* Light Beams */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-blue-400/50 to-transparent transform -rotate-45" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-purple-400/40 to-transparent transform rotate-12" />
+                  </motion.div>
                 </div>
               </div>
             </div>
@@ -419,11 +449,11 @@ export function HomePage() {
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
                   <div key={i} className="flex gap-8 group">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5 text-blue-500 font-bold group-hover:border-blue-500/40 transition-all">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5 text-blue-500 font-bold group-hover:border-blue-500/30 transition-all duration-500">
                       {i + 1}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-all">{step.title}</h3>
+                      <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-all duration-300">{step.title}</h3>
                       <p className="text-slate-400 leading-relaxed text-lg">{step.desc}</p>
                     </div>
                   </div>
@@ -434,9 +464,15 @@ export function HomePage() {
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* HARDWARE SOLUTIONS (HORIZONTAL) */}
-      <section ref={horizontalSectionRef} className="relative overflow-hidden bg-black/40">
+      <div className="section-divider" />
+
+      {/* HARDWARE SOLUTIONS (HORIZONTAL) - CINEMATIC SHOWCASE */}
+      <section ref={horizontalSectionRef} className="relative overflow-hidden bg-black/60">
+        {/* Dramatic depth lighting */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-600/8 blur-[120px] rounded-full" />
+          <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-600/6 blur-[100px] rounded-full" />
+        </div>
         <div className="mx-auto max-w-7xl px-6 py-24 md:px-12 lg:px-20 relative z-10">
           <h2 className="text-4xl font-bold md:text-6xl tracking-tight">Hardware Infrastructure</h2>
           <p className="mt-6 text-xl text-slate-400">Reliable hardware for mission-critical business environments.</p>
@@ -444,69 +480,102 @@ export function HomePage() {
 
         <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-12 lg:px-20 pb-40">
           {hardwareProducts.map((product, i) => (
-            <div key={i} className="product-card glass rounded-[50px] p-16 border-white/5 bg-[#07070a]/40 backdrop-blur-xl group hover:border-blue-500/20 transition-all duration-1000">
-              <div className="text-xs font-bold text-blue-500 uppercase tracking-widest mb-8 opacity-60">Module 0{i + 1}</div>
-              <h3 className="text-3xl font-bold mb-8">{product.title}</h3>
-              <p className="text-slate-300 leading-relaxed text-lg mb-12">{product.desc}</p>
+            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/25 transition-all duration-700 hover:shadow-[0_0_80px_rgba(59,130,246,0.12)]">
+              {/* Depth glow on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.06] via-transparent to-transparent" />
+              </div>
+              <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
+              <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
+              <p className="text-slate-300 leading-relaxed text-lg mb-12 relative z-[2]">{product.desc}</p>
               <div className="flex items-center gap-4 text-sm font-bold opacity-0 group-hover:opacity-100 transition-all duration-700 translate-x-[-10px] group-hover:translate-x-0">
-                <span>VIEW SPECIFICATIONS</span>
+                <span className="tracking-[0.2em]">VIEW SPECIFICATIONS</span>
                 <div className="h-px w-10 bg-blue-500" />
-=======
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative">
-                    <div className="w-48 h-48 rounded-full border border-purple/10 flex items-center justify-center" />
-                    <div className="absolute inset-0 w-48 h-48 rounded-full border border-blue/10 rotate-45" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <svg className="h-16 w-16 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="0.5" d="M11 4a2 2 0 114 0v1a2 2 0 002 2h1a2 2 0 110 4h-1a2 2 0 00-2 2v1a2 2 0 01-4 0v-1a2 2 0 00-2-2H7a2 2 0 110-4h1a2 2 0 002-2V4z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ABOUT SECTION - REFINED CORPORATE */}
-      <section className="py-60 px-6 md:px-12 lg:px-20 relative">
+      {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
+      <section className="py-40 px-6 md:px-12 lg:px-20 relative">
         <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-12 gap-16 items-center">
-            <div className="lg:col-span-12 space-y-12 mb-20">
-              <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
-                <div className="overflow-hidden"><CinematicText>Precision Engineering.</CinematicText></div>
-                <div className="overflow-hidden text-blue-500"><CinematicText>Absolute Trust.</CinematicText></div>
+          <div className="grid lg:grid-cols-2 gap-16 items-start">
+            <div>
+              <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">
+                <CinematicText>Memory Solutions</CinematicText>
               </h2>
-<<<<<<< HEAD
-            </div>
-
-            <div className="lg:col-span-8 lg:col-start-1">
-              <div className="surface-tint p-12 md:p-20 border border-white/5">
-                <p className="text-2xl md:text-3xl text-slate-100 leading-relaxed font-light italic">
-                  "SunEdge delivers high-performance technology architectures that empower organizations to operate with precision, reliability, and measurable impact."
-                </p>
-                <div className="mt-16 flex items-center gap-6">
-                  <div className="h-[2px] w-20 bg-blue-600" />
-                  <span className="text-sm font-bold uppercase tracking-[0.4em] opacity-60">The SunEdge Standard</span>
+              <p className="text-xl text-slate-400 leading-relaxed mb-10">
+                Enterprise-grade memory modules engineered for reliability, consistency, and mission-critical performance across server and workstation environments.
+              </p>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
+                  <p className="text-slate-300 leading-relaxed">JEDEC-compliant modules with structured validation and burn-in testing for enterprise reliability.</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
+                  <p className="text-slate-300 leading-relaxed">Batch-level traceability ensuring consistent quality across every production run.</p>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
+                  <p className="text-slate-300 leading-relaxed">Rigorous multi-stage testing protocols before deployment to customer environments.</p>
                 </div>
               </div>
             </div>
 
-            <div className="lg:col-span-4 space-y-8">
+            <div className="space-y-4">
+              <div className="surface-tint p-8 border border-white/5">
+                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
+                <h3 className="text-xl font-bold mb-2">DDR4 ECC UDIMM</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">Unbuffered ECC memory for entry-level servers and workstations requiring error correction without registered overhead.</p>
+              </div>
+              <div className="surface-tint p-8 border border-white/5">
+                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
+                <h3 className="text-xl font-bold mb-2">Registered RDIMM</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">Registered DIMMs with buffered architecture for multi-socket server platforms supporting higher memory density.</p>
+              </div>
+              <div className="surface-tint p-8 border border-white/5">
+                <div className="text-xs font-bold uppercase tracking-widest text-blue-400/60 mb-3">Server RAM</div>
+                <h3 className="text-xl font-bold mb-2">Load-Reduced DIMM (LRDIMM)</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">Maximum capacity modules with reduced electrical load for high-density compute and data-intensive enterprise workloads.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ABOUT SECTION - REFINED CORPORATE */}
+      <section className="py-40 px-6 md:px-12 lg:px-20 relative">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid lg:grid-cols-12 gap-16 items-start">
+            <div className="lg:col-span-12 mb-16">
+              <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
+                <div className="overflow-hidden"><CinematicText>About SunEdge.</CinematicText></div>
+              </h2>
+            </div>
+
+            <div className="lg:col-span-7 lg:col-start-1">
+              <div className="surface-tint p-12 md:p-16 border border-white/5">
+                <p className="text-xl md:text-3xl text-slate-200 leading-tight font-light mb-8">
+                  <span className="text-blue-500 font-bold">DPIIT Recognized.</span> <span className="text-purple-400 font-bold">MSME Registered.</span> Performance Driven.
+                </p>
+                <div className="space-y-6">
+                  <p className="text-lg text-slate-400 leading-relaxed border-l-2 border-blue-500/30 pl-6">
+                    Delivering reliable, structured, and scalable technology for measurable business impact.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-5 space-y-6">
               {whyChooseUs.map((item, i) => (
-                <div key={i} className="p-8 border-l-[1px] border-white/5 hover:border-blue-500/40 transition-all">
-                  <h4 className="text-lg font-bold mb-2">{item.title}</h4>
+                <div key={i} className="p-6 border-l-[1px] border-white/5 hover:border-blue-500/30 transition-all duration-500">
+                  <h4 className="text-base font-bold mb-1.5">{item.title}</h4>
                   <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
                 </div>
               ))}
-=======
-              <button className="group relative rounded-full bg-white px-16 py-6 text-black font-black uppercase tracking-[0.4em] text-xs transition-all hover:scale-105 hover:shadow-glow">
-                Get Consultation
-              </button>
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
             </div>
           </div>
         </div>
@@ -518,54 +587,99 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-24">
             <div className="space-y-12">
               <div>
-                <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">Let’s Talk About Your Requirements</h2>
+                <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
                 <p className="text-xl text-slate-400 leading-relaxed max-w-xl">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
                 </p>
               </div>
 
               <div className="space-y-10">
-                <div className="flex gap-8 items-start group">
-                  <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/40 transition-all">
+                <div className="flex gap-6 items-start group">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Office Headquarters</h4>
-                    <p className="text-xl font-medium">Global Business Center, Tech Park, India</p>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Registered Office</h4>
+                    <p className="text-lg font-medium">Unitech Cyber Park, Sec-39, Gurugram, Haryana</p>
                   </div>
                 </div>
 
-                <div className="flex gap-8 items-start group">
-                  <div className="w-12 h-12 rounded-2xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-purple-500/40 transition-all">
-                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full" />
+                <div className="flex gap-6 items-start group">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold uppercase tracking-widest text-slate-500 mb-2">Direct Communication</h4>
-                    <p className="text-xl font-medium">info@sunedgeit.com</p>
-                    <p className="text-xl font-medium">+91 62390 60064</p>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Corporate Office</h4>
+                    <p className="text-lg font-medium">601A, Hemkunt Chamber, Building No. 89,</p>
+                    <p className="text-lg font-medium">Nehru Place, New Delhi, Delhi – 110074</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-6 items-start group">
+                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
+                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Direct Communication</h4>
+                    <p className="text-lg font-medium">info@sunedgeit.com</p>
+                    <p className="text-lg font-medium">+91 62390 60064</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="relative">
-              <div className="surface-tint p-12 md:p-16 border border-white/5">
-                <form className="space-y-8">
+              <div className="surface-tint p-12 md:p-16 border border-white/5 relative overflow-hidden">
+                {status === "success" ? (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#07070a]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
+                    <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mb-6">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
+                    <p className="text-slate-400">Thank you for contacting us. We will get back to you shortly.</p>
+                    <button onClick={() => setStatus("idle")} className="mt-8 text-sm text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest">Send Another</button>
+                  </div>
+                ) : null}
+
+                <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Full Name</label>
-                    <input type="text" className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all" />
+                    <input
+                      type="text"
+                      required
+                      value={formState.name}
+                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Email Address</label>
-                    <input type="email" className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all" />
+                    <input
+                      type="email"
+                      required
+                      value={formState.email}
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-widest text-slate-500 ml-1">Project Message</label>
-                    <textarea rows={4} className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all" />
+                    <textarea
+                      rows={4}
+                      required
+                      value={formState.message}
+                      onChange={(e) => setFormState({ ...formState, message: e.target.value })}
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                    />
                   </div>
-                  <button className="w-full rounded-full bg-blue-600 py-5 font-bold tracking-wide transition-all hover:bg-blue-700 hover:shadow-[0_0_30px_rgba(37,99,235,0.4)]">
-                    Submit Inquiry
-                  </button>
+                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 py-5 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed">
+                    {status === "sending" ? "Sending..." : "Submit Inquiry"}
+                  </MagneticButton>
+                  {status === "error" && (
+                    <p className="text-red-400 text-sm text-center mt-4">Something went wrong. Please try again.</p>
+                  )}
                 </form>
               </div>
             </div>
@@ -580,11 +694,11 @@ export function HomePage() {
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
           </h2>
-          <button className="rounded-full bg-white text-black px-16 py-6 text-lg font-black transition-all hover:scale-105 active:scale-95 shadow-[0_0_50px_rgba(255,255,255,0.3)]">
+          <MagneticButton className="rounded-full bg-white text-black px-16 py-6 text-lg font-black transition-all hover:scale-[1.03] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)]">
             GET CONSULTATION
-          </button>
+          </MagneticButton>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-blue-600/10 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-blue-600/8 to-transparent pointer-events-none" />
       </section>
 
       {/* WHATSAPP QUICK CHAT */}
@@ -602,27 +716,60 @@ export function HomePage() {
         </svg>
       </a>
 
-<<<<<<< HEAD
-      <footer className="py-20 px-6 border-t border-white/5 text-slate-500 text-sm">
-        <div className="mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="text-center md:text-left">
-            <div className="text-white font-bold tracking-widest uppercase mb-2">SunEdge IT Solution</div>
-            <p>© 2026 Engineering High-Performance Technical Architectures.</p>
+      {/* THEME TOGGLE - Fixed Position */}
+      <button
+        onClick={toggleTheme}
+        className="fixed bottom-10 left-10 z-[100] p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] group"
+      >
+        <div className="relative w-6 h-6">
+          <div className={`absolute inset-0 transition-transform duration-500 ${isDark ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
+            <Moon size={24} strokeWidth={1.5} />
           </div>
-          <div className="flex gap-12 uppercase tracking-widest text-[10px] font-bold">
-            <span className="hover:text-blue-500 transition-all cursor-pointer">Protocol</span>
-            <span className="hover:text-blue-500 transition-all cursor-pointer">Infrastructure</span>
-            <span className="hover:text-blue-500 transition-all cursor-pointer">Governance</span>
+          <div className={`absolute inset-0 transition-transform duration-500 ${isDark ? '-rotate-90 opacity-0' : 'rotate-0 opacity-100'}`}>
+            <Sun size={24} strokeWidth={1.5} />
+          </div>
+        </div>
+      </button>
+
+      <footer className="py-20 px-6 border-t border-white/5 text-slate-500 text-sm bg-black/40 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
+            <div className="md:col-span-2">
+              <div className="text-white font-bold tracking-widest uppercase mb-6 text-lg">SunEdge IT Solution Pvt. Ltd.</div>
+              <p className="max-w-xs text-slate-400 mb-8 leading-relaxed">
+                Empowering enterprises with next-generation technology infrastructure and strategic software solutions.
+              </p>
+              <div className="flex gap-4">
+                {/* Social placeholders could go here */}
+              </div>
+            </div>
+            <div>
+              <h4 className="text-white font-bold uppercase tracking-widest mb-6 text-xs">Services</h4>
+              <ul className="space-y-4">
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Software Solutions</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">IT Consulting</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Cloud Migration</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold uppercase tracking-widest mb-6 text-xs">Hardware</h4>
+              <ul className="space-y-4">
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Enterprise Servers</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Storage Solutions</a></li>
+                <li><a href="#" className="hover:text-blue-400 transition-colors">Networking Gear</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <p>© 2026 SunEdge IT Solution Pvt. Ltd. All rights reserved.</p>
+            <div className="flex gap-8 text-xs font-bold uppercase tracking-widest">
+              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            </div>
           </div>
         </div>
       </footer>
-=======
-      {/* Progress Line */}
-      <motion.div
-        style={{ scaleX: useScroll().scrollYProgress }}
-        className="fixed top-0 left-0 right-0 h-1 bg-purple/80 origin-left z-[110]"
-      />
->>>>>>> d77bc51f76b7cb6fa93769a273f3ab441f1bd34f
     </main>
   );
 }

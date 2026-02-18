@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
-import { Outfit } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   display: 'swap',
+  variable: '--font-jakarta',
 });
 
 export const metadata: Metadata = {
-  title: "SunEdge IT Solution | Futuristic Technology Partner",
-  description: "Premium futuristic corporate technology website for SunEdge IT Solution.",
+  title: "SunEdge IT Solution Pvt. Ltd. | Enterprise Software, IT Services & Hardware",
+  description: "SunEdge IT Solution Private Limited is a DPIIT-recognized startup delivering reliable IT services, enterprise software solutions, and high-performance computer hardware products.",
 };
 
 export default function RootLayout({
@@ -19,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={outfit.className}>{children}</body>
+      <body className={jakarta.className}>{children}</body>
     </html>
   );
 }
