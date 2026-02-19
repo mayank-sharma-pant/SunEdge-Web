@@ -4,10 +4,20 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, Suspense, useCallback, useState } from "react";
-import { Sun, Moon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
+
+const REVEAL_CONFIG = {
+  duration: 0.85,
+  ease: "power3.out",
+  start: "top 86%",
+} as const;
+
+const SCROLL_SYNC = {
+  scrub: 1.8,
+  start: "top top",
+} as const;
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -273,6 +283,19 @@ function WorkflowGraphic() {
   );
 }
 
+function HardwareVisualPlaceholder({ index }: { index: number }) {
+  return (
+    <div className="relative mb-10 h-44 overflow-hidden rounded-3xl border border-white/[0.08] bg-[linear-gradient(145deg,rgba(123,92,255,0.14),rgba(56,182,255,0.08)_42%,rgba(255,255,255,0.02))]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.16),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(56,182,255,0.18),transparent_40%)]" />
+      <div className="absolute -top-10 left-8 h-32 w-32 rounded-full border border-white/10 bg-white/[0.02] blur-[1px]" />
+      <div className="absolute bottom-[-24px] right-8 h-24 w-40 rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_30%,rgba(255,255,255,0.04)_50%,transparent_70%)] opacity-70" />
+      <div className="absolute left-6 top-6 text-[10px] font-bold uppercase tracking-[0.32em] text-white/50">Surface {index + 1}</div>
+      <div className="absolute bottom-6 left-6 h-[1px] w-20 bg-gradient-to-r from-blue-500/80 to-transparent" />
+    </div>
+  );
+}
+
 const solutions = [
 
   { title: "Software Solutions", desc: "Scalable cloud platforms and custom CRM systems." },
@@ -365,12 +388,12 @@ export function HomePage() {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 2,
-          ease: "expo.out",
+          duration: 1.1,
+          ease: REVEAL_CONFIG.ease,
           onStart: () => {
             gsap.fromTo(".hero-headline",
               { letterSpacing: "0.15em", opacity: 0 },
-              { letterSpacing: "normal", opacity: 1, duration: 1.8, ease: "power4.out" }
+              { letterSpacing: "normal", opacity: 1, duration: 1, ease: REVEAL_CONFIG.ease }
             );
           }
         }
@@ -382,7 +405,7 @@ export function HomePage() {
         ease: "none",
         scrollTrigger: {
           trigger: ".hero-section",
-          start: "top top",
+          start: SCROLL_SYNC.start,
           end: "bottom top",
           scrub: true
         }
@@ -398,12 +421,12 @@ export function HomePage() {
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: 0.7,
-            delay: i * 0.08,
-            ease: "power3.out",
+            duration: REVEAL_CONFIG.duration,
+            delay: i * 0.06,
+            ease: REVEAL_CONFIG.ease,
             scrollTrigger: {
               trigger: card,
-              start: "top 85%",
+              start: REVEAL_CONFIG.start,
               toggleActions: "play none none reverse"
             }
           }
@@ -420,8 +443,8 @@ export function HomePage() {
           scrollTrigger: {
             trigger: horizontalSectionRef.current,
             pin: true,
-            scrub: 2.5,
-            start: "top top",
+            scrub: SCROLL_SYNC.scrub,
+            start: SCROLL_SYNC.start,
             end: () => `+=${scrollWidth}`,
             anticipatePin: 1,
           }
@@ -436,12 +459,12 @@ export function HomePage() {
               scale: 1.05,
               filter: "blur(0px)",
               opacity: 1,
-              ease: "power2.out",
+              ease: REVEAL_CONFIG.ease,
               scrollTrigger: {
                 trigger: card,
                 containerAnimation: horizontalTween,
-                start: "left 70%",
-                end: "left 30%",
+                start: "left 74%",
+                end: "left 34%",
                 scrub: true,
               }
             }
@@ -455,7 +478,7 @@ export function HomePage() {
         ease: "none",
         scrollTrigger: {
           trigger: "body",
-          start: "top top",
+          start: SCROLL_SYNC.start,
           end: "bottom bottom",
           scrub: true
         }
@@ -610,6 +633,7 @@ export function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
               </div>
+              <HardwareVisualPlaceholder index={i} />
               <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
               <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
               <p className="text-slate-300 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
