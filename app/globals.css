@@ -37,6 +37,35 @@ section {
   scroll-margin-top: 80px;
 }
 
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+@media (max-width: 1024px) {
+  section {
+    scroll-margin-top: 64px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+}
+
 .glass {
   background: rgba(10, 10, 14, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -108,24 +137,6 @@ section {
   will-change: transform, filter, opacity;
 }
 
-/* Custom Horizontal Scroll Utility */
-.horizontal-track {
-  display: flex;
-  width: fit-content;
-  will-change: transform;
-}
-
-.product-card {
-  flex-shrink: 0;
-  width: 450px;
-  margin-right: 2rem;
-}
-
-@media (max-width: 768px) {
-  .product-card {
-    width: 320px;
-  }
-}
 
 /* ——— MICRO-INTERACTION: Shimmer hover sweep ——— */
 .shimmer-hover {
