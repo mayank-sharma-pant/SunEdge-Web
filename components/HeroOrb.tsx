@@ -87,11 +87,11 @@ function MainSphere() {
 
         if (meshRef.current) {
             // ── Self rotation (spin on its own axis) ──
-            meshRef.current.rotation.y = t * 0.18;
-            meshRef.current.rotation.x = Math.sin(t * 0.13) * 0.06;
+            meshRef.current.rotation.y = t * 0.06; // Much slower for enterprise feel
+            meshRef.current.rotation.x = Math.sin(t * 0.08) * 0.04;
 
             // ── Slow revolution around Y (orbit-like full body orbit) ──
-            const rev = t * 0.08;
+            const rev = t * 0.04; // Slower orbital motion
             const orbitRadius = 0.15;
             meshRef.current.position.x =
                 Math.cos(rev) * orbitRadius + currentPos.current.x;
@@ -112,9 +112,9 @@ function MainSphere() {
 
         // ── Shape-shifting: distort cycles strongly between values ──
         if (materialRef.current) {
-            // 0.1 → 0.45 cycle — very visible morphing
+            // ~12s cycle for strong morphing
             materialRef.current.distort =
-                0.28 + Math.sin(t * 0.55) * 0.18 + Math.sin(t * 1.3) * 0.07;
+                0.28 + Math.sin(t * 0.3) * 0.18 + Math.sin(t * 0.7) * 0.05;
         }
     });
 
@@ -181,7 +181,7 @@ export default function HeroOrb() {
         {
             radius: 2.8,
             tilt: [Math.PI / 6, 0, Math.PI / 8] as [number, number, number],
-            speed: 0.5,
+            speed: 0.15, // Drastically slowed
             ringColor: "#7B5CFF",
             dotColor: "#a78bfa",
             dotOffset: 0,
@@ -190,7 +190,7 @@ export default function HeroOrb() {
         {
             radius: 3.3,
             tilt: [-Math.PI / 4, Math.PI / 5, 0] as [number, number, number],
-            speed: -0.35,
+            speed: -0.08, // Slow and steady
             ringColor: "#38B6FF",
             dotColor: "#7dd3fc",
             dotOffset: Math.PI / 2,
@@ -199,7 +199,7 @@ export default function HeroOrb() {
         {
             radius: 3.8,
             tilt: [Math.PI / 3, -Math.PI / 6, Math.PI / 4] as [number, number, number],
-            speed: 0.28,
+            speed: 0.06, // Almost static presence
             ringColor: "#FF4FD8",
             dotColor: "#f9a8d4",
             dotOffset: Math.PI,

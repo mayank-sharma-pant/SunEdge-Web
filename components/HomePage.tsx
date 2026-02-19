@@ -9,10 +9,23 @@ import SectionHUD from "./SectionHUD";
 
 const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
 
-const REVEAL_CONFIG = {
-  duration: 0.85,
-  ease: "power3.out",
-  start: "top 86%",
+const MOTION = {
+  section: {
+    duration: 0.8,
+    y: 32,
+    ease: "expo.out",
+    trigger: "top 88%"
+  },
+  content: {
+    duration: 0.5,
+    y: 16,
+    ease: "power2.out",
+    stagger: 0.08
+  },
+  hover: {
+    duration: 0.2,
+    ease: "easeOut"
+  }
 } as const;
 
 const SCROLL_SYNC = {
@@ -36,11 +49,11 @@ function CinematicText({ children, className = "" }: { children: React.ReactNode
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 0.8,
-          ease: "power2.out",
+          duration: MOTION.section.duration,
+          ease: MOTION.section.ease,
           scrollTrigger: {
             trigger: textRef.current,
-            start: "top 90%",
+            start: MOTION.section.trigger,
             toggleActions: "play none none reverse"
           }
         }
@@ -56,8 +69,8 @@ function MagneticButton({ children, className = "", disabled }: { children: Reac
   const ref = useRef<HTMLButtonElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 250, damping: 20 });
-  const springY = useSpring(y, { stiffness: 250, damping: 20 });
+  const springX = useSpring(x, { stiffness: 400, damping: 25 }); // Higher stiffness for faster feedback
+  const springY = useSpring(y, { stiffness: 400, damping: 25 });
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     if (!ref.current || disabled) return;
@@ -571,6 +584,27 @@ export function HomePage() {
         }
       });
 
+      // 4) Hardware Reveal
+      gsap.utils.toArray<HTMLElement>(".product-card").forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { opacity: 0, x: 40, filter: "blur(4px)" },
+          {
+            opacity: 1,
+            x: 0,
+            filter: "blur(0px)",
+            duration: MOTION.content.duration,
+            delay: i * MOTION.content.stagger,
+            ease: MOTION.content.ease,
+            scrollTrigger: {
+              trigger: card,
+              start: MOTION.section.trigger,
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+
       // 2) Services Reveal (Richer)
       gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
         gsap.fromTo(
@@ -581,12 +615,12 @@ export function HomePage() {
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: REVEAL_CONFIG.duration,
-            delay: i * 0.06,
-            ease: REVEAL_CONFIG.ease,
+            duration: MOTION.content.duration,
+            delay: i * MOTION.content.stagger,
+            ease: MOTION.content.ease,
             scrollTrigger: {
               trigger: card,
-              start: REVEAL_CONFIG.start,
+              start: MOTION.section.trigger,
               toggleActions: "play none none reverse"
             }
           }
@@ -697,7 +731,7 @@ export function HomePage() {
       <div className="ambient-bg" />
 
       {/* HERO SECTION - SPLIT SCREEN */}
-      <section id="hero" className="hero-section relative flex min-h-screen items-center px-8 md:px-24 lg:px-40 overflow-hidden">
+      <section id="hero" className="hero-section relative flex min-h-screen items-center px-6 md:px-8 overflow-hidden pt-32 pb-24">
         {/* Cinematic ambient light streaks */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[20%] -left-[10%] w-[70%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent transform rotate-[15deg]" />
@@ -706,9 +740,9 @@ export function HomePage() {
           <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_30%,rgba(123,92,255,0.06),transparent_60%)]" />
         </div>
 
-        <div className="mx-auto w-full max-w-[1360px] relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
+        <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-12 hero-parallax-layer">
           <div className="hero-content">
-            <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/80">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/80">
               SunEdge IT Solution Private Limited
             </p>
             <h1 className="hero-headline text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl tracking-tight">
@@ -722,16 +756,16 @@ export function HomePage() {
                 <CinematicText>Enabling Innovation.</CinematicText>
               </div>
             </h1>
-            <div className="mt-8 max-w-xl">
+            <div className="mt-6 max-w-xl">
               <p className="text-base text-blue-100/50 md:text-lg leading-relaxed">
                 Powering enterprises with next-generation software and mission-critical hardware infrastructure.
               </p>
             </div>
-            <div className="mt-12 flex flex-wrap gap-6">
-              <MagneticButton className="rounded-full bg-blue-500 px-10 py-5 text-white font-bold tracking-wide transition-all duration-500 hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] active:scale-[0.97]">
+            <div className="mt-12 flex flex-wrap gap-8">
+              <MagneticButton className="rounded-full bg-blue-500 px-12 py-4 text-white font-bold tracking-wide transition-all duration-200 hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] active:scale-[0.97]">
                 Explore Our Solutions
               </MagneticButton>
-              <MagneticButton className="rounded-full border border-blue-500/25 bg-blue-950/40 backdrop-blur-md px-10 py-5 font-bold text-blue-100 tracking-wide transition-all duration-500 hover:bg-blue-900/60 hover:border-blue-400/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] active:scale-[0.97]">
+              <MagneticButton className="rounded-full border border-blue-500/25 bg-blue-950/40 backdrop-blur-md px-12 py-4 font-bold text-blue-100 tracking-wide transition-all duration-200 hover:bg-blue-900/60 hover:border-blue-400/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] active:scale-[0.97]">
                 Contact Us
               </MagneticButton>
             </div>
@@ -754,26 +788,26 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section id="services" className="py-40 px-8 md:px-24 lg:px-40 relative z-10">
+      <section id="services" className="py-24 px-6 md:px-8 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1360px]">
-          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-xl">
               <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
               <p className="text-lg text-blue-200/50">Custom-engineered packages for vertical-specific technology demands.</p>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent hidden md:block mb-6 md:ml-12" />
+            <div className="h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent hidden md:block mb-4 md:ml-12" />
           </div>
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-8 lg:grid-cols-3">
             {solutions.map((item, i) => (
-              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-12 bg-[#0D1630]/70 border border-blue-500/10 backdrop-blur-2xl transition-all duration-700 group hover:border-blue-400/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.18)]">
+              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-8 bg-[#0D1630]/70 border border-blue-500/10 backdrop-blur-2xl transition-all duration-700 group hover:border-blue-400/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.18)]">
                 {/* Scanner sweep effect on hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
                   <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
                 </div>
                 <div className="absolute top-0 right-0 p-8 text-blue-500/[0.07] font-black text-7xl group-hover:text-blue-400/15 transition-all duration-700">0{i + 1}</div>
-                <h3 className="text-3xl font-bold mb-6 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2]">{item.title}</h3>
+                <h3 className="text-3xl font-bold mb-4 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2]">{item.title}</h3>
                 <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{item.desc}</p>
                 <div className="mt-12 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-blue-400/0 group-hover:w-full transition-all duration-1000 ease-out" />
               </TiltCard>
@@ -785,9 +819,9 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
-      <section id="about" className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
-        <div className="mx-auto w-full max-w-[1360px]">
-          <div className="grid lg:grid-cols-2 gap-32 items-center">
+      <section id="about" className="py-24 px-6 md:px-8 relative overflow-hidden">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative">
               <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden relative group">
                 <WorkflowGraphic />
@@ -798,15 +832,26 @@ export function HomePage() {
               <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">Our Approach</h2>
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
-                  <div key={i} className="flex gap-8 group">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-400 transition-all duration-500">
+                  <motion.div
+                    key={i}
+                    className="flex gap-8 group"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{
+                      duration: MOTION.content.duration,
+                      delay: i * MOTION.content.stagger,
+                      ease: "easeOut"
+                    }}
+                  >
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-400 transition-all duration-200">
                       {i + 1}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-all duration-300">{step.title}</h3>
+                      <h3 className="text-2xl font-bold mb-2 group-hover:text-white transition-all duration-200">{step.title}</h3>
                       <p className="text-blue-100/40 leading-relaxed text-lg">{step.desc}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -817,15 +862,15 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative overflow-hidden bg-[#080E1C]">
-        <div className="mx-auto w-full max-w-[1360px] relative z-10 px-8 py-32 md:px-24 lg:px-40">
-          <h2 className="text-3xl font-bold md:text-5xl tracking-tight">Hardware Infrastructure</h2>
-          <p className="mt-6 text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
+      <section ref={horizontalSectionRef} id="hardware" className="relative overflow-hidden bg-[#080E1C] py-24">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12">
+          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
+          <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
         </div>
 
-        <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
+        <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 pb-24">
           {hardwareProducts.map((product, i) => (
-            <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-12 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-700 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)]">
+            <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-300 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)]">
               {/* Depth lighting */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
@@ -847,21 +892,21 @@ export function HomePage() {
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
-      <section id="memory" className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section id="memory" className="py-24 px-6 md:px-8 relative overflow-hidden">
         {/* Enhanced ambient depth — purple/blue accent lighting */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1360px]">
-          <div className="grid lg:grid-cols-2 gap-32 items-center">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-24 items-center">
             {/* LEFT: Typography dominant */}
             <div>
-              <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">
+              <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">
                 <CinematicText>Memory Solutions</CinematicText>
               </h2>
-              <p className="text-lg text-slate-400 leading-relaxed mb-10">
+              <p className="text-lg text-slate-400 leading-relaxed mb-12">
                 Enterprise-grade memory modules engineered for reliability, consistency, and mission-critical performance across server and workstation environments.
               </p>
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
                   <p className="text-blue-100/50 leading-relaxed">JEDEC-compliant modules with structured validation and burn-in testing for enterprise reliability.</p>
@@ -901,16 +946,16 @@ export function HomePage() {
               </div>
 
               {/* Panel composition — staggered assembly */}
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
                 <PrecisionPanel className="w-[220px] h-[300px] top-[10%] left-[5%]" driftX={5} driftY={8} delay={0} duration={14} rotate={-3} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
                 <PrecisionPanel className="w-[160px] h-[200px] top-[30%] left-[38%]" driftX={-4} driftY={6} delay={2} duration={16} rotate={4} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
                 <PrecisionPanel className="w-[120px] h-[140px] bottom-[8%] left-[15%]" driftX={3} driftY={-5} delay={4} duration={18} rotate={-1} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
                 <PrecisionPanel className="w-[180px] h-[110px] top-[5%] right-[5%]" driftX={-3} driftY={7} delay={1} duration={13} rotate={2} />
               </motion.div>
 
@@ -938,7 +983,7 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* ABOUT SUNEDGE — restructured for visual authority */}
-      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section className="py-24 px-6 md:px-8 relative overflow-hidden">
         {/* Background precision panels — depth framing */}
         <PrecisionPanel
           className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-40"
@@ -949,14 +994,14 @@ export function HomePage() {
           driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
         />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1360px] relative z-10">
+        <div className="mx-auto w-full max-w-7xl relative z-10">
           {/* Header */}
-          <div className="mb-16">
-            <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">About SunEdge</h2>
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">About SunEdge</h2>
             <div className="w-16 h-1 bg-blue-500 rounded-full" />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-32 items-start">
+          <div className="grid lg:grid-cols-2 gap-24 items-start">
             {/* LEFT: Precision visual composition — choreographed assembly */}
             <motion.div
               className="relative h-[480px] hidden lg:flex items-center justify-center border-r border-blue-500/10"
@@ -1013,13 +1058,24 @@ export function HomePage() {
               {/* Compact authority items */}
               <div className="grid grid-cols-1 gap-4 pt-4">
                 {whyChooseUs.map((item, i) => (
-                  <div key={i} className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-500">
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{
+                      duration: MOTION.content.duration,
+                      delay: i * 0.05,
+                      ease: MOTION.content.ease
+                    }}
+                    className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-200"
+                  >
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
                     <div>
                       <h4 className="text-sm font-bold text-white mb-1 tracking-wide">{item.title}</h4>
                       <p className="text-blue-100/40 text-sm leading-relaxed">{item.desc}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -1028,18 +1084,18 @@ export function HomePage() {
       </section>
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
-      <section className="py-52 px-8 md:px-24 lg:px-40 relative bg-[#080E1C]">
-        <div className="mx-auto w-full max-w-[1360px]">
-          <div className="grid lg:grid-cols-2 gap-32">
+      <section className="py-24 px-6 md:px-8 relative bg-[#080E1C]">
+        <div className="mx-auto w-full max-w-7xl">
+          <div className="grid lg:grid-cols-2 gap-24">
             <div className="space-y-12">
               <div>
-                <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
-                <p className="text-lg text-blue-100/50 leading-relaxed max-w-xl">
+                <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Let&apos;s Talk About Your Requirements</h2>
+                <p className="text-lg text-blue-100/50 leading-relaxed max-w-xl mb-12">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
                 </p>
               </div>
 
-              <div className="space-y-10">
+              <div className="space-y-8">
                 <div className="flex gap-6 items-start group">
                   <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
@@ -1076,7 +1132,7 @@ export function HomePage() {
             </div>
 
             <div className="relative">
-              <div className="surface-tint p-12 md:p-16 border border-blue-500/15 relative overflow-hidden">
+              <div className="surface-tint p-8 md:p-12 border border-blue-500/15 relative overflow-hidden">
                 {status === "success" ? (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0A0F1E]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
                     <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mb-6">
@@ -1098,7 +1154,8 @@ export function HomePage() {
                       required
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
+                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1108,7 +1165,7 @@ export function HomePage() {
                       required
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1118,7 +1175,7 @@ export function HomePage() {
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
                   <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 text-white py-4 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_4px_20px_rgba(29,110,230,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
@@ -1135,13 +1192,13 @@ export function HomePage() {
       </section>
 
       {/* FINAL CTA SECTION */}
-      <section className="py-40 px-8 md:px-24 lg:px-40 text-center relative overflow-hidden">
-        <div className="mx-auto w-full max-w-[1360px] relative z-10">
-          <h2 className="text-4xl font-bold md:text-7xl tracking-tight mb-16">
+      <section className="py-24 px-6 md:px-8 text-center relative overflow-hidden">
+        <div className="mx-auto w-full max-w-7xl relative z-10">
+          <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-12">
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
           </h2>
-          <MagneticButton className="rounded-full bg-blue-500 text-white px-16 py-6 text-lg font-black transition-all hover:scale-[1.03] hover:bg-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)] active:scale-95">
+          <MagneticButton className="rounded-full bg-blue-500 text-white px-12 py-4 text-lg font-black transition-all hover:scale-[1.03] hover:bg-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)] active:scale-95">
             GET CONSULTATION
           </MagneticButton>
         </div>
@@ -1164,9 +1221,9 @@ export function HomePage() {
       </a>
 
 
-      <footer className="py-20 px-6 border-t border-blue-500/10 text-blue-200/40 text-sm bg-[#060B18]">
+      <footer className="py-24 px-6 md:px-8 border-t border-blue-500/10 text-blue-200/40 text-sm bg-[#060B18]">
         <div className="mx-auto max-w-7xl">
-          <div className="grid md:grid-cols-4 gap-12 mb-16">
+          <div className="grid md:grid-cols-4 gap-12 mb-12">
             <div className="md:col-span-2">
               <div className="text-white font-bold tracking-widest uppercase mb-6 text-lg">SunEdge IT Solution Pvt. Ltd.</div>
               <p className="max-w-xs text-blue-200/40 mb-8 leading-relaxed">
