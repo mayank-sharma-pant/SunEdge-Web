@@ -430,6 +430,45 @@ export function HomePage() {
         );
       });
 
+      // 3) Horizontal Scroll
+      if (horizontalSectionRef.current && horizontalTrackRef.current) {
+        const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
+
+        const horizontalTween = gsap.to(horizontalTrackRef.current, {
+          x: -scrollWidth,
+          ease: "none",
+          scrollTrigger: {
+            trigger: horizontalSectionRef.current,
+            pin: true,
+            scrub: SCROLL_SYNC.scrub,
+            start: SCROLL_SYNC.start,
+            end: () => `+=${scrollWidth}`,
+            anticipatePin: 1,
+          }
+        });
+
+        // Cinematic Center Focus Logic
+        gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
+          gsap.fromTo(
+            card,
+            { scale: 0.92, filter: "blur(3px)", opacity: 0.5 },
+            {
+              scale: 1.05,
+              filter: "blur(0px)",
+              opacity: 1,
+              ease: REVEAL_CONFIG.ease,
+              scrollTrigger: {
+                trigger: card,
+                containerAnimation: horizontalTween,
+                start: "left 74%",
+                end: "left 34%",
+                scrub: true,
+              }
+            }
+          );
+        });
+      }
+
       // Parallax Drift for Depth
       gsap.to(".parallax-layer", {
         y: -100,
@@ -597,6 +636,24 @@ export function HomePage() {
               </article>
             ))}
           </div>
+          <p className="mt-6 text-lg text-slate-400">Reliable hardware for mission-critical business environments.</p>
+        </div>
+
+        <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
+          {hardwareProducts.map((product, i) => (
+            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_100px_rgba(59,130,246,0.18)]">
+              {/* Depth glow on hover */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
+              </div>
+              <HardwareVisualPlaceholder index={i} />
+              <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
+              <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
+              <p className="text-slate-300 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
+            </div>
+          ))}
         </div>
         <div className="section-divider opacity-50 mt-20" />
       </section>
