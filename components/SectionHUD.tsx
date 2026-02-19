@@ -60,7 +60,7 @@ export default function SectionHUD({ sectionName, sectionCode }: HUDProps) {
                         <span>Latency</span>
                         <span className="text-blue-400/70">{latency}ms</span>
                     </div>
-                    <div className="flex flex-col items-end border-l border-blue-500/15 pl-4">
+                    <div className="flex flex-col items-end border-l border-[var(--border-normal)] pl-4">
                         <span>Auth</span>
                         <span className="text-violet-400/70">Level_7</span>
                     </div>
@@ -76,10 +76,10 @@ export default function SectionHUD({ sectionName, sectionCode }: HUDProps) {
             </div>
 
             {/* Technical Frame — electric blue accent lines */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-[var(--border-strong)] to-transparent" />
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-[1px] bg-gradient-to-r from-transparent via-[var(--border-strong)] to-transparent" />
+            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[var(--border-strong)] to-transparent" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[1px] h-32 bg-gradient-to-b from-transparent via-[var(--border-strong)] to-transparent" />
         </div>
     );
 }

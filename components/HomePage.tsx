@@ -11,21 +11,23 @@ const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
 
 const MOTION = {
   section: {
-    duration: 0.8,
-    y: 32,
+    duration: 0.6,
+    y: 12,
     ease: "expo.out",
-    trigger: "top 87%" // Triggers earlier as it enters the viewport
+    framerEase: [0.19, 1, 0.22, 1],
+    trigger: "top 95%" // Triggers much earlier for immediate appearance
   },
   content: {
-    duration: 0.5,
-    y: 16,
-    ease: "power2.out",
-    stagger: 0.08,
-    delay: 0.12 // Coordinated delay after heading starts
+    duration: 0.4,
+    y: 8,
+    ease: "power4.out", // GSAP
+    framerEase: "easeOut", // Framer
+    stagger: 0.04,
+    delay: 0.05
   },
   hover: {
-    duration: 0.2,
-    ease: "easeOut"
+    duration: 0.15, // Immediate interaction feedback
+    ease: "power2.out"
   }
 } as const;
 
@@ -133,6 +135,39 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode, cla
     >
       {children}
     </motion.div>
+  );
+}
+
+// Atmospheric Depth Layer — provides diffused radial focus and subtle section-specific moods
+function AtmosphericDepth({
+  color = "blue",
+  position = "center",
+  opacity = 1,
+  className = ""
+}: {
+  color?: "blue" | "purple" | "cyan",
+  position?: "center" | "left" | "right" | "top",
+  opacity?: number,
+  className?: string
+}) {
+  const colorMap = {
+    blue: "from-blue-500/10 via-blue-600/5 to-transparent",
+    purple: "from-purple-500/8 via-purple-600/4 to-transparent",
+    cyan: "from-cyan-500/10 via-cyan-600/5 to-transparent"
+  };
+
+  const posMap = {
+    center: "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2",
+    left: "top-1/2 left-[10%] -translate-y-1/2",
+    right: "top-1/2 right-[10%] -translate-y-1/2",
+    top: "top-[10%] left-1/2 -translate-x-1/2"
+  };
+
+  return (
+    <div className={`absolute pointer-events-none select-none overflow-hidden h-full w-full z-0 ${className}`} style={{ opacity }}>
+      <div className={`absolute w-[800px] h-[800px] rounded-full bg-radial-gradient ${colorMap[color]} blur-[120px] ${posMap[position]}`} />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/[0.02] to-transparent" />
+    </div>
   );
 }
 
@@ -273,8 +308,11 @@ function WorkflowGraphic() {
             key={i}
             r="2"
             fill="#fff"
-            initial={{ offsetDistance: "0%", opacity: 0 }}
-            animate={{ offsetDistance: "100%", opacity: [0, 1, 1, 0] }}
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              offsetDistance: "100%"
+            }}
             transition={{
               duration: 3,
               delay: i * 1.5,
@@ -282,6 +320,7 @@ function WorkflowGraphic() {
               ease: "linear"
             }}
             style={{
+              offsetDistance: "0%",
               offsetPath: "path('M 100 200 C 150 200 150 100 200 100 H 400 C 450 100 450 300 500 300')",
             }}
           />
@@ -352,7 +391,7 @@ function HardwareVisualPlaceholder({ index }: { index: number }) {
     // 0: RAM Modules
     <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
       <defs>
-        <linearGradient id="ramGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+        <linearGradient id={`ramGrad-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#38B6FF" stopOpacity="0.2" />
           <stop offset="50%" stopColor="#38B6FF" stopOpacity="0.5" />
           <stop offset="100%" stopColor="#38B6FF" stopOpacity="0.2" />
@@ -369,7 +408,7 @@ function HardwareVisualPlaceholder({ index }: { index: number }) {
           transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
         />
       ))}
-      <path d="M 50 120 L 350 120" stroke="url(#ramGrad)" strokeWidth="2" strokeDasharray="4 2" />
+      <path d="M 50 120 L 350 120" stroke={`url(#ramGrad-${index})`} strokeWidth="2" strokeDasharray="4 2" />
     </svg>,
 
     // 1: Storage Devices
@@ -563,11 +602,11 @@ export function HomePage() {
           y: 0,
           filter: "blur(0px)",
           duration: 1.1,
-          ease: REVEAL_CONFIG.ease,
+          ease: MOTION.section.ease,
           onStart: () => {
             gsap.fromTo(".hero-headline",
               { letterSpacing: "0.15em", opacity: 0 },
-              { letterSpacing: "normal", opacity: 1, duration: 1, ease: REVEAL_CONFIG.ease }
+              { letterSpacing: "normal", opacity: 1, duration: 1, ease: MOTION.section.ease }
             );
           }
         }
@@ -593,8 +632,7 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      solutionsTL.fromTo("#solutions .section-header", { opacity: 0, y: 32, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#solutions .service-card", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.6");
+      solutionsTL.fromTo("#solutions .section-header", { opacity: 0, y: 32, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 2) Approach Sequence
       const approachTL = gsap.timeline({
@@ -604,8 +642,7 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      approachTL.fromTo("#approach .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#approach .approach-item", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.5");
+      approachTL.fromTo("#approach .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 3) Hardware Sequence
       const hardwareTL = gsap.timeline({
@@ -615,8 +652,7 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      hardwareTL.fromTo("#hardware .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#hardware .product-card", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.5");
+      hardwareTL.fromTo("#hardware .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 4) Memory Sequence
       const memoryTL = gsap.timeline({
@@ -626,8 +662,7 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      memoryTL.fromTo("#memory .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#memory .memory-visual", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: MOTION.content.duration, ease: MOTION.content.ease }, "-=0.4");
+      memoryTL.fromTo("#memory .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 5) About Authority Sequence
       const authorityTL = gsap.timeline({
@@ -637,8 +672,7 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      authorityTL.fromTo("#about-authority .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#about-authority .authority-item", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: MOTION.content.duration, stagger: 0.05, ease: MOTION.content.ease }, "-=0.4");
+      authorityTL.fromTo("#about-authority .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 6) Contact Sequence
       const contactTL = gsap.timeline({
@@ -648,24 +682,24 @@ export function HomePage() {
           toggleActions: "play none none reverse"
         }
       });
-      contactTL.fromTo("#contact .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
-        .fromTo("#contact .contact-form", { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: MOTION.content.duration, ease: MOTION.content.ease }, "-=0.4");
+      contactTL.fromTo("#contact .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // 3) Horizontal Scroll — Sliding Showcase
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
         const track = horizontalTrackRef.current;
         const scrollWidth = track.scrollWidth - window.innerWidth + 200;
 
-        gsap.to(track, {
+        const horizontalTween = gsap.to(track, {
           x: -scrollWidth,
           ease: "none",
           scrollTrigger: {
             trigger: horizontalSectionRef.current,
             pin: true,
-            scrub: SCROLL_SYNC.scrub,
-            start: SCROLL_SYNC.start,
+            scrub: 2.2, // Higher scrub for momentum-based physics
+            start: "top top",
             end: () => `+=${scrollWidth}`,
             anticipatePin: 1,
+            invalidateOnRefresh: true,
           }
         });
 
@@ -678,7 +712,7 @@ export function HomePage() {
               scale: 1.05,
               filter: "blur(0px)",
               opacity: 1,
-              ease: REVEAL_CONFIG.ease,
+              ease: MOTION.section.ease,
               scrollTrigger: {
                 trigger: card,
                 containerAnimation: horizontalTween,
@@ -699,7 +733,7 @@ export function HomePage() {
         onToggle: self => self.isActive && setActiveSection({ name: "Core_System", code: "S_01" })
       });
       ScrollTrigger.create({
-        trigger: "#services",
+        trigger: "#solutions",
         start: "top center",
         end: "bottom center",
         onToggle: self => self.isActive && setActiveSection({ name: "Strategic_Services", code: "S_02" })
@@ -725,7 +759,7 @@ export function HomePage() {
         });
       }
       ScrollTrigger.create({
-        trigger: "#about",
+        trigger: "#about-authority",
         start: "top center",
         end: "bottom center",
         onToggle: self => self.isActive && setActiveSection({ name: "Brand_Authority", code: "S_06" })
@@ -757,6 +791,7 @@ export function HomePage() {
 
       {/* HERO SECTION - SPLIT SCREEN */}
       <section id="hero" className="hero-section relative flex min-h-screen items-center px-6 md:px-8 overflow-hidden pt-32 pb-24">
+        <AtmosphericDepth color="blue" position="top" opacity={0.6} />
         {/* Cinematic ambient light streaks */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[20%] -left-[10%] w-[70%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent transform rotate-[15deg]" />
@@ -767,10 +802,10 @@ export function HomePage() {
 
         <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-12 hero-parallax-layer">
           <div className="hero-content">
-            <p className="mb-4 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/80">
+            <p className="mb-4 text-xs font-bold uppercase tracking-[0.4em] text-blue-400/80">
               SunEdge IT Solution Private Limited
             </p>
-            <h1 className="hero-headline text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl tracking-tight">
+            <h1 className="hero-headline text-4xl font-bold leading-[1.05] md:text-6xl lg:text-7xl tracking-[-0.04em] max-w-[12ch]">
               <div className="overflow-hidden">
                 <CinematicText>Powering</CinematicText>
               </div>
@@ -781,16 +816,16 @@ export function HomePage() {
                 <CinematicText>Enabling Innovation.</CinematicText>
               </div>
             </h1>
-            <div className="mt-6 max-w-xl">
-              <p className="text-base text-blue-100/50 md:text-lg leading-relaxed">
+            <div className="mt-8 max-w-[50ch]">
+              <p className="text-lg text-blue-100/50 md:text-xl leading-relaxed font-medium">
                 Powering enterprises with next-generation software and mission-critical hardware infrastructure.
               </p>
             </div>
             <div className="mt-12 flex flex-wrap gap-8">
-              <MagneticButton className="rounded-full bg-blue-500 px-12 py-4 text-white font-bold tracking-wide transition-all duration-200 hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] active:scale-[0.97]">
+              <MagneticButton className="rounded-full bg-blue-500 px-12 py-4 text-white font-bold tracking-wide transition-all duration-150 hover:bg-blue-400 hover:shadow-[var(--shadow-glow)] active:scale-[0.97]">
                 Explore Our Solutions
               </MagneticButton>
-              <MagneticButton className="rounded-full border border-blue-500/25 bg-blue-950/40 backdrop-blur-md px-12 py-4 font-bold text-blue-100 tracking-wide transition-all duration-200 hover:bg-blue-900/60 hover:border-blue-400/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] active:scale-[0.97]">
+              <MagneticButton className="rounded-full border border-[var(--border-strong)] bg-blue-950/40 backdrop-blur-[var(--blur-md)] px-12 py-4 font-bold text-blue-100 tracking-wide transition-all duration-150 hover:bg-blue-900/60 hover:border-blue-400/40 hover:shadow-[var(--shadow-glow)] active:scale-[0.97]">
                 Contact Us
               </MagneticButton>
             </div>
@@ -813,29 +848,40 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section id="solutions" className="py-24 px-6 md:px-8 relative z-10">
-        {/* Section ambient glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-7xl">
+      <section id="solutions" className="py-24 px-6 md:px-8 relative z-10 overflow-hidden">
+        <AtmosphericDepth color="cyan" position="left" opacity={0.45} />
+        <div className="mx-auto w-full max-w-7xl relative z-10">
           <div className="section-header mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="max-w-xl">
-              <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
-              <p className="text-lg text-blue-200/50">Custom-engineered packages for vertical-specific technology demands.</p>
+            <div className="max-w-2xl">
+              <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6 tracking-[-0.02em]">Strategic Solutions</h2>
+              <p className="text-lg text-blue-200/50 max-w-[55ch] leading-relaxed">Custom-engineered packages for vertical-specific technology demands.</p>
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent hidden md:block mb-4 md:ml-12" />
           </div>
           <div className="grid gap-8 lg:grid-cols-3">
             {solutions.map((item, i) => (
-              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-8 bg-[#0D1630]/70 border border-blue-500/10 backdrop-blur-2xl transition-all duration-700 group hover:border-blue-400/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.18)]">
-                {/* Scanner sweep effect on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
-                </div>
-                <div className="absolute top-0 right-0 p-8 text-blue-500/[0.07] font-black text-7xl group-hover:text-blue-400/15 transition-all duration-700">0{i + 1}</div>
-                <h3 className="text-3xl font-bold mb-4 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2]">{item.title}</h3>
-                <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{item.desc}</p>
-                <div className="mt-12 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-blue-400/0 group-hover:w-full transition-all duration-1000 ease-out" />
-              </TiltCard>
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  duration: MOTION.content.duration,
+                  delay: i * 0.04,
+                  ease: MOTION.content.framerEase
+                }}
+              >
+                <TiltCard className="service-card relative overflow-hidden rounded-[var(--radius-md)] p-8 bg-[#0D1630]/70 border border-[var(--border-normal)] backdrop-blur-[var(--blur-lg)] transition-all duration-700 group hover:border-[var(--border-strong)] hover:shadow-[var(--shadow-premium)]">
+                  {/* Scanner sweep effect on hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
+                    <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
+                  </div>
+                  <div className="absolute top-0 right-0 p-8 text-blue-500/[0.07] font-black text-7xl group-hover:text-blue-400/15 transition-all duration-700">0{i + 1}</div>
+                  <h3 className="text-2xl font-bold mb-4 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2] leading-tight">{item.title}</h3>
+                  <p className="text-blue-100/40 leading-relaxed text-base relative z-[2]">{item.desc}</p>
+                  <div className="mt-12 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-blue-400/0 group-hover:w-full transition-all duration-1000 ease-out" />
+                </TiltCard>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -845,17 +891,18 @@ export function HomePage() {
 
       {/* PROTOCOL APPROACH */}
       <section id="approach" className="py-24 px-6 md:px-8 relative overflow-hidden">
+        <AtmosphericDepth color="purple" position="right" opacity={0.35} />
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative">
-              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden relative group">
+              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[var(--radius-md)] overflow-hidden relative group">
                 <WorkflowGraphic />
               </div>
             </div>
 
             <div>
               <div className="section-header">
-                <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">Our Approach</h2>
+                <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12 tracking-[-0.02em] max-w-[15ch]">Our Approach</h2>
               </div>
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
@@ -867,16 +914,16 @@ export function HomePage() {
                     viewport={{ once: true, margin: "-100px" }}
                     transition={{
                       duration: MOTION.content.duration,
-                      delay: i * MOTION.content.stagger,
-                      ease: "easeOut"
+                      delay: i * 0.04,
+                      ease: MOTION.content.framerEase
                     }}
                   >
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-400 transition-all duration-200">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-sm)] bg-blue-500/10 border border-[var(--border-strong)] text-blue-400 font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-400 transition-all duration-150">
                       {i + 1}
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold mb-2 group-hover:text-white transition-all duration-200">{step.title}</h3>
-                      <p className="text-blue-100/40 leading-relaxed text-lg">{step.desc}</p>
+                      <h3 className="text-xl font-bold mb-2 group-hover:text-white transition-all duration-150 tracking-tight">{step.title}</h3>
+                      <p className="text-blue-100/40 leading-relaxed text-base max-w-[45ch]">{step.desc}</p>
                     </div>
                   </motion.div>
                 ))}
@@ -888,18 +935,34 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-24 min-h-screen flex flex-col justify-center">
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12 section-header">
-          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
-          <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
+      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
+      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
+        <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-32 section-header relative z-20">
+          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.03em] max-w-[15ch]">Hardware Infrastructure</h2>
+          <p className="text-lg text-slate-400 max-w-[55ch] leading-relaxed">Reliable hardware for mission-critical business environments.</p>
         </div>
 
-        {/* Viewport Mask — allows vertical overflow for shadows but clips horizontal */}
-        <div className="slider-mask relative overflow-x-hidden overflow-y-visible py-12">
-          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8">
+        {/* Relaxed Container — No mask element, allowing full vertical breathing room for hovers/shadows */}
+        <div className="relative py-20">
+          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[800px] gap-24">
             {hardwareProducts.map((product, i) => (
-              <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-300 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)] transform-gpu">
+              <motion.article
+                key={i}
+                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 bg-[#0D1630]/80 border border-[var(--border-normal)] backdrop-blur-[var(--blur-lg)] group flex flex-col transform-gpu min-h-[600px]"
+                whileHover={{
+                  y: -12,
+                  scale: 1.01,
+                  borderColor: "var(--border-strong)",
+                  boxShadow: "var(--shadow-premium)"
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  duration: 0.3
+                }}
+              >
                 {/* Depth lighting */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
@@ -908,14 +971,14 @@ export function HomePage() {
 
                 <HardwareVisualPlaceholder index={i} />
                 <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.4em] mb-8 opacity-60">System_Module 0{i + 1}</p>
-                <h3 className="text-3xl font-bold mb-8 tracking-tighter text-white">{product.title}</h3>
-                <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
+                <h3 className="text-2xl font-bold mb-8 tracking-tighter text-white leading-tight">{product.title}</h3>
+                <p className="text-blue-100/40 leading-relaxed text-base relative z-[2] max-w-[32ch]">{product.desc}</p>
 
-                <div className="mt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
+                <div className="mt-auto pt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
                   <span className="w-2 h-2 rounded-full bg-blue-500/40 animate-pulse" />
                   <span>Verification_Active</span>
                 </div>
-              </article>
+              </motion.article>
             ))}
           </div>
         </div>
@@ -923,19 +986,17 @@ export function HomePage() {
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
       <section id="memory" className="py-24 px-6 md:px-8 relative overflow-hidden">
-        {/* Enhanced ambient depth — purple/blue accent lighting */}
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
-        <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
+        <AtmosphericDepth color="purple" position="right" opacity={0.4} />
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             {/* LEFT: Typography dominant */}
             <div>
               <div className="section-header mb-6">
-                <h2 className="text-3xl font-bold md:text-5xl tracking-tight">
+                <h2 className="text-3xl font-bold md:text-5xl tracking-tight tracking-[-0.02em] max-w-[12ch]">
                   <CinematicText>Memory Solutions</CinematicText>
                 </h2>
               </div>
-              <p className="text-lg text-slate-400 leading-relaxed mb-12">
+              <p className="text-lg text-slate-400 leading-relaxed mb-12 max-w-[55ch]">
                 Enterprise-grade memory modules engineered for reliability, consistency, and mission-critical performance across server and workstation environments.
               </p>
               <div className="space-y-4">
@@ -963,13 +1024,13 @@ export function HomePage() {
               variants={{
                 visible: {
                   transition: {
-                    staggerChildren: 0.1,
-                    delayChildren: 0.2
+                    staggerChildren: 0.05,
+                    delayChildren: 0.1
                   }
                 }
               }}
             >
-              <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl">
+              <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-[var(--radius-md)]">
                 <motion.div
                   className="absolute inset-y-0 w-[30%] bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transform skew-x-12"
                   animate={{ x: ["-100%", "200%"] }}
@@ -978,22 +1039,21 @@ export function HomePage() {
               </div>
 
               {/* Panel composition — staggered assembly */}
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.framerEase } } }}>
                 <PrecisionPanel className="w-[220px] h-[300px] top-[10%] left-[5%]" driftX={5} driftY={8} delay={0} duration={14} rotate={-3} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.framerEase } } }}>
                 <PrecisionPanel className="w-[160px] h-[200px] top-[30%] left-[38%]" driftX={-4} driftY={6} delay={2} duration={16} rotate={4} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.framerEase } } }}>
                 <PrecisionPanel className="w-[120px] h-[140px] bottom-[8%] left-[15%]" driftX={3} driftY={-5} delay={4} duration={18} rotate={-1} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.ease } } }}>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: MOTION.content.duration, ease: MOTION.section.framerEase } } }}>
                 <PrecisionPanel className="w-[180px] h-[110px] top-[5%] right-[5%]" driftX={-3} driftY={7} delay={1} duration={13} rotate={2} />
               </motion.div>
 
               {/* Purple/blue accent glow behind panels */}
-              <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-purple-500/8 blur-[60px] rounded-full pointer-events-none" />
-              <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] bg-blue-500/8 blur-[50px] rounded-full pointer-events-none" />
+              <AtmosphericDepth color="purple" position="left" opacity={0.3} className="scale-75 translate-x-[-20%]" />
 
               {/* Spec labels floating over panels — choreographed entrance */}
               <motion.div variants={{ hidden: { y: 10, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, delay: 0.3 } } }} className="absolute top-[25%] left-[12%] z-30">
@@ -1028,7 +1088,7 @@ export function HomePage() {
         <div className="mx-auto w-full max-w-7xl relative z-10">
           {/* Header */}
           <div className="section-header mb-12">
-            <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">About SunEdge</h2>
+            <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.02em]">About SunEdge</h2>
             <div className="w-16 h-1 bg-blue-500 rounded-full" />
           </div>
 
@@ -1042,8 +1102,8 @@ export function HomePage() {
               variants={{
                 visible: {
                   transition: {
-                    staggerChildren: 0.1,
-                    delayChildren: 0.2
+                    staggerChildren: 0.05,
+                    delayChildren: 0.1
                   }
                 }
               }}
@@ -1072,16 +1132,16 @@ export function HomePage() {
                 <div className="text-xs font-bold text-blue-200/50">New Delhi, India</div>
               </motion.div>
               {/* Ambient glow */}
-              <div className="absolute top-1/3 left-1/3 w-[200px] h-[200px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
+              <AtmosphericDepth color="blue" position="center" opacity={0.2} className="scale-50 opacity-40" />
             </motion.div>
 
             {/* RIGHT: Scan-friendly authority blocks */}
             <div className="space-y-8">
               {/* Statement block */}
               <div className="border-l-2 border-blue-500/40 pl-8 py-2">
-                <p className="text-2xl md:text-3xl font-light text-blue-100/60 leading-snug">
-                  <span className="text-blue-400 font-bold">DPIIT Recognized.</span>{" "}
-                  <span className="text-violet-400 font-bold">MSME Registered.</span>{" "}
+                <p className="text-2xl md:text-3xl font-light text-blue-100/60 leading-snug max-w-[20ch]">
+                  <span className="text-blue-400 font-bold tracking-tight">DPIIT Recognized.</span>{" "}
+                  <span className="text-violet-400 font-bold tracking-tight">MSME Registered.</span>{" "}
                   Performance Driven.
                 </p>
               </div>
@@ -1097,9 +1157,9 @@ export function HomePage() {
                     transition={{
                       duration: MOTION.content.duration,
                       delay: i * 0.05,
-                      ease: MOTION.content.ease
+                      ease: MOTION.content.framerEase
                     }}
-                    className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-200 authority-item"
+                    className="flex gap-5 items-start group p-5 border border-[var(--border-normal)] rounded-[var(--radius-md)] hover:border-[var(--border-strong)] hover:bg-blue-500/5 transition-all duration-150 authority-item active:scale-[0.99]"
                   >
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
                     <div>
@@ -1115,20 +1175,21 @@ export function HomePage() {
       </section>
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
-      <section id="contact" className="py-24 px-6 md:px-8 relative bg-[#080E1C]">
+      <section id="contact" className="py-24 px-6 md:px-8 relative bg-[#080E1C] overflow-hidden">
+        <AtmosphericDepth color="cyan" position="right" opacity={0.4} />
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-24">
             <div className="space-y-12">
               <div className="section-header">
-                <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Let&apos;s Talk About Your Requirements</h2>
-                <p className="text-lg text-blue-100/50 leading-relaxed max-w-xl mb-12">
+                <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.02em] max-w-[15ch]">Let&apos;s Talk About Your Requirements</h2>
+                <p className="text-lg text-blue-100/50 leading-relaxed max-w-[50ch] mb-12">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
                 </p>
               </div>
 
               <div className="space-y-8">
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-[var(--radius-sm)] bg-blue-500/10 border border-[var(--border-normal)] flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -1138,7 +1199,7 @@ export function HomePage() {
                 </div>
 
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-[var(--radius-sm)] bg-blue-500/10 border border-[var(--border-normal)] flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -1149,7 +1210,7 @@ export function HomePage() {
                 </div>
 
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-[var(--radius-sm)] bg-blue-500/10 border border-[var(--border-normal)] flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -1163,7 +1224,7 @@ export function HomePage() {
             </div>
 
             <div className="relative contact-form">
-              <div className="surface-tint p-8 md:p-12 border border-blue-500/15 relative overflow-hidden">
+              <div className="surface-tint p-8 md:p-12 border border-[var(--border-normal)] relative overflow-hidden rounded-[var(--radius-md)]">
                 {status === "success" ? (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0A0F1E]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
                     <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mb-6">
@@ -1185,8 +1246,7 @@ export function HomePage() {
                       required
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-[var(--border-normal)] text-blue-100 rounded-[var(--radius-sm)] px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1196,7 +1256,7 @@ export function HomePage() {
                       required
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-[var(--border-normal)] text-blue-100 rounded-[var(--radius-sm)] px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -1206,10 +1266,10 @@ export function HomePage() {
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-[var(--border-normal)] text-blue-100 rounded-[var(--radius-sm)] px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
-                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 text-white py-4 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_4px_20px_rgba(29,110,230,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
+                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 text-white py-4 font-bold tracking-wide transition-all duration-150 hover:bg-blue-700 hover:shadow-[0_4px_20px_rgba(29,110,230,0.3)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                     {status === "sending" ? "Sending..." : "Submit Inquiry"}
                   </MagneticButton>
                   {status === "error" && (
@@ -1223,7 +1283,8 @@ export function HomePage() {
       </section>
 
       {/* FINAL CTA SECTION */}
-      <section className="py-24 px-6 md:px-8 text-center relative overflow-hidden">
+      <section className="py-32 px-6 md:px-8 text-center relative overflow-hidden">
+        <AtmosphericDepth color="blue" position="center" opacity={0.5} className="scale-125" />
         <div className="mx-auto w-full max-w-7xl relative z-10">
           <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-12">
             Let’s Build Your <br />
