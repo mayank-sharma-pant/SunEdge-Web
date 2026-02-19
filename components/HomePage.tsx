@@ -34,6 +34,10 @@ const SCROLL_SYNC = {
   start: "top top",
 } as const;
 
+const REVEAL_CONFIG = {
+  ease: "expo.out",
+} as const;
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -348,121 +352,35 @@ function CinematicPreloader() {
 }
 
 function HardwareVisualPlaceholder({ index }: { index: number }) {
-  const visuals = [
-    // 0: RAM Modules
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <defs>
-        <linearGradient id="ramGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#38B6FF" stopOpacity="0.2" />
-          <stop offset="50%" stopColor="#38B6FF" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#38B6FF" stopOpacity="0.2" />
-        </linearGradient>
-      </defs>
-      <rect x="50" y="80" width="300" height="40" rx="4" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.25)" />
-      {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
-        <motion.rect
-          key={i}
-          x={70 + i * 35} y="85" width="25" height="30" rx="2"
-          fill="rgba(56,182,255,0.1)"
-          initial={{ opacity: 0.3 }}
-          animate={{ opacity: [0.3, 0.8, 0.3] }}
-          transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
-        />
-      ))}
-      <path d="M 50 120 L 350 120" stroke="url(#ramGrad)" strokeWidth="2" strokeDasharray="4 2" />
-    </svg>,
-
-    // 1: Storage Devices
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <rect x="100" y="40" width="200" height="120" rx="8" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
-      <motion.path
-        d="M 120 70 H 280 M 120 100 H 280 M 120 130 H 280"
-        stroke="rgba(56,182,255,0.3)" strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <circle cx="250" cy="100" r="30" fill="none" stroke="rgba(56,182,255,0.1)" strokeWidth="0.5" />
-      <motion.circle
-        cx="250" cy="100" r="15"
-        fill="rgba(56,182,255,0.2)"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-    </svg>,
-
-    // 2: Server Hardware
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      {[40, 80, 120].map((y, i) => (
-        <g key={i}>
-          <rect x="60" y={y} width="280" height="30" rx="2" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
-          <circle cx="80" cy={y + 15} r="3" fill="#38B6FF" opacity="0.6">
-            <animate attributeName="opacity" values="0.2;1;0.2" dur="1s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
-          </circle>
-          <motion.rect
-            x="280" y={y + 12} width="40" height="6" rx="3"
-            fill="rgba(56,182,255,0.1)"
-            animate={{ width: [10, 40, 10] }}
-            transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
-          />
-        </g>
-      ))}
-    </svg>,
-
-    // 3: Custom Setup
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <path d="M 100 150 L 150 50 L 250 50 L 300 150 Z" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
-      <motion.path
-        d="M 150 50 L 250 50" stroke="#38B6FF" strokeWidth="3"
-        animate={{ opacity: [0.2, 1, 0.2] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-      <circle cx="200" cy="100" r="40" fill="none" stroke="rgba(56,182,255,0.05)" strokeWidth="1" />
-      <motion.path
-        d="M 160 100 A 40 40 0 0 1 240 100"
-        stroke="rgba(123,92,255,0.4)" strokeWidth="2" fill="none"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        style={{ transformOrigin: "200px 100px" }}
-      />
-    </svg>,
-
-    // 4: Enterprise Solutions
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <rect x="50" y="50" width="300" height="100" rx="12" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
-      <motion.path
-        d="M 50 100 H 350" stroke="rgba(56,182,255,0.1)" strokeWidth="1" strokeDasharray="10 5"
-        animate={{ strokeDashoffset: [0, -30] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-      />
-      {[100, 150, 200, 250, 300].map((x, i) => (
-        <motion.circle
-          key={i}
-          cx={x} cy="100" r="4" fill="#38B6FF"
-          animate={{ r: [3, 5, 3], opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity }}
-        />
-      ))}
-    </svg>
+  const hardwareImages = [
+    { src: "/hardware/ram-modules.svg", alt: "RAM modules arranged on an enterprise memory board" },
+    { src: "/hardware/storage-devices.svg", alt: "Enterprise SSD and HDD storage device visualization" },
+    { src: "/hardware/server-hardware.svg", alt: "Rack server hardware with status indicators" },
+    { src: "/hardware/custom-setup.svg", alt: "Custom hardware system architecture diagram" },
+    { src: "/hardware/enterprise-solutions.svg", alt: "Connected enterprise hardware infrastructure nodes" },
   ];
 
+  const image = hardwareImages[index] || hardwareImages[0];
+
   return (
-    <div className="relative mb-12 h-52 overflow-hidden rounded-[32px] border border-blue-500/15 bg-[#060D1E] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.10),transparent_70%)]" />
-      <div className="relative z-10 w-full h-full p-6">
-        {visuals[index] || visuals[0]}
+    <div className="relative mb-10 h-52 overflow-hidden rounded-[26px] border border-blue-300/20 bg-[#0a142c]">
+      <img
+        src={image.src}
+        alt={image.alt}
+        className="h-full w-full object-cover opacity-90 transition-all duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
+        loading="lazy"
+      />
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#4ea0ff]/10 via-transparent to-[#020713]/58" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/70 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/35 to-transparent" />
+      <div className="pointer-events-none absolute bottom-4 right-5 rounded-full border border-blue-200/40 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-blue-100/75">
+        {`Visual_Module_${index + 1}`}
       </div>
-
-      {/* Decorative Technical Overlays */}
-      <div className="absolute top-6 left-6 w-2 h-2 border-l border-t border-blue-500/30" />
-      <div className="absolute top-6 right-6 w-2 h-2 border-r border-t border-blue-500/30" />
-      <div className="absolute bottom-6 left-6 w-2 h-2 border-l border-b border-blue-500/30" />
-      <div className="absolute bottom-6 right-6 w-2 h-2 border-r border-b border-blue-500/30" />
-
-      <div className="absolute bottom-6 inset-x-6 h-[1px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent" />
     </div>
   );
 }
+
 
 const solutions = [
 
@@ -656,7 +574,7 @@ export function HomePage() {
         const track = horizontalTrackRef.current;
         const scrollWidth = track.scrollWidth - window.innerWidth + 200;
 
-        gsap.to(track, {
+        const horizontalTween = gsap.to(track, {
           x: -scrollWidth,
           ease: "none",
           scrollTrigger: {
@@ -673,21 +591,29 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
-            { scale: 0.92, filter: "blur(3px)", opacity: 0.5 },
+            { scale: 0.96, filter: "saturate(0.9) brightness(0.82)", opacity: 0.78 },
             {
-              scale: 1.05,
-              filter: "blur(0px)",
+              scale: 1.02,
+              filter: "saturate(1.08) brightness(1.1)",
               opacity: 1,
               ease: REVEAL_CONFIG.ease,
               scrollTrigger: {
                 trigger: card,
                 containerAnimation: horizontalTween,
-                start: "left 74%",
-                end: "left 34%",
+                start: "left 72%",
+                end: "left 38%",
                 scrub: true,
               }
             }
           );
+
+          ScrollTrigger.create({
+            trigger: card,
+            containerAnimation: horizontalTween,
+            start: "left 60%",
+            end: "right 40%",
+            onToggle: (self) => card.classList.toggle("is-active", self.isActive),
+          });
         });
       }
 
@@ -889,7 +815,11 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-24 min-h-screen flex flex-col justify-center">
+      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#081022] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_24%,rgba(42,98,210,0.2),transparent_58%)]" />
+          <div className="absolute inset-x-0 top-0 h-[68%] bg-[linear-gradient(180deg,rgba(20,39,79,0.4)_0%,rgba(9,16,33,0)_100%)]" />
+        </div>
         <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12 section-header">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
           <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
@@ -899,11 +829,16 @@ export function HomePage() {
         <div className="slider-mask relative overflow-x-hidden overflow-y-visible py-12">
           <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8">
             {hardwareProducts.map((product, i) => (
-              <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-300 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)] transform-gpu">
+              <article
+                key={i}
+                className="product-card flex-shrink-0 w-[440px] mr-16 relative overflow-hidden rounded-[34px] p-8 bg-[#132448]/96 border border-blue-300/24 shadow-[0_20px_60px_rgba(2,8,22,0.78),inset_0_1px_0_rgba(174,214,255,0.17),inset_0_-1px_0_rgba(24,53,114,0.72)] transition-all duration-500 group hover:border-blue-200/42 hover:bg-[#1a3160]/96 hover:shadow-[0_28px_90px_rgba(5,13,33,0.9),0_0_30px_rgba(84,164,255,0.24),inset_0_1px_0_rgba(199,229,255,0.25)] transform-gpu will-change-transform"
+              >
+                <div className="active-card-glow pointer-events-none absolute -inset-x-8 -inset-y-10 bg-[radial-gradient(ellipse_at_center,rgba(98,179,255,0.24)_0%,rgba(45,103,203,0.12)_44%,transparent_76%)] opacity-0 blur-3xl transition-opacity duration-500" />
                 {/* Depth lighting */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-200/[0.12] via-transparent to-[#070d1d]/46" />
+                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-blue-200/40 via-blue-300/10 to-transparent" />
                 </div>
 
                 <HardwareVisualPlaceholder index={i} />
@@ -1184,7 +1119,6 @@ export function HomePage() {
                       type="text"
                       required
                       value={formState.name}
-                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />

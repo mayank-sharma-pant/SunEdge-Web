@@ -264,5 +264,21 @@ img {
 
 .product-card {
   flex-shrink: 0;
-  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.8s ease, opacity 0.8s ease;
+  transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.8s ease, opacity 0.8s ease, border-color 0.6s ease, box-shadow 0.6s ease, background-color 0.6s ease;
+}
+
+.product-card .active-card-glow {
+  transform: translateX(0);
+  transition: opacity 0.55s ease, transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-card.is-active {
+  border-color: rgba(133, 200, 255, 0.48) !important;
+  box-shadow: 0 34px 110px rgba(4, 10, 25, 0.94), 0 0 38px rgba(80, 162, 255, 0.35), inset 0 1px 0 rgba(201, 232, 255, 0.3), inset 0 -1px 0 rgba(39, 86, 169, 0.78) !important;
+  background-color: rgba(23, 42, 82, 0.96) !important;
+}
+
+.product-card.is-active .active-card-glow {
+  opacity: 1;
+  transform: translateX(28px);
 }
