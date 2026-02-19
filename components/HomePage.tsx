@@ -157,58 +157,118 @@ function PrecisionPanel({
   );
 }
 
-// Process Flow — Aggressively simplified linear system visual
-function ProcessFlow() {
+// Workflow Graphic — Technical system visualization for 'Our Approach'
+function WorkflowGraphic() {
   return (
-    <div className="relative w-full h-full flex items-center justify-center opacity-60">
-      <svg viewBox="0 0 600 400" className="w-[80%] h-[80%] relative z-10 overflow-visible">
-        {/* Path 1: Primary Stream */}
+    <div className="relative w-full h-full flex items-center justify-center p-8 bg-black/40">
+      <svg viewBox="0 0 600 400" className="w-full h-full relative z-10 overflow-visible">
+        {/* Logic Grid Background */}
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
+          </pattern>
+        </defs>
+        <rect width="600" height="400" fill="url(#grid)" />
+
+        {/* Primary Data Flow Paths */}
         <motion.path
-          d="M 50 200 H 550"
-          stroke="rgba(56,182,255,0.15)"
-          strokeWidth="0.5"
+          d="M 100 200 C 150 200 150 100 200 100 H 400 C 450 100 450 300 500 300"
+          stroke="rgba(56,182,255,0.1)"
+          strokeWidth="1.5"
           fill="none"
         />
         <motion.path
-          d="M 50 200 H 550"
+          d="M 100 200 C 150 200 150 100 200 100 H 400 C 450 100 450 300 500 300"
           stroke="#38B6FF"
-          strokeWidth="1"
+          strokeWidth="2"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
           animate={{ pathLength: 1, opacity: [0, 1, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Path 2: Technical Branch */}
         <motion.path
-          d="M 150 200 L 200 120 H 400 L 450 200"
+          d="M 100 200 C 150 200 150 300 200 300 H 400 C 450 300 450 100 500 100"
           stroke="rgba(123,92,255,0.1)"
-          strokeWidth="0.5"
+          strokeWidth="1.5"
           fill="none"
         />
         <motion.path
-          d="M 150 200 L 200 120 H 400 L 450 200"
+          d="M 100 200 C 150 200 150 300 200 300 H 400 C 450 300 450 100 500 100"
           stroke="#7B5CFF"
-          strokeWidth="1"
+          strokeWidth="2"
           fill="none"
           initial={{ pathLength: 0, opacity: 0 }}
-          animate={{ pathLength: 1, opacity: [0, 0.8, 0] }}
-          transition={{ duration: 4, delay: 0.5, repeat: Infinity, ease: "linear" }}
+          animate={{ pathLength: 1, opacity: [0, 1, 0] }}
+          transition={{ duration: 4, delay: 2, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        {/* Structured Nodes */}
+        {/* Definitive Step Nodes */}
         {[
-          { x: 200, y: 120, color: "#38B6FF" },
-          { x: 400, y: 120, color: "#38B6FF" },
-          { x: 150, y: 200, color: "#7B5CFF" },
-          { x: 450, y: 200, color: "#7B5CFF" },
+          { x: 100, y: 200, label: "Assessment", color: "#38B6FF" },
+          { x: 250, y: 100, label: "Strategy", color: "#7B5CFF" },
+          { x: 350, y: 300, label: "Execution", color: "#38B6FF" },
+          { x: 500, y: 200, label: "Support", color: "#7B5CFF" },
         ].map((node, i) => (
-          <g key={i}>
-            <circle cx={node.x} cy={node.y} r="2" fill={node.color} />
-            <circle cx={node.x} cy={node.y} r="4" stroke={node.color} strokeWidth="0.2" fill="none" className="opacity-40" />
-          </g>
+          <motion.g key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: i * 0.2 }}>
+            {/* Outer Glow Ring */}
+            <motion.circle
+              cx={node.x}
+              cy={node.y}
+              r="12"
+              fill="none"
+              stroke={node.color}
+              strokeWidth="0.5"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: [0.8, 1.2, 0.8], opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            />
+            {/* Core Node */}
+            <circle cx={node.x} cy={node.y} r="4" fill={node.color} />
+            <circle cx={node.x} cy={node.y} r="8" stroke={node.color} strokeWidth="1" fill="none" opacity="0.3" />
+
+            {/* Node Label (Technical Style) */}
+            <text
+              x={node.x}
+              y={node.y + 25}
+              textAnchor="middle"
+              fill="rgba(255,255,255,0.4)"
+              fontSize="8"
+              fontWeight="bold"
+              className="uppercase tracking-[0.2em]"
+            >
+              {node.label}
+            </text>
+          </motion.g>
+        ))}
+
+        {/* Floating Data Packets */}
+        {[0, 1, 2].map((i) => (
+          <motion.circle
+            key={i}
+            r="2"
+            fill="#fff"
+            initial={{ offsetDistance: "0%", opacity: 0 }}
+            animate={{ offsetDistance: "100%", opacity: [0, 1, 1, 0] }}
+            transition={{
+              duration: 3,
+              delay: i * 1.5,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            style={{
+              offsetPath: "path('M 100 200 C 150 200 150 100 200 100 H 400 C 450 100 450 300 500 300')",
+            }}
+          />
         ))}
       </svg>
+
+      {/* Precision Frame Overlay */}
+      <div className="absolute inset-4 border border-white/[0.03] pointer-events-none" />
+      <div className="absolute top-4 left-4 w-4 h-[1px] bg-blue-500/40" />
+      <div className="absolute top-4 left-4 w-[1px] h-4 bg-blue-500/40" />
+      <div className="absolute bottom-4 right-4 w-4 h-[1px] bg-purple-500/40" />
+      <div className="absolute bottom-4 right-4 w-[1px] h-4 bg-purple-500/40" />
     </div>
   );
 }
@@ -274,28 +334,6 @@ export function HomePage() {
 
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [isDark, setIsDark] = useState(true);
-
-  // Theme Toggle Logic
-  useEffect(() => {
-    const theme = localStorage.getItem("theme");
-    if (theme === "light") {
-      setIsDark(false);
-      document.documentElement.classList.add("light");
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.add("light");
-      localStorage.setItem("theme", "light");
-      setIsDark(false);
-    } else {
-      document.documentElement.classList.remove("light");
-      localStorage.setItem("theme", "dark");
-      setIsDark(true);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -446,7 +484,7 @@ export function HomePage() {
             <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/70">
               SunEdge IT Solution Private Limited
             </p>
-            <h1 className="hero-headline text-5xl font-bold leading-[1.1] md:text-7xl lg:text-8xl tracking-tight">
+            <h1 className="hero-headline text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl tracking-tight">
               <div className="overflow-hidden">
                 <CinematicText>Powering</CinematicText>
               </div>
@@ -458,7 +496,7 @@ export function HomePage() {
               </div>
             </h1>
             <div className="mt-8 max-w-xl">
-              <p className="text-lg text-slate-400 md:text-xl leading-relaxed">
+              <p className="text-base text-slate-400 md:text-lg leading-relaxed">
                 Powering enterprises with next-generation software and mission-critical hardware infrastructure.
               </p>
             </div>
@@ -489,14 +527,14 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section className="py-52 px-8 md:px-24 lg:px-40 relative z-10">
+      <section className="py-40 px-8 md:px-24 lg:px-40 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto w-full max-w-[1600px]">
-          <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-bold tracking-tight md:text-6xl mb-6">Strategic Solutions</h2>
-              <p className="text-xl text-slate-400">Custom-engineered packages for vertical-specific technology demands.</p>
+          <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div className="max-w-xl">
+              <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
+              <p className="text-lg text-slate-400">Custom-engineered packages for vertical-specific technology demands.</p>
             </div>
             <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent hidden md:block mb-6 md:ml-12" />
           </div>
@@ -520,17 +558,17 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
-      <section className="py-60 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         <div className="mx-auto w-full max-w-[1600px]">
           <div className="grid lg:grid-cols-2 gap-32 items-center">
             <div className="relative">
-              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[40px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
-                <ProcessFlow />
+              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
+                <WorkflowGraphic />
               </div>
             </div>
 
             <div>
-              <h2 className="text-4xl font-bold tracking-tight md:text-6xl mb-12">Our Approach</h2>
+              <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">Our Approach</h2>
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
                   <div key={i} className="flex gap-8 group">
@@ -559,8 +597,8 @@ export function HomePage() {
           <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-600/6 blur-[100px] rounded-full" />
         </div>
         <div className="mx-auto w-full max-w-[1600px] px-8 py-32 md:px-24 lg:px-40 relative z-10">
-          <h2 className="text-4xl font-bold md:text-6xl tracking-tight">Hardware Infrastructure</h2>
-          <p className="mt-6 text-xl text-slate-400">Reliable hardware for mission-critical business environments.</p>
+          <h2 className="text-3xl font-bold md:text-5xl tracking-tight">Hardware Infrastructure</h2>
+          <p className="mt-6 text-lg text-slate-400">Reliable hardware for mission-critical business environments.</p>
         </div>
 
         <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
@@ -582,7 +620,7 @@ export function HomePage() {
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
-      <section className="py-52 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         {/* Enhanced ambient depth — purple/blue accent lighting */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
@@ -590,10 +628,10 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-32 items-center">
             {/* LEFT: Typography dominant */}
             <div>
-              <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">
+              <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">
                 <CinematicText>Memory Solutions</CinematicText>
               </h2>
-              <p className="text-xl text-slate-400 leading-relaxed mb-10">
+              <p className="text-lg text-slate-400 leading-relaxed mb-10">
                 Enterprise-grade memory modules engineered for reliability, consistency, and mission-critical performance across server and workstation environments.
               </p>
               <div className="space-y-6">
@@ -636,17 +674,17 @@ export function HomePage() {
               </div>
 
               {/* Panel composition — staggered assembly */}
-              <motion.div variants={{ hidden: { x: -20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[260px] h-[340px] top-[10%] left-[5%]" driftX={5} driftY={8} delay={0} duration={14} rotate={-3} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[220px] h-[300px] top-[10%] left-[5%]" driftX={5} driftY={8} delay={0} duration={14} rotate={-3} />
               </motion.div>
-              <motion.div variants={{ hidden: { x: 20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[180px] h-[220px] top-[30%] left-[38%]" driftX={-4} driftY={6} delay={2} duration={16} rotate={4} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[160px] h-[200px] top-[30%] left-[38%]" driftX={-4} driftY={6} delay={2} duration={16} rotate={4} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[140px] h-[160px] bottom-[8%] left-[15%]" driftX={3} driftY={-5} delay={4} duration={18} rotate={-1} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[120px] h-[140px] bottom-[8%] left-[15%]" driftX={3} driftY={-5} delay={4} duration={18} rotate={-1} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: -20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[200px] h-[120px] top-[5%] right-[5%]" driftX={-3} driftY={7} delay={1} duration={13} rotate={2} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[180px] h-[110px] top-[5%] right-[5%]" driftX={-3} driftY={7} delay={1} duration={13} rotate={2} />
               </motion.div>
 
               {/* Purple/blue accent glow behind panels */}
@@ -673,7 +711,7 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* ABOUT SUNEDGE — restructured for visual authority */}
-      <section className="py-60 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         {/* Background precision panels — depth framing */}
         <PrecisionPanel
           className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-40"
@@ -686,9 +724,9 @@ export function HomePage() {
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto w-full max-w-[1600px] relative z-10">
           {/* Header */}
-          <div className="mb-24">
-            <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">About SunEdge</h2>
-            <div className="w-24 h-1 bg-blue-500 rounded-full" />
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">About SunEdge</h2>
+            <div className="w-16 h-1 bg-blue-500 rounded-full" />
           </div>
 
           <div className="grid lg:grid-cols-2 gap-32 items-start">
@@ -708,14 +746,14 @@ export function HomePage() {
               }}
             >
               {/* Glass slab stack — assembled motion */}
-              <motion.div variants={{ hidden: { x: -20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[220px] h-[280px] top-[10%] left-[8%]" driftX={4} driftY={6} delay={0} duration={16} rotate={-4} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[180px] h-[240px] top-[10%] left-[8%]" driftX={4} driftY={6} delay={0} duration={16} rotate={-4} />
               </motion.div>
-              <motion.div variants={{ hidden: { x: 20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[160px] h-[200px] top-[25%] left-[45%]" driftX={-3} driftY={5} delay={2} duration={18} rotate={3} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[140px] h-[180px] top-[25%] left-[45%]" driftX={-3} driftY={5} delay={2} duration={18} rotate={3} />
               </motion.div>
-              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
-                <PrecisionPanel className="w-[120px] h-[140px] bottom-[12%] left-[25%]" driftX={2} driftY={-4} delay={4} duration={14} rotate={-2} />
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[100px] h-[120px] bottom-[12%] left-[25%]" driftX={2} driftY={-4} delay={4} duration={14} rotate={-2} />
               </motion.div>
               {/* Authority labels */}
               <motion.div className="absolute top-[22%] left-[12%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 1 }}>
@@ -768,8 +806,8 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-32">
             <div className="space-y-12">
               <div>
-                <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
-                <p className="text-xl text-slate-400 leading-relaxed max-w-xl">
+                <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
+                <p className="text-lg text-slate-400 leading-relaxed max-w-xl">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
                 </p>
               </div>
@@ -833,7 +871,7 @@ export function HomePage() {
                       required
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -843,7 +881,7 @@ export function HomePage() {
                       required
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -853,10 +891,10 @@ export function HomePage() {
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-6 py-4 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
                     />
                   </div>
-                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 py-5 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed">
+                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 py-4 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed">
                     {status === "sending" ? "Sending..." : "Submit Inquiry"}
                   </MagneticButton>
                   {status === "error" && (
@@ -870,9 +908,9 @@ export function HomePage() {
       </section>
 
       {/* FINAL CTA SECTION */}
-      <section className="py-60 px-8 md:px-24 lg:px-40 text-center relative overflow-hidden">
+      <section className="py-40 px-8 md:px-24 lg:px-40 text-center relative overflow-hidden">
         <div className="mx-auto w-full max-w-[1600px] relative z-10">
-          <h2 className="text-5xl font-bold md:text-8xl tracking-tight mb-16">
+          <h2 className="text-4xl font-bold md:text-7xl tracking-tight mb-16">
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
           </h2>
@@ -898,20 +936,6 @@ export function HomePage() {
         </svg>
       </a>
 
-      {/* THEME TOGGLE - Fixed Position */}
-      <button
-        onClick={toggleTheme}
-        className="fixed bottom-10 left-10 z-[100] p-4 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all shadow-[0_0_20px_rgba(255,255,255,0.15)] group"
-      >
-        <div className="relative w-6 h-6">
-          <div className={`absolute inset-0 transition-transform duration-500 ${isDark ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
-            <Moon size={24} strokeWidth={1.5} />
-          </div>
-          <div className={`absolute inset-0 transition-transform duration-500 ${isDark ? '-rotate-90 opacity-0' : 'rotate-0 opacity-100'}`}>
-            <Sun size={24} strokeWidth={1.5} />
-          </div>
-        </div>
-      </button>
 
       <footer className="py-20 px-6 border-t border-white/5 text-slate-500 text-sm bg-black/40 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl">

@@ -85,7 +85,7 @@ function MainSphere() {
     });
 
     return (
-        <Sphere ref={meshRef} args={[1.6, 128, 128]}>
+        <Sphere ref={meshRef} args={[1.4, 128, 128]}>
             <MeshDistortMaterial
                 ref={materialRef}
                 color="#e8e8ff"
