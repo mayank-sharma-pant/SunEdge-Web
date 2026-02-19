@@ -14,13 +14,14 @@ const MOTION = {
     duration: 0.8,
     y: 32,
     ease: "expo.out",
-    trigger: "top 88%"
+    trigger: "top 87%" // Triggers earlier as it enters the viewport
   },
   content: {
     duration: 0.5,
     y: 16,
     ease: "power2.out",
-    stagger: 0.08
+    stagger: 0.08,
+    delay: 0.12 // Coordinated delay after heading starts
   },
   hover: {
     duration: 0.2,
@@ -584,54 +585,78 @@ export function HomePage() {
         }
       });
 
-      // 4) Hardware Reveal
-      gsap.utils.toArray<HTMLElement>(".product-card").forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0, x: 40, filter: "blur(4px)" },
-          {
-            opacity: 1,
-            x: 0,
-            filter: "blur(0px)",
-            duration: MOTION.content.duration,
-            delay: i * MOTION.content.stagger,
-            ease: MOTION.content.ease,
-            scrollTrigger: {
-              trigger: card,
-              start: MOTION.section.trigger,
-              toggleActions: "play none none reverse"
-            }
-          }
-        );
+      // 1) Strategic Solutions Sequence
+      const solutionsTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#solutions",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
       });
+      solutionsTL.fromTo("#solutions .section-header", { opacity: 0, y: 32, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#solutions .service-card", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.6");
 
-      // 2) Services Reveal (Richer)
-      gsap.utils.toArray<HTMLElement>(".service-card").forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0, y: 30, scale: 0.97, filter: "blur(4px)" },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: "blur(0px)",
-            duration: MOTION.content.duration,
-            delay: i * MOTION.content.stagger,
-            ease: MOTION.content.ease,
-            scrollTrigger: {
-              trigger: card,
-              start: MOTION.section.trigger,
-              toggleActions: "play none none reverse"
-            }
-          }
-        );
+      // 2) Approach Sequence
+      const approachTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#approach",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
       });
+      approachTL.fromTo("#approach .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#approach .approach-item", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.5");
+
+      // 3) Hardware Sequence
+      const hardwareTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#hardware",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
+      });
+      hardwareTL.fromTo("#hardware .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#hardware .product-card", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: MOTION.content.duration, stagger: MOTION.content.stagger, ease: MOTION.content.ease }, "-=0.5");
+
+      // 4) Memory Sequence
+      const memoryTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#memory",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
+      });
+      memoryTL.fromTo("#memory .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#memory .memory-visual", { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: MOTION.content.duration, ease: MOTION.content.ease }, "-=0.4");
+
+      // 5) About Authority Sequence
+      const authorityTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#about-authority",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
+      });
+      authorityTL.fromTo("#about-authority .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#about-authority .authority-item", { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: MOTION.content.duration, stagger: 0.05, ease: MOTION.content.ease }, "-=0.4");
+
+      // 6) Contact Sequence
+      const contactTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#contact",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
+      });
+      contactTL.fromTo("#contact .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease })
+        .fromTo("#contact .contact-form", { opacity: 0, scale: 0.98 }, { opacity: 1, scale: 1, duration: MOTION.content.duration, ease: MOTION.content.ease }, "-=0.4");
 
       // 3) Horizontal Scroll — Sliding Showcase
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
-        const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
+        const track = horizontalTrackRef.current;
+        const scrollWidth = track.scrollWidth - window.innerWidth + 200;
 
-        const horizontalTween = gsap.to(horizontalTrackRef.current, {
+        gsap.to(track, {
           x: -scrollWidth,
           ease: "none",
           scrollTrigger: {
@@ -788,11 +813,11 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section id="services" className="py-24 px-6 md:px-8 relative z-10">
+      <section id="solutions" className="py-24 px-6 md:px-8 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto w-full max-w-7xl">
-          <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+          <div className="section-header mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-xl">
               <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
               <p className="text-lg text-blue-200/50">Custom-engineered packages for vertical-specific technology demands.</p>
@@ -819,7 +844,7 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
-      <section id="about" className="py-24 px-6 md:px-8 relative overflow-hidden">
+      <section id="approach" className="py-24 px-6 md:px-8 relative overflow-hidden">
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             <div className="relative">
@@ -829,12 +854,14 @@ export function HomePage() {
             </div>
 
             <div>
-              <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">Our Approach</h2>
+              <div className="section-header">
+                <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-12">Our Approach</h2>
+              </div>
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
                   <motion.div
                     key={i}
-                    className="flex gap-8 group"
+                    className="flex gap-8 group approach-item"
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: "-100px" }}
@@ -862,32 +889,35 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative overflow-hidden bg-[#080E1C] py-24">
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12">
+      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-24 min-h-screen flex flex-col justify-center">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12 section-header">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
           <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
         </div>
 
-        <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 pb-24">
-          {hardwareProducts.map((product, i) => (
-            <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-300 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)]">
-              {/* Depth lighting */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
-              </div>
+        {/* Viewport Mask — allows vertical overflow for shadows but clips horizontal */}
+        <div className="slider-mask relative overflow-x-hidden overflow-y-visible py-12">
+          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8">
+            {hardwareProducts.map((product, i) => (
+              <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-300 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)] transform-gpu">
+                {/* Depth lighting */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                </div>
 
-              <HardwareVisualPlaceholder index={i} />
-              <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.4em] mb-8 opacity-60">System_Module 0{i + 1}</p>
-              <h3 className="text-3xl font-bold mb-8 tracking-tighter text-white">{product.title}</h3>
-              <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
+                <HardwareVisualPlaceholder index={i} />
+                <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.4em] mb-8 opacity-60">System_Module 0{i + 1}</p>
+                <h3 className="text-3xl font-bold mb-8 tracking-tighter text-white">{product.title}</h3>
+                <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
 
-              <div className="mt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
-                <span className="w-2 h-2 rounded-full bg-blue-500/40 animate-pulse" />
-                <span>Verification_Active</span>
-              </div>
-            </article>
-          ))}
+                <div className="mt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
+                  <span className="w-2 h-2 rounded-full bg-blue-500/40 animate-pulse" />
+                  <span>Verification_Active</span>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -900,9 +930,11 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-24 items-center">
             {/* LEFT: Typography dominant */}
             <div>
-              <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">
-                <CinematicText>Memory Solutions</CinematicText>
-              </h2>
+              <div className="section-header mb-6">
+                <h2 className="text-3xl font-bold md:text-5xl tracking-tight">
+                  <CinematicText>Memory Solutions</CinematicText>
+                </h2>
+              </div>
               <p className="text-lg text-slate-400 leading-relaxed mb-12">
                 Enterprise-grade memory modules engineered for reliability, consistency, and mission-critical performance across server and workstation environments.
               </p>
@@ -924,7 +956,7 @@ export function HomePage() {
 
             {/* RIGHT: Precision Panel Visual Anchor — enhanced with accent lighting */}
             <motion.div
-              className="relative h-[480px] hidden lg:block"
+              className="relative h-[480px] hidden lg:block memory-visual"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
@@ -983,7 +1015,7 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* ABOUT SUNEDGE — restructured for visual authority */}
-      <section className="py-24 px-6 md:px-8 relative overflow-hidden">
+      <section id="about-authority" className="py-24 px-6 md:px-8 relative overflow-hidden">
         {/* Background precision panels — depth framing */}
         <PrecisionPanel
           className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-40"
@@ -993,10 +1025,9 @@ export function HomePage() {
           className="w-[200px] h-[280px] bottom-[10%] -left-[3%] opacity-20"
           driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
         />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto w-full max-w-7xl relative z-10">
           {/* Header */}
-          <div className="mb-12">
+          <div className="section-header mb-12">
             <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">About SunEdge</h2>
             <div className="w-16 h-1 bg-blue-500 rounded-full" />
           </div>
@@ -1068,7 +1099,7 @@ export function HomePage() {
                       delay: i * 0.05,
                       ease: MOTION.content.ease
                     }}
-                    className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-200"
+                    className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-200 authority-item"
                   >
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
                     <div>
@@ -1084,11 +1115,11 @@ export function HomePage() {
       </section>
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
-      <section className="py-24 px-6 md:px-8 relative bg-[#080E1C]">
+      <section id="contact" className="py-24 px-6 md:px-8 relative bg-[#080E1C]">
         <div className="mx-auto w-full max-w-7xl">
           <div className="grid lg:grid-cols-2 gap-24">
             <div className="space-y-12">
-              <div>
+              <div className="section-header">
                 <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Let&apos;s Talk About Your Requirements</h2>
                 <p className="text-lg text-blue-100/50 leading-relaxed max-w-xl mb-12">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
@@ -1131,7 +1162,7 @@ export function HomePage() {
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative contact-form">
               <div className="surface-tint p-8 md:p-12 border border-blue-500/15 relative overflow-hidden">
                 {status === "success" ? (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0A0F1E]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
