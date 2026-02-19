@@ -36,6 +36,10 @@ const SCROLL_SYNC = {
   start: "top top",
 } as const;
 
+const REVEAL_CONFIG = {
+  ease: "expo.out",
+} as const;
+
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -707,10 +711,10 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
-            { scale: 0.92, filter: "blur(3px)", opacity: 0.5 },
+            { scale: 0.95, filter: "saturate(0.88) brightness(0.7)", opacity: 0.58 },
             {
-              scale: 1.05,
-              filter: "blur(0px)",
+              scale: 1.03,
+              filter: "saturate(1.06) brightness(1.12)",
               opacity: 1,
               ease: MOTION.section.ease,
               scrollTrigger: {
@@ -722,6 +726,14 @@ export function HomePage() {
               }
             }
           );
+
+          ScrollTrigger.create({
+            trigger: card,
+            containerAnimation: horizontalTween,
+            start: "left 62%",
+            end: "right 38%",
+            onToggle: (self) => card.classList.toggle("is-active", self.isActive),
+          });
         });
       }
 
@@ -935,6 +947,15 @@ export function HomePage() {
 
       <div className="section-divider" />
 
+      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
+      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#070C19] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_22%,rgba(38,88,190,0.18),transparent_56%)]" />
+          <div className="absolute inset-x-0 top-0 h-[62%] bg-[linear-gradient(180deg,rgba(18,31,63,0.42)_0%,rgba(9,16,33,0)_100%)]" />
+        </div>
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12 section-header">
+          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
+          <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
       <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
@@ -947,6 +968,11 @@ export function HomePage() {
         <div className="relative py-20">
           <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[800px] gap-24">
             {hardwareProducts.map((product, i) => (
+              <article
+                key={i}
+                className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#121f3f]/92 border border-blue-300/20 shadow-[0_22px_70px_rgba(3,8,20,0.82),inset_0_1px_0_rgba(150,202,255,0.14),inset_0_-1px_0_rgba(17,40,89,0.7)] transition-all duration-500 group hover:border-blue-300/38 hover:bg-[#182a53]/94 hover:shadow-[0_28px_95px_rgba(6,13,30,0.9),0_0_34px_rgba(82,157,255,0.2),inset_0_1px_0_rgba(188,226,255,0.2)] transform-gpu will-change-transform"
+              >
+                <div className="active-card-glow pointer-events-none absolute -inset-x-10 -inset-y-12 bg-[radial-gradient(ellipse_at_center,rgba(82,164,255,0.22)_0%,rgba(39,92,185,0.12)_42%,transparent_74%)] opacity-0 blur-3xl transition-opacity duration-500" />
               <motion.article
                 key={i}
                 className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 bg-[#0D1630]/80 border border-[var(--border-normal)] backdrop-blur-[var(--blur-lg)] group flex flex-col transform-gpu min-h-[600px]"
@@ -964,9 +990,10 @@ export function HomePage() {
                 }}
               >
                 {/* Depth lighting */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-300/[0.1] via-transparent to-[#070d1d]/44" />
+                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-blue-200/40 via-blue-300/10 to-transparent" />
                 </div>
 
                 <HardwareVisualPlaceholder index={i} />
@@ -1246,6 +1273,7 @@ export function HomePage() {
                       required
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                       className="w-full bg-[#0D1630] border border-[var(--border-normal)] text-blue-100 rounded-[var(--radius-sm)] px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all duration-200 input-focus-glow"
                     />
                   </div>
