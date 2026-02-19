@@ -25,7 +25,7 @@ function CinematicText({ children, className = "" }: { children: React.ReactNode
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 1.2,
+          duration: 0.8,
           ease: "power2.out",
           scrollTrigger: {
             trigger: textRef.current,
@@ -146,14 +146,70 @@ function PrecisionPanel({
     >
       <div
         style={{
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(255,255,255,0.07)",
-          boxShadow: "inset 0 0 0 1px rgba(123,92,255,0.06), 0 0 20px rgba(56,182,255,0.04)",
-          backdropFilter: "blur(4px)",
+          background: "rgba(255,255,255,0.015)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          boxShadow: "0 0 15px rgba(56,182,255,0.02)",
+          backdropFilter: "blur(2px)",
         }}
         className="w-full h-full rounded-2xl"
       />
     </motion.div>
+  );
+}
+
+// Process Flow — Aggressively simplified linear system visual
+function ProcessFlow() {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center opacity-60">
+      <svg viewBox="0 0 600 400" className="w-[80%] h-[80%] relative z-10 overflow-visible">
+        {/* Path 1: Primary Stream */}
+        <motion.path
+          d="M 50 200 H 550"
+          stroke="rgba(56,182,255,0.15)"
+          strokeWidth="0.5"
+          fill="none"
+        />
+        <motion.path
+          d="M 50 200 H 550"
+          stroke="#38B6FF"
+          strokeWidth="1"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: [0, 1, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Path 2: Technical Branch */}
+        <motion.path
+          d="M 150 200 L 200 120 H 400 L 450 200"
+          stroke="rgba(123,92,255,0.1)"
+          strokeWidth="0.5"
+          fill="none"
+        />
+        <motion.path
+          d="M 150 200 L 200 120 H 400 L 450 200"
+          stroke="#7B5CFF"
+          strokeWidth="1"
+          fill="none"
+          initial={{ pathLength: 0, opacity: 0 }}
+          animate={{ pathLength: 1, opacity: [0, 0.8, 0] }}
+          transition={{ duration: 4, delay: 0.5, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* Structured Nodes */}
+        {[
+          { x: 200, y: 120, color: "#38B6FF" },
+          { x: 400, y: 120, color: "#38B6FF" },
+          { x: 150, y: 200, color: "#7B5CFF" },
+          { x: 450, y: 200, color: "#7B5CFF" },
+        ].map((node, i) => (
+          <g key={i}>
+            <circle cx={node.x} cy={node.y} r="2" fill={node.color} />
+            <circle cx={node.x} cy={node.y} r="4" stroke={node.color} strokeWidth="0.2" fill="none" className="opacity-40" />
+          </g>
+        ))}
+      </svg>
+    </div>
   );
 }
 
@@ -304,8 +360,8 @@ export function HomePage() {
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: 1.2,
-            delay: i * 0.15,
+            duration: 0.7,
+            delay: i * 0.08,
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
@@ -376,7 +432,7 @@ export function HomePage() {
       <div className="ambient-bg" />
 
       {/* HERO SECTION - SPLIT SCREEN */}
-      <section className="hero-section relative flex min-h-screen items-center px-6 md:px-12 lg:px-20 overflow-hidden">
+      <section className="hero-section relative flex min-h-screen items-center px-8 md:px-24 lg:px-40 overflow-hidden">
         {/* Cinematic ambient light streaks */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[20%] -left-[10%] w-[70%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent transform rotate-[15deg]" />
@@ -385,7 +441,7 @@ export function HomePage() {
           <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_30%,rgba(123,92,255,0.06),transparent_60%)]" />
         </div>
 
-        <div className="mx-auto w-full max-w-7xl relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
+        <div className="mx-auto w-full max-w-[1600px] relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
           <div className="hero-content">
             <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/70">
               SunEdge IT Solution Private Limited
@@ -430,13 +486,13 @@ export function HomePage() {
         </div>
       </section>
 
-      <div className="section-divider" />
+      <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative z-10">
+      <section className="py-52 px-8 md:px-24 lg:px-40 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto w-full max-w-[1600px]">
           <div className="mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-2xl">
               <h2 className="text-4xl font-bold tracking-tight md:text-6xl mb-6">Strategic Solutions</h2>
@@ -464,47 +520,12 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+      <section className="py-60 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+        <div className="mx-auto w-full max-w-[1600px]">
+          <div className="grid lg:grid-cols-2 gap-32 items-center">
             <div className="relative">
-              <div className="glass aspect-[4/3] rounded-[60px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
-                {/* Richer base gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-900/30 to-purple-900/30 backdrop-blur-3xl" />
-
-                {/* Cinematic light sweep — slow diagonal pass */}
-                <motion.div
-                  className="absolute inset-0 pointer-events-none"
-                  initial={{ x: "-100%", opacity: 0 }}
-                  animate={{ x: ["- 100%", "200%"], opacity: [0, 0.4, 0] }}
-                  transition={{ duration: 6, repeat: Infinity, repeatDelay: 8, ease: "easeInOut" }}
-                >
-                  <div className="absolute inset-y-0 w-[40%] bg-gradient-to-r from-transparent via-blue-400/15 to-transparent transform skew-x-12" />
-                </motion.div>
-
-                {/* Structured Prism / Crystal Visual */}
-                <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-                  <motion.div
-                    initial={{ rotate: 0 }}
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-                    className="relative w-72 h-72"
-                  >
-                    {/* Core Crystal — stronger glow */}
-                    <div className="absolute inset-0 border border-white/30 rounded-[40px] transform rotate-45 backdrop-blur-md bg-white/8 shadow-[0_0_60px_rgba(56,182,255,0.3),inset_0_0_30px_rgba(123,92,255,0.1)]" />
-                    <div className="absolute inset-4 border border-white/15 rounded-[30px] transform -rotate-12 backdrop-blur-sm bg-white/5 shadow-[0_0_20px_rgba(123,92,255,0.15)]" />
-                    {/* Inner core — depth layer */}
-                    <div className="absolute inset-10 border border-white/10 rounded-[20px] transform rotate-6 bg-blue-500/5" />
-
-                    {/* Light Beams — brighter */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[1px] bg-gradient-to-r from-transparent via-blue-400/70 to-transparent transform -rotate-45" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[220%] h-[1px] bg-gradient-to-r from-transparent via-purple-400/60 to-transparent transform rotate-12" />
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent transform rotate-[60deg]" />
-                  </motion.div>
-                </div>
-
-                {/* Rim glow accent */}
-                <div className="absolute inset-0 rounded-[60px] shadow-[inset_0_0_60px_rgba(56,182,255,0.08),inset_0_0_120px_rgba(123,92,255,0.06)] pointer-events-none" />
+              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[40px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
+                <ProcessFlow />
               </div>
             </div>
 
@@ -537,12 +558,12 @@ export function HomePage() {
           <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-600/8 blur-[120px] rounded-full" />
           <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-600/6 blur-[100px] rounded-full" />
         </div>
-        <div className="mx-auto max-w-7xl px-6 py-24 md:px-12 lg:px-20 relative z-10">
+        <div className="mx-auto w-full max-w-[1600px] px-8 py-32 md:px-24 lg:px-40 relative z-10">
           <h2 className="text-4xl font-bold md:text-6xl tracking-tight">Hardware Infrastructure</h2>
           <p className="mt-6 text-xl text-slate-400">Reliable hardware for mission-critical business environments.</p>
         </div>
 
-        <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-12 lg:px-20 pb-40">
+        <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
           {hardwareProducts.map((product, i) => (
             <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_100px_rgba(59,130,246,0.18)]">
               {/* Depth glow on hover */}
@@ -557,15 +578,16 @@ export function HomePage() {
             </div>
           ))}
         </div>
+        <div className="section-divider opacity-50" />
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+      <section className="py-52 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         {/* Enhanced ambient depth — purple/blue accent lighting */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="mx-auto w-full max-w-[1600px]">
+          <div className="grid lg:grid-cols-2 gap-32 items-center">
             {/* LEFT: Typography dominant */}
             <div>
               <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">
@@ -591,102 +613,110 @@ export function HomePage() {
             </div>
 
             {/* RIGHT: Precision Panel Visual Anchor — enhanced with accent lighting */}
-            <div className="relative h-[480px] hidden lg:block">
-              {/* Cinematic light sweep over panels */}
-              <motion.div
-                className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl"
-                initial={{ x: "-100%" }}
-                animate={{ x: ["- 100%", "200%"] }}
-                transition={{ duration: 5, repeat: Infinity, repeatDelay: 10, ease: "easeInOut" }}
-              >
-                <div className="absolute inset-y-0 w-[30%] bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transform skew-x-12" />
-              </motion.div>
+            <motion.div
+              className="relative h-[480px] hidden lg:block"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1,
+                    delayChildren: 0.2
+                  }
+                }
+              }}
+            >
+              <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden rounded-2xl">
+                <motion.div
+                  className="absolute inset-y-0 w-[30%] bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transform skew-x-12"
+                  animate={{ x: ["-100%", "200%"] }}
+                  transition={{ duration: 5, repeat: Infinity, repeatDelay: 10, ease: "easeInOut" }}
+                />
+              </div>
 
-              {/* Panel composition — staggered glass slabs */}
-              <PrecisionPanel
-                className="w-[260px] h-[340px] top-[10%] left-[5%]"
-                driftX={5} driftY={8} delay={0} duration={14} rotate={-3}
-              />
-              <PrecisionPanel
-                className="w-[180px] h-[220px] top-[30%] left-[38%]"
-                driftX={-4} driftY={6} delay={2} duration={16} rotate={4}
-              />
-              <PrecisionPanel
-                className="w-[140px] h-[160px] bottom-[8%] left-[15%]"
-                driftX={3} driftY={-5} delay={4} duration={18} rotate={-1}
-              />
-              <PrecisionPanel
-                className="w-[200px] h-[120px] top-[5%] right-[5%]"
-                driftX={-3} driftY={7} delay={1} duration={13} rotate={2}
-              />
+              {/* Panel composition — staggered assembly */}
+              <motion.div variants={{ hidden: { x: -20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[260px] h-[340px] top-[10%] left-[5%]" driftX={5} driftY={8} delay={0} duration={14} rotate={-3} />
+              </motion.div>
+              <motion.div variants={{ hidden: { x: 20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[180px] h-[220px] top-[30%] left-[38%]" driftX={-4} driftY={6} delay={2} duration={16} rotate={4} />
+              </motion.div>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[140px] h-[160px] bottom-[8%] left-[15%]" driftX={3} driftY={-5} delay={4} duration={18} rotate={-1} />
+              </motion.div>
+              <motion.div variants={{ hidden: { y: -20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[200px] h-[120px] top-[5%] right-[5%]" driftX={-3} driftY={7} delay={1} duration={13} rotate={2} />
+              </motion.div>
 
               {/* Purple/blue accent glow behind panels */}
               <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-purple-500/8 blur-[60px] rounded-full pointer-events-none" />
               <div className="absolute bottom-[20%] right-[10%] w-[150px] h-[150px] bg-blue-500/8 blur-[50px] rounded-full pointer-events-none" />
 
-              {/* Spec labels floating over panels */}
-              <motion.div
-                className="absolute top-[18%] left-[8%] z-10"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 1 }}
-              >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/60 mb-1">DDR4 / DDR5</div>
-                <div className="text-sm font-bold text-white/80">ECC UDIMM</div>
+              {/* Spec labels floating over panels — choreographed entrance */}
+              <motion.div variants={{ hidden: { y: 10, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, delay: 0.3 } } }} className="absolute top-[25%] left-[12%] z-30">
+                <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-purple-400/60 mb-2">Validation</div>
+                <div className="text-sm font-bold text-white shadow-sm">100% RELIABILITY</div>
               </motion.div>
-              <motion.div
-                className="absolute top-[38%] left-[42%] z-10"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8, duration: 1 }}
-              >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-purple-400/60 mb-1">Registered</div>
-                <div className="text-sm font-bold text-white/80">RDIMM</div>
-              </motion.div>
-              <motion.div
-                className="absolute bottom-[14%] left-[18%] z-10"
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.1, duration: 1 }}
-              >
-                <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-blue-400/50 mb-1">Load-Reduced</div>
-                <div className="text-sm font-bold text-white/70">LRDIMM</div>
+              <motion.div variants={{ hidden: { y: 10, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.5, delay: 0.4 } } }} className="absolute bottom-[22%] left-[42%] z-30">
+                <div className="text-[10px] font-bold uppercase tracking-[0.4em] text-blue-400/60 mb-2">Compliance</div>
+                <div className="text-sm font-bold text-white shadow-sm">JEDEC STANDARD</div>
               </motion.div>
 
               {/* Thin horizontal rule — precision line */}
               <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* ABOUT SECTION - REFINED CORPORATE */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative overflow-hidden">
+      <div className="section-divider opacity-50" />
+
+      {/* ABOUT SUNEDGE — restructured for visual authority */}
+      <section className="py-60 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         {/* Background precision panels — depth framing */}
         <PrecisionPanel
-          className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-60"
+          className="w-[300px] h-[400px] -top-[5%] -right-[5%] opacity-40"
           driftX={3} driftY={5} delay={0} duration={20} rotate={8}
         />
         <PrecisionPanel
-          className="w-[200px] h-[280px] bottom-[10%] -left-[3%] opacity-40"
+          className="w-[200px] h-[280px] bottom-[10%] -left-[3%] opacity-20"
           driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
         />
-        <div className="mx-auto max-w-7xl relative z-10">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
+        <div className="mx-auto w-full max-w-[1600px] relative z-10">
           {/* Header */}
-          <div className="mb-20">
-            <h2 className="text-5xl font-bold md:text-8xl tracking-tight leading-[0.95]">
-              <div className="overflow-hidden"><CinematicText>About SunEdge.</CinematicText></div>
-            </h2>
+          <div className="mb-24">
+            <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">About SunEdge</h2>
+            <div className="w-24 h-1 bg-blue-500 rounded-full" />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
-            {/* LEFT: Precision visual composition */}
-            <div className="relative h-[420px] hidden lg:flex items-center justify-center">
-              {/* Thin geometric lines */}
-              <div className="absolute inset-0 pointer-events-none">
-                <div className="absolute top-[15%] left-[10%] w-[60%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
-                <div className="absolute top-[50%] left-[5%] w-[80%] h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-                <div className="absolute top-[80%] left-[20%] w-[50%] h-[1px] bg-gradient-to-r from-transparent via-purple-500/15 to-transparent" />
-                <div className="absolute top-[10%] left-[30%] w-[1px] h-[80%] bg-gradient-to-b from-transparent via-white/8 to-transparent" />
-              </div>
-              {/* Glass slab stack */}
-              <PrecisionPanel className="w-[220px] h-[280px] top-[10%] left-[8%]" driftX={4} driftY={6} delay={0} duration={16} rotate={-4} />
-              <PrecisionPanel className="w-[160px] h-[200px] top-[25%] left-[35%]" driftX={-3} driftY={5} delay={2} duration={18} rotate={3} />
-              <PrecisionPanel className="w-[120px] h-[140px] bottom-[12%] left-[20%]" driftX={2} driftY={-4} delay={4} duration={14} rotate={-2} />
+          <div className="grid lg:grid-cols-2 gap-32 items-start">
+            {/* LEFT: Precision visual composition — choreographed assembly */}
+            <motion.div
+              className="relative h-[480px] hidden lg:flex items-center justify-center border-r border-white/5"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={{
+                visible: {
+                  transition: {
+                    staggerChildren: 0.1,
+                    delayChildren: 0.2
+                  }
+                }
+              }}
+            >
+              {/* Glass slab stack — assembled motion */}
+              <motion.div variants={{ hidden: { x: -20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[220px] h-[280px] top-[10%] left-[8%]" driftX={4} driftY={6} delay={0} duration={16} rotate={-4} />
+              </motion.div>
+              <motion.div variants={{ hidden: { x: 20, opacity: 0 }, visible: { x: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[160px] h-[200px] top-[25%] left-[45%]" driftX={-3} driftY={5} delay={2} duration={18} rotate={3} />
+              </motion.div>
+              <motion.div variants={{ hidden: { y: 20, opacity: 0 }, visible: { y: 0, opacity: 1, transition: { duration: 0.65, ease: [0.23, 1, 0.32, 1] } } }}>
+                <PrecisionPanel className="w-[120px] h-[140px] bottom-[12%] left-[25%]" driftX={2} driftY={-4} delay={4} duration={14} rotate={-2} />
+              </motion.div>
               {/* Authority labels */}
               <motion.div className="absolute top-[22%] left-[12%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 1 }}>
                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-blue-400/50 mb-1">Recognized</div>
@@ -702,7 +732,7 @@ export function HomePage() {
               </motion.div>
               {/* Ambient glow */}
               <div className="absolute top-1/3 left-1/3 w-[200px] h-[200px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
-            </div>
+            </motion.div>
 
             {/* RIGHT: Scan-friendly authority blocks */}
             <div className="space-y-8">
@@ -733,9 +763,9 @@ export function HomePage() {
       </section>
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
-      <section className="py-40 px-6 md:px-12 lg:px-20 relative bg-[#07070a]">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid lg:grid-cols-2 gap-24">
+      <section className="py-52 px-8 md:px-24 lg:px-40 relative bg-[#07070a]">
+        <div className="mx-auto w-full max-w-[1600px]">
+          <div className="grid lg:grid-cols-2 gap-32">
             <div className="space-y-12">
               <div>
                 <h2 className="text-4xl font-bold md:text-6xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
@@ -840,8 +870,8 @@ export function HomePage() {
       </section>
 
       {/* FINAL CTA SECTION */}
-      <section className="py-40 px-6 text-center relative overflow-hidden">
-        <div className="mx-auto max-w-5xl relative z-10">
+      <section className="py-60 px-8 md:px-24 lg:px-40 text-center relative overflow-hidden">
+        <div className="mx-auto w-full max-w-[1600px] relative z-10">
           <h2 className="text-5xl font-bold md:text-8xl tracking-tight mb-16">
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
@@ -922,6 +952,6 @@ export function HomePage() {
           </div>
         </div>
       </footer>
-    </main>
+    </main >
   );
 }

@@ -64,28 +64,28 @@ function MainSphere() {
             meshRef.current.rotation.y = t * 0.12;
             meshRef.current.rotation.x = Math.sin(t * 0.15) * 0.05;
 
-            // Aggressive breathing pulse (1.0 → 1.06) — energy core feel
-            const breathe = 1.0 + Math.sin(t * 0.6) * 0.06 + Math.sin(t * 1.8) * 0.015;
+            // Aggressive breathing pulse (1.0 → 1.02) — premium energy core feel
+            const breathe = 1.0 + Math.sin(t * 0.6) * 0.015 + Math.sin(t * 1.8) * 0.005;
             meshRef.current.scale.setScalar(breathe);
 
-            // Reactive inertia — smooth cursor tracking with heavier lerp
+            // Reactive inertia — disciplined cursor tracking
             const pointer = state.pointer;
-            targetPos.current.x = pointer.x * 0.5;
-            targetPos.current.y = pointer.y * 0.35;
-            currentPos.current.x += (targetPos.current.x - currentPos.current.x) * 0.04;
-            currentPos.current.y += (targetPos.current.y - currentPos.current.y) * 0.04;
+            targetPos.current.x = pointer.x * 0.3;
+            targetPos.current.y = pointer.y * 0.2;
+            currentPos.current.x += (targetPos.current.x - currentPos.current.x) * 0.025;
+            currentPos.current.y += (targetPos.current.y - currentPos.current.y) * 0.025;
             meshRef.current.position.x = currentPos.current.x;
             meshRef.current.position.y = currentPos.current.y;
         }
 
-        // Dynamic distortion intensity
+        // Dynamic distortion intensity — restrained
         if (materialRef.current) {
-            materialRef.current.distort = 0.22 + Math.sin(t * 0.8) * 0.08;
+            materialRef.current.distort = 0.15 + Math.sin(t * 0.8) * 0.04;
         }
     });
 
     return (
-        <Sphere ref={meshRef} args={[2.2, 128, 128]}>
+        <Sphere ref={meshRef} args={[1.6, 128, 128]}>
             <MeshDistortMaterial
                 ref={materialRef}
                 color="#e8e8ff"
