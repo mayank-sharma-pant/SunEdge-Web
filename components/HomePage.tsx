@@ -1,10 +1,11 @@
 "use client";
 
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, Suspense, useCallback, useState } from "react";
 import dynamic from "next/dynamic";
+import SectionHUD from "./SectionHUD";
 
 const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
 
@@ -156,10 +157,10 @@ function PrecisionPanel({
     >
       <div
         style={{
-          background: "rgba(255,255,255,0.015)",
-          border: "1px solid rgba(255,255,255,0.05)",
-          boxShadow: "0 0 15px rgba(56,182,255,0.02)",
-          backdropFilter: "blur(2px)",
+          background: "rgba(13, 20, 40, 0.55)",
+          border: "1px solid rgba(59, 130, 246, 0.18)",
+          boxShadow: "0 0 30px rgba(59, 130, 246, 0.06), inset 0 1px 0 rgba(255,255,255,0.04)",
+          backdropFilter: "blur(12px)",
         }}
         className="w-full h-full rounded-2xl"
       />
@@ -170,12 +171,12 @@ function PrecisionPanel({
 // Workflow Graphic — Technical system visualization for 'Our Approach'
 function WorkflowGraphic() {
   return (
-    <div className="relative w-full h-full flex items-center justify-center p-8 bg-black/40">
+    <div className="relative w-full h-full flex items-center justify-center p-8 bg-[#060D1E]/80">
       <svg viewBox="0 0 600 400" className="w-full h-full relative z-10 overflow-visible">
         {/* Logic Grid Background */}
         <defs>
           <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(59,130,246,0.07)" strokeWidth="0.5" />
           </pattern>
         </defs>
         <rect width="600" height="400" fill="url(#grid)" />
@@ -242,7 +243,7 @@ function WorkflowGraphic() {
               x={node.x}
               y={node.y + 25}
               textAnchor="middle"
-              fill="rgba(255,255,255,0.4)"
+              fill="rgba(200,215,255,0.45)"
               fontSize="8"
               fontWeight="bold"
               className="uppercase tracking-[0.2em]"
@@ -274,7 +275,7 @@ function WorkflowGraphic() {
       </svg>
 
       {/* Precision Frame Overlay */}
-      <div className="absolute inset-4 border border-white/[0.03] pointer-events-none" />
+      <div className="absolute inset-4 border border-blue-500/10 pointer-events-none" />
       <div className="absolute top-4 left-4 w-4 h-[1px] bg-blue-500/40" />
       <div className="absolute top-4 left-4 w-[1px] h-4 bg-blue-500/40" />
       <div className="absolute bottom-4 right-4 w-4 h-[1px] bg-purple-500/40" />
@@ -283,15 +284,168 @@ function WorkflowGraphic() {
   );
 }
 
-function HardwareVisualPlaceholder({ index }: { index: number }) {
+// Cinematic Preloader — Premium boot sequence
+function CinematicPreloader() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + Math.random() * 5));
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="relative mb-10 h-44 overflow-hidden rounded-3xl border border-white/[0.08] bg-[linear-gradient(145deg,rgba(123,92,255,0.14),rgba(56,182,255,0.08)_42%,rgba(255,255,255,0.02))]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.16),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(56,182,255,0.18),transparent_40%)]" />
-      <div className="absolute -top-10 left-8 h-32 w-32 rounded-full border border-white/10 bg-white/[0.02] blur-[1px]" />
-      <div className="absolute bottom-[-24px] right-8 h-24 w-40 rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-md" />
-      <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_30%,rgba(255,255,255,0.04)_50%,transparent_70%)] opacity-70" />
-      <div className="absolute left-6 top-6 text-[10px] font-bold uppercase tracking-[0.32em] text-white/50">Surface {index + 1}</div>
-      <div className="absolute bottom-6 left-6 h-[1px] w-20 bg-gradient-to-r from-blue-500/80 to-transparent" />
+    <motion.div
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 1.1, filter: "blur(20px)" }}
+      transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }}
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0A0F1E] px-8"
+    >
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.12),transparent)]" />
+      </div>
+
+      <div className="w-full max-w-md relative">
+        <div className="flex justify-between items-end mb-4">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-blue-400/80 mb-1">System Boot</span>
+            <span className="text-xl font-black text-white tracking-tighter uppercase italic">SunEdge_Core_v2.0</span>
+          </div>
+          <span className="text-xs font-mono text-blue-400">{Math.floor(progress)}%</span>
+        </div>
+
+        <div className="h-[2px] w-full bg-white/10 relative overflow-hidden flex items-center">
+          <motion.div
+            className="h-full bg-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.5)]"
+            initial={{ width: "0%" }}
+            animate={{ width: `${progress}%` }}
+            transition={{ ease: "easeOut" }}
+          />
+        </div>
+
+        <div className="mt-6 flex justify-between text-[9px] font-mono text-blue-400/50 uppercase tracking-widest">
+          <span>Loading_Modules...</span>
+          <span>Encrypted_Link_Active</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function HardwareVisualPlaceholder({ index }: { index: number }) {
+  const visuals = [
+    // 0: RAM Modules
+    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+      <defs>
+        <linearGradient id="ramGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#38B6FF" stopOpacity="0.2" />
+          <stop offset="50%" stopColor="#38B6FF" stopOpacity="0.5" />
+          <stop offset="100%" stopColor="#38B6FF" stopOpacity="0.2" />
+        </linearGradient>
+      </defs>
+      <rect x="50" y="80" width="300" height="40" rx="4" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.25)" />
+      {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
+        <motion.rect
+          key={i}
+          x={70 + i * 35} y="85" width="25" height="30" rx="2"
+          fill="rgba(56,182,255,0.1)"
+          initial={{ opacity: 0.3 }}
+          animate={{ opacity: [0.3, 0.8, 0.3] }}
+          transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
+        />
+      ))}
+      <path d="M 50 120 L 350 120" stroke="url(#ramGrad)" strokeWidth="2" strokeDasharray="4 2" />
+    </svg>,
+
+    // 1: Storage Devices
+    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+      <rect x="100" y="40" width="200" height="120" rx="8" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
+      <motion.path
+        d="M 120 70 H 280 M 120 100 H 280 M 120 130 H 280"
+        stroke="rgba(56,182,255,0.3)" strokeWidth="1"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <circle cx="250" cy="100" r="30" fill="none" stroke="rgba(56,182,255,0.1)" strokeWidth="0.5" />
+      <motion.circle
+        cx="250" cy="100" r="15"
+        fill="rgba(56,182,255,0.2)"
+        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </svg>,
+
+    // 2: Server Hardware
+    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+      {[40, 80, 120].map((y, i) => (
+        <g key={i}>
+          <rect x="60" y={y} width="280" height="30" rx="2" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
+          <circle cx="80" cy={y + 15} r="3" fill="#38B6FF" opacity="0.6">
+            <animate attributeName="opacity" values="0.2;1;0.2" dur="1s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
+          </circle>
+          <motion.rect
+            x="280" y={y + 12} width="40" height="6" rx="3"
+            fill="rgba(56,182,255,0.1)"
+            animate={{ width: [10, 40, 10] }}
+            transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+          />
+        </g>
+      ))}
+    </svg>,
+
+    // 3: Custom Setup
+    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+      <path d="M 100 150 L 150 50 L 250 50 L 300 150 Z" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
+      <motion.path
+        d="M 150 50 L 250 50" stroke="#38B6FF" strokeWidth="3"
+        animate={{ opacity: [0.2, 1, 0.2] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      <circle cx="200" cy="100" r="40" fill="none" stroke="rgba(56,182,255,0.05)" strokeWidth="1" />
+      <motion.path
+        d="M 160 100 A 40 40 0 0 1 240 100"
+        stroke="rgba(123,92,255,0.4)" strokeWidth="2" fill="none"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+        style={{ transformOrigin: "200px 100px" }}
+      />
+    </svg>,
+
+    // 4: Enterprise Solutions
+    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
+      <rect x="50" y="50" width="300" height="100" rx="12" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
+      <motion.path
+        d="M 50 100 H 350" stroke="rgba(56,182,255,0.1)" strokeWidth="1" strokeDasharray="10 5"
+        animate={{ strokeDashoffset: [0, -30] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+      />
+      {[100, 150, 200, 250, 300].map((x, i) => (
+        <motion.circle
+          key={i}
+          cx={x} cy="100" r="4" fill="#38B6FF"
+          animate={{ r: [3, 5, 3], opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity }}
+        />
+      ))}
+    </svg>
+  ];
+
+  return (
+    <div className="relative mb-12 h-52 overflow-hidden rounded-[32px] border border-blue-500/15 bg-[#060D1E] flex items-center justify-center">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.10),transparent_70%)]" />
+      <div className="relative z-10 w-full h-full p-6">
+        {visuals[index] || visuals[0]}
+      </div>
+
+      {/* Decorative Technical Overlays */}
+      <div className="absolute top-6 left-6 w-2 h-2 border-l border-t border-blue-500/30" />
+      <div className="absolute top-6 right-6 w-2 h-2 border-r border-t border-blue-500/30" />
+      <div className="absolute bottom-6 left-6 w-2 h-2 border-l border-b border-blue-500/30" />
+      <div className="absolute bottom-6 right-6 w-2 h-2 border-r border-b border-blue-500/30" />
+
+      <div className="absolute bottom-6 inset-x-6 h-[1px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent" />
     </div>
   );
 }
@@ -352,8 +506,17 @@ const whyChooseUs = [
 ];
 
 export function HomePage() {
+  const horizontalSectionRef = useRef<HTMLDivElement>(null);
+  const horizontalTrackRef = useRef<HTMLDivElement>(null);
+  const [activeSection, setActiveSection] = useState({ name: "Core_System", code: "S_01" });
+  const [isLoading, setIsLoading] = useState(true);
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 3000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -430,7 +593,7 @@ export function HomePage() {
         );
       });
 
-      // 3) Horizontal Scroll
+      // 3) Horizontal Scroll — Sliding Showcase
       if (horizontalSectionRef.current && horizontalTrackRef.current) {
         const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
 
@@ -469,6 +632,46 @@ export function HomePage() {
         });
       }
 
+      // Section HUD Logic
+      ScrollTrigger.create({
+        trigger: "#hero",
+        start: "top center",
+        end: "bottom center",
+        onToggle: self => self.isActive && setActiveSection({ name: "Core_System", code: "S_01" })
+      });
+      ScrollTrigger.create({
+        trigger: "#services",
+        start: "top center",
+        end: "bottom center",
+        onToggle: self => self.isActive && setActiveSection({ name: "Strategic_Services", code: "S_02" })
+      });
+
+      const hardwareTrigger = horizontalSectionRef.current;
+      if (hardwareTrigger) {
+        ScrollTrigger.create({
+          trigger: hardwareTrigger,
+          start: "top center",
+          end: () => `+=${horizontalTrackRef.current?.scrollWidth || 2000}`,
+          onToggle: self => self.isActive && setActiveSection({ name: "Hardware_Showcase", code: "H_01" })
+        });
+      }
+
+      const memoryTrigger = document.getElementById("memory");
+      if (memoryTrigger) {
+        ScrollTrigger.create({
+          trigger: memoryTrigger,
+          start: "top center",
+          end: "bottom center",
+          onToggle: self => self.isActive && setActiveSection({ name: "Memory_Systems", code: "M_01" })
+        });
+      }
+      ScrollTrigger.create({
+        trigger: "#about",
+        start: "top center",
+        end: "bottom center",
+        onToggle: self => self.isActive && setActiveSection({ name: "Brand_Authority", code: "S_06" })
+      });
+
       // Parallax Drift for Depth
       gsap.to(".parallax-layer", {
         y: -100,
@@ -486,11 +689,15 @@ export function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#07070a] text-[#f6f7fb]">
+    <main className="min-h-screen bg-[#0A0F1E] text-[#E8EEFF]">
+      <AnimatePresence>
+        {isLoading && <CinematicPreloader />}
+      </AnimatePresence>
+      <SectionHUD sectionName={activeSection.name} sectionCode={activeSection.code} />
       <div className="ambient-bg" />
 
       {/* HERO SECTION - SPLIT SCREEN */}
-      <section className="hero-section relative flex min-h-screen items-center px-8 md:px-24 lg:px-40 overflow-hidden">
+      <section id="hero" className="hero-section relative flex min-h-screen items-center px-8 md:px-24 lg:px-40 overflow-hidden">
         {/* Cinematic ambient light streaks */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[20%] -left-[10%] w-[70%] h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent transform rotate-[15deg]" />
@@ -501,7 +708,7 @@ export function HomePage() {
 
         <div className="mx-auto w-full max-w-[1360px] relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
           <div className="hero-content">
-            <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/70">
+            <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/80">
               SunEdge IT Solution Private Limited
             </p>
             <h1 className="hero-headline text-4xl font-bold leading-[1.1] md:text-6xl lg:text-7xl tracking-tight">
@@ -516,24 +723,24 @@ export function HomePage() {
               </div>
             </h1>
             <div className="mt-8 max-w-xl">
-              <p className="text-base text-slate-400 md:text-lg leading-relaxed">
+              <p className="text-base text-blue-100/50 md:text-lg leading-relaxed">
                 Powering enterprises with next-generation software and mission-critical hardware infrastructure.
               </p>
             </div>
             <div className="mt-12 flex flex-wrap gap-6">
-              <MagneticButton className="rounded-full bg-blue-600 px-10 py-5 font-bold tracking-wide transition-all duration-500 hover:bg-blue-500 hover:shadow-[0_0_40px_rgba(37,99,235,0.5)] active:scale-[0.97]">
+              <MagneticButton className="rounded-full bg-blue-500 px-10 py-5 text-white font-bold tracking-wide transition-all duration-500 hover:bg-blue-400 hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] active:scale-[0.97]">
                 Explore Our Solutions
               </MagneticButton>
-              <MagneticButton className="rounded-full border border-white/15 bg-white/[0.03] backdrop-blur-md px-10 py-5 font-bold tracking-wide transition-all duration-500 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_30px_rgba(255,255,255,0.08)] active:scale-[0.97]">
+              <MagneticButton className="rounded-full border border-blue-500/25 bg-blue-950/40 backdrop-blur-md px-10 py-5 font-bold text-blue-100 tracking-wide transition-all duration-500 hover:bg-blue-900/60 hover:border-blue-400/40 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] active:scale-[0.97]">
                 Contact Us
               </MagneticButton>
             </div>
           </div>
 
           <div className="relative flex justify-center items-center h-[500px] md:h-[700px]">
-            <div className="parallax-layer absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-              <div className="w-[600px] h-[600px] border border-white/5 rounded-full" />
-              <div className="absolute w-[400px] h-[400px] border border-white/5 rounded-full" />
+            <div className="parallax-layer absolute inset-0 flex items-center justify-center pointer-events-none opacity-30">
+              <div className="w-[600px] h-[600px] border border-blue-500/10 rounded-full" />
+              <div className="absolute w-[400px] h-[400px] border border-blue-400/10 rounded-full" />
             </div>
             <div className="relative z-20 w-full h-full">
               <Suspense fallback={<div className="w-10 h-10 rounded-full border border-white/10 animate-spin mx-auto mt-72" />}>
@@ -547,27 +754,27 @@ export function HomePage() {
       <div className="section-divider opacity-50" />
 
       {/* STRATEGIC SOLUTIONS GRID */}
-      <section className="py-40 px-8 md:px-24 lg:px-40 relative z-10">
+      <section id="services" className="py-40 px-8 md:px-24 lg:px-40 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
         <div className="mx-auto w-full max-w-[1360px]">
           <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-xl">
               <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
-              <p className="text-lg text-slate-400">Custom-engineered packages for vertical-specific technology demands.</p>
+              <p className="text-lg text-blue-200/50">Custom-engineered packages for vertical-specific technology demands.</p>
             </div>
-            <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent hidden md:block mb-6 md:ml-12" />
+            <div className="h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent hidden md:block mb-6 md:ml-12" />
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
             {solutions.map((item, i) => (
-              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-12 bg-black/80 border border-white/[0.06] backdrop-blur-2xl transition-all duration-700 group hover:border-blue-500/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.15)]">
+              <TiltCard key={i} className="service-card relative overflow-hidden rounded-[32px] p-12 bg-[#0D1630]/70 border border-blue-500/10 backdrop-blur-2xl transition-all duration-700 group hover:border-blue-400/30 hover:shadow-[0_0_60px_rgba(59,130,246,0.18)]">
                 {/* Scanner sweep effect on hover */}
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000">
                   <div className="absolute inset-0 bg-gradient-to-b from-blue-500/10 via-transparent to-transparent" />
                 </div>
-                <div className="absolute top-0 right-0 p-8 text-white/[0.03] font-black text-7xl group-hover:text-blue-500/10 transition-all duration-700">0{i + 1}</div>
+                <div className="absolute top-0 right-0 p-8 text-blue-500/[0.07] font-black text-7xl group-hover:text-blue-400/15 transition-all duration-700">0{i + 1}</div>
                 <h3 className="text-3xl font-bold mb-6 tracking-tight group-hover:text-blue-400 transition-all duration-500 relative z-[2]">{item.title}</h3>
-                <p className="text-slate-400 leading-relaxed text-lg relative z-[2]">{item.desc}</p>
+                <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{item.desc}</p>
                 <div className="mt-12 h-[2px] w-0 bg-gradient-to-r from-blue-500 to-blue-400/0 group-hover:w-full transition-all duration-1000 ease-out" />
               </TiltCard>
             ))}
@@ -578,11 +785,11 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* PROTOCOL APPROACH */}
-      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section id="about" className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         <div className="mx-auto w-full max-w-[1360px]">
           <div className="grid lg:grid-cols-2 gap-32 items-center">
             <div className="relative">
-              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
+              <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden relative group">
                 <WorkflowGraphic />
               </div>
             </div>
@@ -592,12 +799,12 @@ export function HomePage() {
               <div className="space-y-12">
                 {approachSteps.map((step, i) => (
                   <div key={i} className="flex gap-8 group">
-                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5 text-blue-500 font-bold group-hover:border-blue-500/30 transition-all duration-500">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-400 transition-all duration-500">
                       {i + 1}
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-all duration-300">{step.title}</h3>
-                      <p className="text-slate-400 leading-relaxed text-lg">{step.desc}</p>
+                      <p className="text-blue-100/40 leading-relaxed text-lg">{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -609,57 +816,38 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      {/* HARDWARE INFRASTRUCTURE */}
-      <section className="relative overflow-hidden bg-black/60 py-32 px-6 md:px-10 xl:px-16">
-        {/* Dramatic depth lighting */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-600/8 blur-[120px] rounded-full" />
-          <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-600/6 blur-[100px] rounded-full" />
-        </div>
-        <div className="mx-auto w-full max-w-[1360px] relative z-10">
+      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
+      <section ref={horizontalSectionRef} id="hardware" className="relative overflow-hidden bg-[#080E1C]">
+        <div className="mx-auto w-full max-w-[1360px] relative z-10 px-8 py-32 md:px-24 lg:px-40">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight">Hardware Infrastructure</h2>
           <p className="mt-6 text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
-
-          <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-            {hardwareProducts.map((product, i) => (
-              <article key={i} className="relative overflow-hidden rounded-[36px] p-10 xl:p-12 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_90px_rgba(59,130,246,0.16)]">
-                {/* Depth glow on hover */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
-                </div>
-                <HardwareVisualPlaceholder index={i} />
-                <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-6 opacity-60">Module 0{i + 1}</p>
-                <h3 className="text-2xl xl:text-3xl font-bold mb-6 tracking-tight">{product.title}</h3>
-                <p className="text-slate-300 leading-relaxed text-lg relative z-[2] max-w-[56ch]">{product.desc}</p>
-              </article>
-            ))}
-          </div>
-          <p className="mt-6 text-lg text-slate-400">Reliable hardware for mission-critical business environments.</p>
         </div>
 
         <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
           {hardwareProducts.map((product, i) => (
-            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_100px_rgba(59,130,246,0.18)]">
-              {/* Depth glow on hover */}
+            <article key={i} className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-12 bg-[#0D1630]/80 border border-blue-500/12 backdrop-blur-3xl group hover:border-blue-400/30 transition-all duration-700 hover:shadow-[0_0_80px_rgba(59,130,246,0.20)]">
+              {/* Depth lighting */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
                 <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
               </div>
+
               <HardwareVisualPlaceholder index={i} />
-              <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
-              <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
-              <p className="text-slate-300 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
-            </div>
+              <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.4em] mb-8 opacity-60">System_Module 0{i + 1}</p>
+              <h3 className="text-3xl font-bold mb-8 tracking-tighter text-white">{product.title}</h3>
+              <p className="text-blue-100/40 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
+
+              <div className="mt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
+                <span className="w-2 h-2 rounded-full bg-blue-500/40 animate-pulse" />
+                <span>Verification_Active</span>
+              </div>
+            </article>
           ))}
         </div>
-        <div className="section-divider opacity-50 mt-20" />
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
-      <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
+      <section id="memory" className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
         {/* Enhanced ambient depth — purple/blue accent lighting */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
@@ -676,15 +864,15 @@ export function HomePage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
-                  <p className="text-slate-300 leading-relaxed">JEDEC-compliant modules with structured validation and burn-in testing for enterprise reliability.</p>
+                  <p className="text-blue-100/50 leading-relaxed">JEDEC-compliant modules with structured validation and burn-in testing for enterprise reliability.</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
-                  <p className="text-slate-300 leading-relaxed">Batch-level traceability ensuring consistent quality across every production run.</p>
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2.5 shrink-0" />
+                  <p className="text-blue-100/50 leading-relaxed">Batch-level traceability ensuring consistent quality across every production run.</p>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 shrink-0" />
-                  <p className="text-slate-300 leading-relaxed">Rigorous multi-stage testing protocols before deployment to customer environments.</p>
+                  <div className="w-1.5 h-1.5 bg-blue-400 rounded-full mt-2.5 shrink-0" />
+                  <p className="text-blue-100/50 leading-relaxed">Rigorous multi-stage testing protocols before deployment to customer environments.</p>
                 </div>
               </div>
             </div>
@@ -741,7 +929,7 @@ export function HomePage() {
               </motion.div>
 
               {/* Thin horizontal rule — precision line */}
-              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent" />
             </motion.div>
           </div>
         </div>
@@ -771,7 +959,7 @@ export function HomePage() {
           <div className="grid lg:grid-cols-2 gap-32 items-start">
             {/* LEFT: Precision visual composition — choreographed assembly */}
             <motion.div
-              className="relative h-[480px] hidden lg:flex items-center justify-center border-r border-white/5"
+              className="relative h-[480px] hidden lg:flex items-center justify-center border-r border-blue-500/10"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
@@ -797,15 +985,15 @@ export function HomePage() {
               {/* Authority labels */}
               <motion.div className="absolute top-[22%] left-[12%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4, duration: 1 }}>
                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-blue-400/50 mb-1">Recognized</div>
-                <div className="text-xs font-bold text-white/60">DPIIT Startup</div>
+                <div className="text-xs font-bold text-blue-300/70">DPIIT Startup</div>
               </motion.div>
               <motion.div className="absolute top-[42%] left-[40%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 1 }}>
                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-purple-400/50 mb-1">Registered</div>
-                <div className="text-xs font-bold text-white/60">MSME India</div>
+                <div className="text-xs font-bold text-violet-300/60">MSME India</div>
               </motion.div>
               <motion.div className="absolute bottom-[18%] left-[24%] z-10" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.0, duration: 1 }}>
                 <div className="text-[9px] font-bold uppercase tracking-[0.3em] text-white/30 mb-1">HQ</div>
-                <div className="text-xs font-bold text-white/50">New Delhi, India</div>
+                <div className="text-xs font-bold text-blue-200/50">New Delhi, India</div>
               </motion.div>
               {/* Ambient glow */}
               <div className="absolute top-1/3 left-1/3 w-[200px] h-[200px] bg-blue-500/5 blur-[80px] rounded-full pointer-events-none" />
@@ -815,9 +1003,9 @@ export function HomePage() {
             <div className="space-y-8">
               {/* Statement block */}
               <div className="border-l-2 border-blue-500/40 pl-8 py-2">
-                <p className="text-2xl md:text-3xl font-light text-slate-200 leading-snug">
+                <p className="text-2xl md:text-3xl font-light text-blue-100/60 leading-snug">
                   <span className="text-blue-400 font-bold">DPIIT Recognized.</span>{" "}
-                  <span className="text-purple-400 font-bold">MSME Registered.</span>{" "}
+                  <span className="text-violet-400 font-bold">MSME Registered.</span>{" "}
                   Performance Driven.
                 </p>
               </div>
@@ -825,11 +1013,11 @@ export function HomePage() {
               {/* Compact authority items */}
               <div className="grid grid-cols-1 gap-4 pt-4">
                 {whyChooseUs.map((item, i) => (
-                  <div key={i} className="flex gap-5 items-start group p-5 border border-white/[0.04] rounded-2xl hover:border-blue-500/20 hover:bg-white/[0.02] transition-all duration-500">
+                  <div key={i} className="flex gap-5 items-start group p-5 border border-blue-500/10 rounded-2xl hover:border-blue-500/25 hover:bg-blue-500/5 transition-all duration-500">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
                     <div>
                       <h4 className="text-sm font-bold text-white mb-1 tracking-wide">{item.title}</h4>
-                      <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+                      <p className="text-blue-100/40 text-sm leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -840,20 +1028,20 @@ export function HomePage() {
       </section>
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
-      <section className="py-52 px-8 md:px-24 lg:px-40 relative bg-[#07070a]">
+      <section className="py-52 px-8 md:px-24 lg:px-40 relative bg-[#080E1C]">
         <div className="mx-auto w-full max-w-[1360px]">
           <div className="grid lg:grid-cols-2 gap-32">
             <div className="space-y-12">
               <div>
                 <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">Let&apos;s Talk About Your Requirements</h2>
-                <p className="text-lg text-slate-400 leading-relaxed max-w-xl">
+                <p className="text-lg text-blue-100/50 leading-relaxed max-w-xl">
                   Share your current goals and technical constraints. Our team will respond with a practical, implementation-ready direction.
                 </p>
               </div>
 
               <div className="space-y-10">
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -863,7 +1051,7 @@ export function HomePage() {
                 </div>
 
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -874,7 +1062,7 @@ export function HomePage() {
                 </div>
 
                 <div className="flex gap-6 items-start group">
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center group-hover:border-blue-500/30 transition-all shrink-0 mt-1">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover:border-blue-400/40 transition-all shrink-0 mt-1">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
                   </div>
                   <div>
@@ -888,16 +1076,16 @@ export function HomePage() {
             </div>
 
             <div className="relative">
-              <div className="surface-tint p-12 md:p-16 border border-white/5 relative overflow-hidden">
+              <div className="surface-tint p-12 md:p-16 border border-blue-500/15 relative overflow-hidden">
                 {status === "success" ? (
-                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#07070a]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0A0F1E]/95 backdrop-blur-md p-8 text-center animate-in fade-in duration-500">
                     <div className="w-16 h-16 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center mb-6">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
                     <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-                    <p className="text-slate-400">Thank you for contacting us. We will get back to you shortly.</p>
+                    <p className="text-blue-100/50">Thank you for contacting us. We will get back to you shortly.</p>
                     <button onClick={() => setStatus("idle")} className="mt-8 text-sm text-blue-400 hover:text-blue-300 font-bold uppercase tracking-widest">Send Another</button>
                   </div>
                 ) : null}
@@ -910,7 +1098,7 @@ export function HomePage() {
                       required
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -920,7 +1108,7 @@ export function HomePage() {
                       required
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
                     />
                   </div>
                   <div className="space-y-2">
@@ -930,10 +1118,10 @@ export function HomePage() {
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-6 py-3.5 outline-none focus:border-blue-500/50 focus:bg-white/[0.05] transition-all input-focus-glow"
+                      className="w-full bg-[#0D1630] border border-blue-500/20 text-blue-100 rounded-xl px-6 py-3.5 outline-none focus:border-blue-400/50 focus:bg-[#101D40] transition-all input-focus-glow"
                     />
                   </div>
-                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 py-4 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_0_20px_rgba(37,99,235,0.25)] disabled:opacity-50 disabled:cursor-not-allowed">
+                  <MagneticButton disabled={status === "sending"} className="w-full rounded-full bg-blue-600 text-white py-4 font-bold tracking-wide transition-colors hover:bg-blue-700 hover:shadow-[0_4px_20px_rgba(29,110,230,0.3)] disabled:opacity-50 disabled:cursor-not-allowed">
                     {status === "sending" ? "Sending..." : "Submit Inquiry"}
                   </MagneticButton>
                   {status === "error" && (
@@ -953,11 +1141,11 @@ export function HomePage() {
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
           </h2>
-          <MagneticButton className="rounded-full bg-white text-black px-16 py-6 text-lg font-black transition-all hover:scale-[1.03] active:scale-95 shadow-[0_0_30px_rgba(255,255,255,0.15)]">
+          <MagneticButton className="rounded-full bg-blue-500 text-white px-16 py-6 text-lg font-black transition-all hover:scale-[1.03] hover:bg-blue-400 hover:shadow-[0_0_50px_rgba(59,130,246,0.4)] active:scale-95">
             GET CONSULTATION
           </MagneticButton>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-blue-600/8 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-96 bg-gradient-to-t from-blue-500/10 to-transparent pointer-events-none" />
       </section>
 
       {/* WHATSAPP QUICK CHAT */}
@@ -976,12 +1164,12 @@ export function HomePage() {
       </a>
 
 
-      <footer className="py-20 px-6 border-t border-white/5 text-slate-500 text-sm bg-black/40 backdrop-blur-xl">
+      <footer className="py-20 px-6 border-t border-blue-500/10 text-blue-200/40 text-sm bg-[#060B18]">
         <div className="mx-auto max-w-7xl">
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="md:col-span-2">
               <div className="text-white font-bold tracking-widest uppercase mb-6 text-lg">SunEdge IT Solution Pvt. Ltd.</div>
-              <p className="max-w-xs text-slate-400 mb-8 leading-relaxed">
+              <p className="max-w-xs text-blue-200/40 mb-8 leading-relaxed">
                 Empowering enterprises with next-generation technology infrastructure and strategic software solutions.
               </p>
               <div className="flex gap-4">
@@ -989,7 +1177,7 @@ export function HomePage() {
               </div>
             </div>
             <div>
-              <h4 className="text-white font-bold uppercase tracking-widest mb-6 text-xs">Services</h4>
+              <h4 className="text-blue-300/60 font-bold uppercase tracking-widest mb-6 text-xs">Services</h4>
               <ul className="space-y-4">
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Software Solutions</a></li>
                 <li><a href="#" className="hover:text-blue-400 transition-colors">IT Consulting</a></li>
@@ -997,7 +1185,7 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold uppercase tracking-widest mb-6 text-xs">Hardware</h4>
+              <h4 className="text-blue-300/60 font-bold uppercase tracking-widest mb-6 text-xs">Hardware</h4>
               <ul className="space-y-4">
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Enterprise Servers</a></li>
                 <li><a href="#" className="hover:text-blue-400 transition-colors">Storage Solutions</a></li>
@@ -1006,7 +1194,7 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="pt-8 border-t border-blue-500/10 flex flex-col md:flex-row justify-between items-center gap-6">
             <p>© 2026 SunEdge IT Solution Pvt. Ltd. All rights reserved.</p>
             <div className="flex gap-8 text-xs font-bold uppercase tracking-widest">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
