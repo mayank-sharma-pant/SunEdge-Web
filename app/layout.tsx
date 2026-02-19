@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "SunEdge IT Solution Private Limited is a DPIIT-recognized startup delivering reliable IT services, enterprise software solutions, and high-performance computer hardware products.",
 };
 
+import PrecisionCursor from "@/components/PrecisionCursor";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={jakarta.className}>{children}</body>
+      <body className={jakarta.className}>
+        <PrecisionCursor />
+        {children}
+      </body>
     </html>
   );
 }
