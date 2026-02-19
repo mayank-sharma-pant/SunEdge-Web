@@ -5,82 +5,116 @@ import { useRef, useMemo } from "react";
 import { MeshDistortMaterial, Float, Environment, Sphere } from "@react-three/drei";
 import * as THREE from "three";
 
-function Satellite({ radius, speed, offset, color }: { radius: number, speed: number, offset: number, color: string }) {
-    const ref = useRef<THREE.Group>(null);
+function OrbitalRing({
+    radius,
+    tilt,        // euler angles that tilt the whole ring plane [x,y,z]
+    speed,       // orbital speed (radians per second)
+    ringColor,
+    dotColor,
+    dotOffset,   // starting angle offset (radians)
+    tubeRadius = 0.004,
+}: {
+    radius: number;
+    tilt: [number, number, number];
+    speed: number;
+    ringColor: string;
+    dotColor: string;
+    dotOffset: number;
+    tubeRadius?: number;
+}) {
+    const groupRef = useRef<THREE.Group>(null);         // the whole ring+dot group
+    const dotRef = useRef<THREE.Mesh>(null);
+    const lightRef = useRef<THREE.PointLight>(null);
+
+    // Pre-build the local-space axes from the tilt so dots orbit in the ring plane
+    const euler = useMemo(() => new THREE.Euler(...tilt), [tilt]);
+    const quaternion = useMemo(() => new THREE.Quaternion().setFromEuler(euler), [euler]);
 
     useFrame((state) => {
-        const t = state.clock.getElapsedTime() * speed + offset;
-        if (ref.current) {
-            ref.current.position.set(
-                Math.cos(t) * radius,
-                Math.sin(t * 0.5) * (radius * 0.5),
-                Math.sin(t) * radius
-            );
+        const t = state.clock.getElapsedTime();
+        const angle = t * speed + dotOffset;
+
+        // Orbit position in LOCAL ring plane (XY plane)
+        const localX = Math.cos(angle) * radius;
+        const localY = Math.sin(angle) * radius;
+        const localPos = new THREE.Vector3(localX, localY, 0);
+
+        // Rotate into world space using the same quaternion as the ring group
+        localPos.applyQuaternion(quaternion);
+
+        if (dotRef.current) {
+            dotRef.current.position.copy(localPos);
+        }
+        if (lightRef.current) {
+            lightRef.current.position.copy(localPos);
         }
     });
 
     return (
-        <group ref={ref}>
-            <mesh>
-                <sphereGeometry args={[0.08, 16, 16]} />
-                <meshBasicMaterial color={color} />
+        <group ref={groupRef}>
+            {/* Visible ring torus — tilted in world space */}
+            <group rotation={tilt}>
+                <mesh>
+                    <torusGeometry args={[radius, tubeRadius, 16, 128]} />
+                    <meshBasicMaterial color={ringColor} transparent opacity={0.35} />
+                </mesh>
+            </group>
+
+            {/* Satellite dot — position computed per-frame in useFrame above */}
+            <mesh ref={dotRef}>
+                <sphereGeometry args={[0.07, 16, 16]} />
+                <meshBasicMaterial color={dotColor} />
             </mesh>
-            <pointLight intensity={0.5} distance={2} color={color} />
+
+            {/* Glow emanating from dot */}
+            <pointLight ref={lightRef} intensity={0.6} distance={3} color={dotColor} />
         </group>
     );
 }
 
-function DataRing({ radius, rotation, speed, color }: { radius: number, rotation: [number, number, number], speed: number, color: string }) {
-    const ref = useRef<THREE.Group>(null);
-
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime() * speed;
-        if (ref.current) {
-            ref.current.rotation.z = t;
-        }
-    });
-
-    return (
-        <group rotation={rotation}>
-            <mesh ref={ref}>
-                <torusGeometry args={[radius, 0.005, 16, 100]} />
-                <meshBasicMaterial color={color} transparent opacity={0.3} />
-            </mesh>
-        </group>
-    );
-}
-
+// ──────────────────────────────────────────────────────────
+// MainSphere — shape-shifts, rotates (self-rotation), and
+// slowly revolves its whole body around the Y-axis (revolution)
+// ──────────────────────────────────────────────────────────
 function MainSphere() {
     const meshRef = useRef<THREE.Mesh>(null);
     const materialRef = useRef<any>(null);
     const targetPos = useRef({ x: 0, y: 0 });
     const currentPos = useRef({ x: 0, y: 0 });
-    const { viewport } = useThree();
 
     useFrame((state) => {
         const t = state.clock.getElapsedTime();
+
         if (meshRef.current) {
-            // Cinematic rotation — slightly faster for energy feel
-            meshRef.current.rotation.y = t * 0.12;
-            meshRef.current.rotation.x = Math.sin(t * 0.15) * 0.05;
+            // ── Self rotation (spin on its own axis) ──
+            meshRef.current.rotation.y = t * 0.18;
+            meshRef.current.rotation.x = Math.sin(t * 0.13) * 0.06;
 
-            // Aggressive breathing pulse (1.0 → 1.02) — premium energy core feel
-            const breathe = 1.0 + Math.sin(t * 0.6) * 0.015 + Math.sin(t * 1.8) * 0.005;
-            meshRef.current.scale.setScalar(breathe);
+            // ── Slow revolution around Y (orbit-like full body orbit) ──
+            const rev = t * 0.08;
+            const orbitRadius = 0.15;
+            meshRef.current.position.x =
+                Math.cos(rev) * orbitRadius + currentPos.current.x;
+            meshRef.current.position.z = Math.sin(rev) * orbitRadius;
+            meshRef.current.position.y = currentPos.current.y;
 
-            // Reactive inertia — disciplined cursor tracking
+            // ── Cursor parallax ──
             const pointer = state.pointer;
-            targetPos.current.x = pointer.x * 0.3;
-            targetPos.current.y = pointer.y * 0.2;
+            targetPos.current.x = pointer.x * 0.25;
+            targetPos.current.y = pointer.y * 0.18;
             currentPos.current.x += (targetPos.current.x - currentPos.current.x) * 0.025;
             currentPos.current.y += (targetPos.current.y - currentPos.current.y) * 0.025;
-            meshRef.current.position.x = currentPos.current.x;
-            meshRef.current.position.y = currentPos.current.y;
+
+            // ── Breathing pulse ──
+            const breathe = 1.0 + Math.sin(t * 0.6) * 0.018 + Math.sin(t * 1.9) * 0.006;
+            meshRef.current.scale.setScalar(breathe);
         }
 
-        // Dynamic distortion intensity — restrained
+        // ── Shape-shifting: distort cycles strongly between values ──
         if (materialRef.current) {
-            materialRef.current.distort = 0.15 + Math.sin(t * 0.8) * 0.04;
+            // 0.1 → 0.45 cycle — very visible morphing
+            materialRef.current.distort =
+                0.28 + Math.sin(t * 0.55) * 0.18 + Math.sin(t * 1.3) * 0.07;
         }
     });
 
@@ -88,24 +122,26 @@ function MainSphere() {
         <Sphere ref={meshRef} args={[1.4, 128, 128]}>
             <MeshDistortMaterial
                 ref={materialRef}
-                color="#e8e8ff"
-                speed={0.5}
-                distort={0.22}
+                color="#c8d8ff"
+                speed={1.2}
+                distort={0.28}
                 radius={1}
-                transmission={1}
-                thickness={1.5}
-                roughness={0.08}
-                ior={1.6}
+                transmission={0.95}
+                thickness={2.0}
+                roughness={0.06}
+                ior={1.65}
                 clearcoat={1}
-                clearcoatRoughness={0.12}
-                attenuationColor="#7B5CFF"
-                attenuationDistance={2.5}
+                clearcoatRoughness={0.1}
+                attenuationColor="#5b6fff"
+                attenuationDistance={2.0}
             />
         </Sphere>
     );
 }
 
-// Dramatic cinematic lighting — aggressive intensity shifts
+// ──────────────────────────────────────────────────────────
+// Animated dynamic lighting
+// ──────────────────────────────────────────────────────────
 function AnimatedLights() {
     const purpleRef = useRef<THREE.PointLight>(null);
     const blueRef = useRef<THREE.PointLight>(null);
@@ -114,38 +150,61 @@ function AnimatedLights() {
     useFrame((state) => {
         const t = state.clock.getElapsedTime();
         if (purpleRef.current) {
-            purpleRef.current.intensity = 1.0 + Math.sin(t * 0.5) * 0.4;
-            purpleRef.current.position.x = 10 + Math.sin(t * 0.2) * 3;
+            purpleRef.current.intensity = 1.2 + Math.sin(t * 0.5) * 0.5;
+            purpleRef.current.position.x = 10 + Math.sin(t * 0.2) * 4;
+            purpleRef.current.position.y = 5 + Math.cos(t * 0.18) * 3;
         }
         if (blueRef.current) {
-            blueRef.current.intensity = 0.8 + Math.sin(t * 0.35 + 1.5) * 0.35;
+            blueRef.current.intensity = 1.0 + Math.sin(t * 0.35 + 1.5) * 0.4;
         }
         if (rimRef.current) {
-            rimRef.current.intensity = 0.6 + Math.sin(t * 0.7) * 0.3;
+            rimRef.current.intensity = 0.7 + Math.sin(t * 0.7) * 0.35;
         }
     });
 
     return (
         <>
-            <ambientLight intensity={0.25} />
-            <pointLight ref={purpleRef} position={[10, 10, 10]} intensity={1.2} color="#7B5CFF" />
-            <pointLight ref={blueRef} position={[-10, -5, -10]} intensity={0.9} color="#38B6FF" />
-            {/* Dramatic rim light — back-lighting for cinematic depth */}
-            <pointLight ref={rimRef} position={[0, 8, -12]} intensity={0.8} color="#FF4FD8" />
+            <ambientLight intensity={0.2} />
+            <pointLight ref={purpleRef} position={[10, 8, 8]} intensity={1.4} color="#7B5CFF" />
+            <pointLight ref={blueRef} position={[-10, -5, -10]} intensity={1.0} color="#38B6FF" />
+            <pointLight ref={rimRef} position={[0, 10, -14]} intensity={0.9} color="#60a0ff" />
         </>
     );
 }
 
+// ──────────────────────────────────────────────────────────
+// HeroOrb — main export
+// 3 orbital rings, each with a satellite that travels ON the ring
+// ──────────────────────────────────────────────────────────
 export default function HeroOrb() {
-    const satellites = useMemo(() => [
-        { radius: 3.5, speed: 0.16, offset: 0, color: "#7B5CFF" },
-        { radius: 4.2, speed: 0.12, offset: Math.PI / 2, color: "#38B6FF" },
-        { radius: 3.8, speed: 0.2, offset: Math.PI, color: "#FF4FD8" }
-    ], []);
-
     const rings = useMemo(() => [
-        { radius: 3, rotation: [Math.PI / 4, 0, 0] as [number, number, number], speed: 0.05, color: "#7B5CFF" },
-        { radius: 3.2, rotation: [-Math.PI / 3, 0.5, 0] as [number, number, number], speed: -0.04, color: "#38B6FF" }
+        {
+            radius: 2.8,
+            tilt: [Math.PI / 6, 0, Math.PI / 8] as [number, number, number],
+            speed: 0.5,
+            ringColor: "#7B5CFF",
+            dotColor: "#a78bfa",
+            dotOffset: 0,
+            tubeRadius: 0.005,
+        },
+        {
+            radius: 3.3,
+            tilt: [-Math.PI / 4, Math.PI / 5, 0] as [number, number, number],
+            speed: -0.35,
+            ringColor: "#38B6FF",
+            dotColor: "#7dd3fc",
+            dotOffset: Math.PI / 2,
+            tubeRadius: 0.005,
+        },
+        {
+            radius: 3.8,
+            tilt: [Math.PI / 3, -Math.PI / 6, Math.PI / 4] as [number, number, number],
+            speed: 0.28,
+            ringColor: "#FF4FD8",
+            dotColor: "#f9a8d4",
+            dotOffset: Math.PI,
+            tubeRadius: 0.004,
+        },
     ], []);
 
     return (
@@ -153,22 +212,18 @@ export default function HeroOrb() {
             <Canvas camera={{ position: [0, 0, 10], fov: 45 }} dpr={[1, 2]}>
                 <AnimatedLights />
 
-                <Float speed={0.5} rotationIntensity={0.12} floatIntensity={0.3}>
+                <Float speed={0.4} rotationIntensity={0.08} floatIntensity={0.25}>
                     <MainSphere />
 
                     {rings.map((ring, i) => (
-                        <DataRing key={i} {...ring} />
-                    ))}
-
-                    {satellites.map((sat, i) => (
-                        <Satellite key={i} {...sat} />
+                        <OrbitalRing key={i} {...ring} />
                     ))}
                 </Float>
 
                 <Environment preset="city" />
             </Canvas>
 
-            {/* Aggressive energy glow backdrop */}
+            {/* Ambient glow backdrop */}
             <div className="absolute inset-0 pointer-events-none">
                 <div className="absolute inset-[10%] bg-purple-500/20 blur-[120px] rounded-full animate-[glow-breathe_4s_ease-in-out_infinite]" />
                 <div className="absolute inset-[20%] bg-blue-500/15 blur-[100px] rounded-full animate-[glow-breathe_6s_ease-in-out_infinite_reverse]" />

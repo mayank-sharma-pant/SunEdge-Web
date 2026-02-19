@@ -7,16 +7,19 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      // Extend WITH custom named colors, not override blue/purple defaults
       colors: {
         base: "var(--bg-primary)",
         panel: "var(--bg-secondary)",
-        purple: "#7B5CFF",
-        blue: "#38B6FF",
-        pink: "#FF4FD8",
-        // Extended palette for light mode compatibility
         "text-main": "var(--text-primary)",
         "text-muted": "var(--text-secondary)",
         "border-dim": "var(--border-color)",
+        // Custom brand colors under 'brand' namespace to avoid clobbering Tailwind defaults
+        brand: {
+          purple: "#7B5CFF",
+          blue: "#38B6FF",
+          pink: "#FF4FD8",
+        }
       },
       boxShadow: {
         glow: "0 0 30px rgba(123, 92, 255, 0.15)",
