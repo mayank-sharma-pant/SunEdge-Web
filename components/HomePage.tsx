@@ -772,8 +772,9 @@ export function HomePage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-2">Direct Communication</h4>
-                    <p className="text-lg font-medium">info@sunedgeit.com</p>
-                    <p className="text-lg font-medium">+91 62390 60064</p>
+                    <p className="text-lg font-medium">sales@sunedgesolution.com</p>
+                    <p className="text-lg font-medium">011-40107046</p>
+                    <p className="text-lg font-medium">+91 8882436208</p>
                   </div>
                 </div>
               </div>
@@ -854,7 +855,7 @@ export function HomePage() {
 
       {/* WHATSAPP QUICK CHAT */}
       <a
-        href="https://wa.me/916239060064?text=Hello%20SunEdge%20IT%20Solution"
+        href="https://wa.me/918882436208?text=Hello%20SunEdge%20IT%20Solution"
         target="_blank"
         rel="noopener noreferrer"
         className="fixed bottom-10 right-10 z-[100] flex items-center gap-3 rounded-full bg-[#25D366] px-8 py-5 font-bold text-white shadow-[0_10px_40px_rgba(37,211,102,0.3)] transition-all hover:scale-110 active:scale-95 group"
