@@ -397,6 +397,7 @@ function HardwareVisualPlaceholder({ index }: { index: number }) {
     { src: "/hardware/server-hardware.svg", alt: "Rack server hardware with status indicators" },
     { src: "/hardware/custom-setup.svg", alt: "Custom hardware system architecture diagram" },
     { src: "/hardware/enterprise-solutions.svg", alt: "Connected enterprise hardware infrastructure nodes" },
+  ];
   const visuals = [
     // 0: RAM Modules
     <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
@@ -721,10 +722,6 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
-            { scale: 0.96, filter: "saturate(0.9) brightness(0.82)", opacity: 0.78 },
-            {
-              scale: 1.02,
-              filter: "saturate(1.08) brightness(1.1)",
             { scale: 0.95, filter: "saturate(0.88) brightness(0.7)", opacity: 0.58 },
             {
               scale: 1.03,
@@ -964,18 +961,6 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#081022] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_24%,rgba(42,98,210,0.2),transparent_58%)]" />
-          <div className="absolute inset-x-0 top-0 h-[68%] bg-[linear-gradient(180deg,rgba(20,39,79,0.4)_0%,rgba(9,16,33,0)_100%)]" />
-      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#070C19] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_22%,rgba(38,88,190,0.18),transparent_56%)]" />
-          <div className="absolute inset-x-0 top-0 h-[62%] bg-[linear-gradient(180deg,rgba(18,31,63,0.42)_0%,rgba(9,16,33,0)_100%)]" />
-        </div>
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-12 section-header">
-          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6">Hardware Infrastructure</h2>
-          <p className="text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
       <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
@@ -988,11 +973,6 @@ export function HomePage() {
         <div className="relative py-20">
           <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[800px] gap-24">
             {hardwareProducts.map((product, i) => (
-              <article
-                key={i}
-                className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#121f3f]/92 border border-blue-300/20 shadow-[0_22px_70px_rgba(3,8,20,0.82),inset_0_1px_0_rgba(150,202,255,0.14),inset_0_-1px_0_rgba(17,40,89,0.7)] transition-all duration-500 group hover:border-blue-300/38 hover:bg-[#182a53]/94 hover:shadow-[0_28px_95px_rgba(6,13,30,0.9),0_0_34px_rgba(82,157,255,0.2),inset_0_1px_0_rgba(188,226,255,0.2)] transform-gpu will-change-transform"
-              >
-                <div className="active-card-glow pointer-events-none absolute -inset-x-10 -inset-y-12 bg-[radial-gradient(ellipse_at_center,rgba(82,164,255,0.22)_0%,rgba(39,92,185,0.12)_42%,transparent_74%)] opacity-0 blur-3xl transition-opacity duration-500" />
               <motion.article
                 key={i}
                 className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 bg-[#0D1630]/80 border border-[var(--border-normal)] backdrop-blur-[var(--blur-lg)] group flex flex-col transform-gpu min-h-[600px]"
@@ -1009,6 +989,7 @@ export function HomePage() {
                   duration: 0.3
                 }}
               >
+                <div className="active-card-glow pointer-events-none absolute -inset-x-10 -inset-y-12 bg-[radial-gradient(ellipse_at_center,rgba(82,164,255,0.22)_0%,rgba(39,92,185,0.12)_42%,transparent_74%)] opacity-0 blur-3xl transition-opacity duration-500" />
                 {/* Depth lighting */}
                 <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
