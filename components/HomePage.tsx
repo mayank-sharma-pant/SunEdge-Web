@@ -391,6 +391,12 @@ function CinematicPreloader() {
 }
 
 function HardwareVisualPlaceholder({ index }: { index: number }) {
+  const hardwareImages = [
+    { src: "/hardware/ram-modules.svg", alt: "RAM modules arranged on an enterprise memory board" },
+    { src: "/hardware/storage-devices.svg", alt: "Enterprise SSD and HDD storage device visualization" },
+    { src: "/hardware/server-hardware.svg", alt: "Rack server hardware with status indicators" },
+    { src: "/hardware/custom-setup.svg", alt: "Custom hardware system architecture diagram" },
+    { src: "/hardware/enterprise-solutions.svg", alt: "Connected enterprise hardware infrastructure nodes" },
   const visuals = [
     // 0: RAM Modules
     <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
@@ -489,23 +495,27 @@ function HardwareVisualPlaceholder({ index }: { index: number }) {
     </svg>
   ];
 
+  const image = hardwareImages[index] || hardwareImages[0];
+
   return (
-    <div className="relative mb-12 h-52 overflow-hidden rounded-[32px] border border-blue-500/15 bg-[#060D1E] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.10),transparent_70%)]" />
-      <div className="relative z-10 w-full h-full p-6">
-        {visuals[index] || visuals[0]}
+    <div className="relative mb-10 h-52 overflow-hidden rounded-[26px] border border-blue-300/20 bg-[#0a142c]">
+      <img
+        src={image.src}
+        alt={image.alt}
+        className="h-full w-full object-cover opacity-90 transition-all duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
+        loading="lazy"
+      />
+
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#4ea0ff]/10 via-transparent to-[#020713]/58" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/70 to-transparent" />
+      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/35 to-transparent" />
+      <div className="pointer-events-none absolute bottom-4 right-5 rounded-full border border-blue-200/40 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-blue-100/75">
+        {`Visual_Module_${index + 1}`}
       </div>
-
-      {/* Decorative Technical Overlays */}
-      <div className="absolute top-6 left-6 w-2 h-2 border-l border-t border-blue-500/30" />
-      <div className="absolute top-6 right-6 w-2 h-2 border-r border-t border-blue-500/30" />
-      <div className="absolute bottom-6 left-6 w-2 h-2 border-l border-b border-blue-500/30" />
-      <div className="absolute bottom-6 right-6 w-2 h-2 border-r border-b border-blue-500/30" />
-
-      <div className="absolute bottom-6 inset-x-6 h-[1px] bg-gradient-to-r from-transparent via-blue-500/25 to-transparent" />
     </div>
   );
 }
+
 
 const solutions = [
 
@@ -711,6 +721,10 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
+            { scale: 0.96, filter: "saturate(0.9) brightness(0.82)", opacity: 0.78 },
+            {
+              scale: 1.02,
+              filter: "saturate(1.08) brightness(1.1)",
             { scale: 0.95, filter: "saturate(0.88) brightness(0.7)", opacity: 0.58 },
             {
               scale: 1.03,
@@ -720,8 +734,8 @@ export function HomePage() {
               scrollTrigger: {
                 trigger: card,
                 containerAnimation: horizontalTween,
-                start: "left 74%",
-                end: "left 34%",
+                start: "left 72%",
+                end: "left 38%",
                 scrub: true,
               }
             }
@@ -730,6 +744,8 @@ export function HomePage() {
           ScrollTrigger.create({
             trigger: card,
             containerAnimation: horizontalTween,
+            start: "left 60%",
+            end: "right 40%",
             start: "left 62%",
             end: "right 38%",
             onToggle: (self) => card.classList.toggle("is-active", self.isActive),
@@ -948,6 +964,10 @@ export function HomePage() {
       <div className="section-divider" />
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
+      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#081022] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_24%,rgba(42,98,210,0.2),transparent_58%)]" />
+          <div className="absolute inset-x-0 top-0 h-[68%] bg-[linear-gradient(180deg,rgba(20,39,79,0.4)_0%,rgba(9,16,33,0)_100%)]" />
       <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#070C19] py-24 min-h-screen flex flex-col justify-center overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_22%,rgba(38,88,190,0.18),transparent_56%)]" />
@@ -970,6 +990,13 @@ export function HomePage() {
             {hardwareProducts.map((product, i) => (
               <article
                 key={i}
+                className="product-card flex-shrink-0 w-[440px] mr-16 relative overflow-hidden rounded-[34px] p-8 bg-[#132448]/96 border border-blue-300/24 shadow-[0_20px_60px_rgba(2,8,22,0.78),inset_0_1px_0_rgba(174,214,255,0.17),inset_0_-1px_0_rgba(24,53,114,0.72)] transition-all duration-500 group hover:border-blue-200/42 hover:bg-[#1a3160]/96 hover:shadow-[0_28px_90px_rgba(5,13,33,0.9),0_0_30px_rgba(84,164,255,0.24),inset_0_1px_0_rgba(199,229,255,0.25)] transform-gpu will-change-transform"
+              >
+                <div className="active-card-glow pointer-events-none absolute -inset-x-8 -inset-y-10 bg-[radial-gradient(ellipse_at_center,rgba(98,179,255,0.24)_0%,rgba(45,103,203,0.12)_44%,transparent_76%)] opacity-0 blur-3xl transition-opacity duration-500" />
+                {/* Depth lighting */}
+                <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-200/[0.12] via-transparent to-[#070d1d]/46" />
                 className="product-card flex-shrink-0 w-[450px] mr-24 relative overflow-hidden rounded-[40px] p-8 bg-[#121f3f]/92 border border-blue-300/20 shadow-[0_22px_70px_rgba(3,8,20,0.82),inset_0_1px_0_rgba(150,202,255,0.14),inset_0_-1px_0_rgba(17,40,89,0.7)] transition-all duration-500 group hover:border-blue-300/38 hover:bg-[#182a53]/94 hover:shadow-[0_28px_95px_rgba(6,13,30,0.9),0_0_34px_rgba(82,157,255,0.2),inset_0_1px_0_rgba(188,226,255,0.2)] transform-gpu will-change-transform"
               >
                 <div className="active-card-glow pointer-events-none absolute -inset-x-10 -inset-y-12 bg-[radial-gradient(ellipse_at_center,rgba(82,164,255,0.22)_0%,rgba(39,92,185,0.12)_42%,transparent_74%)] opacity-0 blur-3xl transition-opacity duration-500" />
