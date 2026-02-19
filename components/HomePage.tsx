@@ -4,10 +4,20 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useEffect, useRef, Suspense, useCallback, useState } from "react";
-import { Sun, Moon } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const HeroOrb = dynamic(() => import("./HeroOrb"), { ssr: false });
+
+const REVEAL_CONFIG = {
+  duration: 0.85,
+  ease: "power3.out",
+  start: "top 86%",
+} as const;
+
+const SCROLL_SYNC = {
+  scrub: 1.8,
+  start: "top top",
+} as const;
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -273,6 +283,19 @@ function WorkflowGraphic() {
   );
 }
 
+function HardwareVisualPlaceholder({ index }: { index: number }) {
+  return (
+    <div className="relative mb-10 h-44 overflow-hidden rounded-3xl border border-white/[0.08] bg-[linear-gradient(145deg,rgba(123,92,255,0.14),rgba(56,182,255,0.08)_42%,rgba(255,255,255,0.02))]">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(255,255,255,0.16),transparent_36%),radial-gradient(circle_at_85%_85%,rgba(56,182,255,0.18),transparent_40%)]" />
+      <div className="absolute -top-10 left-8 h-32 w-32 rounded-full border border-white/10 bg-white/[0.02] blur-[1px]" />
+      <div className="absolute bottom-[-24px] right-8 h-24 w-40 rounded-[24px] border border-white/10 bg-black/20 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-[linear-gradient(120deg,transparent_30%,rgba(255,255,255,0.04)_50%,transparent_70%)] opacity-70" />
+      <div className="absolute left-6 top-6 text-[10px] font-bold uppercase tracking-[0.32em] text-white/50">Surface {index + 1}</div>
+      <div className="absolute bottom-6 left-6 h-[1px] w-20 bg-gradient-to-r from-blue-500/80 to-transparent" />
+    </div>
+  );
+}
+
 const solutions = [
 
   { title: "Software Solutions", desc: "Scalable cloud platforms and custom CRM systems." },
@@ -329,9 +352,6 @@ const whyChooseUs = [
 ];
 
 export function HomePage() {
-  const horizontalSectionRef = useRef<HTMLDivElement>(null);
-  const horizontalTrackRef = useRef<HTMLDivElement>(null);
-
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
@@ -365,12 +385,12 @@ export function HomePage() {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
-          duration: 2,
-          ease: "expo.out",
+          duration: 1.1,
+          ease: REVEAL_CONFIG.ease,
           onStart: () => {
             gsap.fromTo(".hero-headline",
               { letterSpacing: "0.15em", opacity: 0 },
-              { letterSpacing: "normal", opacity: 1, duration: 1.8, ease: "power4.out" }
+              { letterSpacing: "normal", opacity: 1, duration: 1, ease: REVEAL_CONFIG.ease }
             );
           }
         }
@@ -382,7 +402,7 @@ export function HomePage() {
         ease: "none",
         scrollTrigger: {
           trigger: ".hero-section",
-          start: "top top",
+          start: SCROLL_SYNC.start,
           end: "bottom top",
           scrub: true
         }
@@ -398,56 +418,17 @@ export function HomePage() {
             y: 0,
             scale: 1,
             filter: "blur(0px)",
-            duration: 0.7,
-            delay: i * 0.08,
-            ease: "power3.out",
+            duration: REVEAL_CONFIG.duration,
+            delay: i * 0.06,
+            ease: REVEAL_CONFIG.ease,
             scrollTrigger: {
               trigger: card,
-              start: "top 85%",
+              start: REVEAL_CONFIG.start,
               toggleActions: "play none none reverse"
             }
           }
         );
       });
-
-      // 3) Horizontal Scroll
-      if (horizontalSectionRef.current && horizontalTrackRef.current) {
-        const scrollWidth = horizontalTrackRef.current.scrollWidth - window.innerWidth + 200;
-
-        const horizontalTween = gsap.to(horizontalTrackRef.current, {
-          x: -scrollWidth,
-          ease: "none",
-          scrollTrigger: {
-            trigger: horizontalSectionRef.current,
-            pin: true,
-            scrub: 2.5,
-            start: "top top",
-            end: () => `+=${scrollWidth}`,
-            anticipatePin: 1,
-          }
-        });
-
-        // Cinematic Center Focus Logic
-        gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
-          gsap.fromTo(
-            card,
-            { scale: 0.92, filter: "blur(3px)", opacity: 0.5 },
-            {
-              scale: 1.05,
-              filter: "blur(0px)",
-              opacity: 1,
-              ease: "power2.out",
-              scrollTrigger: {
-                trigger: card,
-                containerAnimation: horizontalTween,
-                start: "left 70%",
-                end: "left 30%",
-                scrub: true,
-              }
-            }
-          );
-        });
-      }
 
       // Parallax Drift for Depth
       gsap.to(".parallax-layer", {
@@ -455,7 +436,7 @@ export function HomePage() {
         ease: "none",
         scrollTrigger: {
           trigger: "body",
-          start: "top top",
+          start: SCROLL_SYNC.start,
           end: "bottom bottom",
           scrub: true
         }
@@ -479,7 +460,7 @@ export function HomePage() {
           <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_80%_30%,rgba(123,92,255,0.06),transparent_60%)]" />
         </div>
 
-        <div className="mx-auto w-full max-w-[1600px] relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
+        <div className="mx-auto w-full max-w-[1360px] relative z-10 grid lg:grid-cols-2 items-center gap-10 hero-parallax-layer">
           <div className="hero-content">
             <p className="mb-6 text-sm font-bold uppercase tracking-[0.4em] text-blue-400/70">
               SunEdge IT Solution Private Limited
@@ -530,7 +511,7 @@ export function HomePage() {
       <section className="py-40 px-8 md:px-24 lg:px-40 relative z-10">
         {/* Section ambient glow */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1600px]">
+        <div className="mx-auto w-full max-w-[1360px]">
           <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div className="max-w-xl">
               <h2 className="text-3xl font-bold tracking-tight md:text-5xl mb-6">Strategic Solutions</h2>
@@ -559,7 +540,7 @@ export function HomePage() {
 
       {/* PROTOCOL APPROACH */}
       <section className="py-40 px-8 md:px-24 lg:px-40 relative overflow-hidden">
-        <div className="mx-auto w-full max-w-[1600px]">
+        <div className="mx-auto w-full max-w-[1360px]">
           <div className="grid lg:grid-cols-2 gap-32 items-center">
             <div className="relative">
               <div className="glass aspect-[16/9] lg:aspect-[4/3] rounded-[32px] overflow-hidden border-white/5 relative group bg-[#07070a]/60">
@@ -589,34 +570,35 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      {/* HARDWARE SOLUTIONS (HORIZONTAL) - CINEMATIC SHOWCASE */}
-      <section ref={horizontalSectionRef} className="relative overflow-hidden bg-black/60">
+      {/* HARDWARE INFRASTRUCTURE */}
+      <section className="relative overflow-hidden bg-black/60 py-32 px-6 md:px-10 xl:px-16">
         {/* Dramatic depth lighting */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-blue-600/8 blur-[120px] rounded-full" />
           <div className="absolute bottom-0 right-1/4 w-[300px] h-[300px] bg-purple-600/6 blur-[100px] rounded-full" />
         </div>
-        <div className="mx-auto w-full max-w-[1600px] px-8 py-32 md:px-24 lg:px-40 relative z-10">
+        <div className="mx-auto w-full max-w-[1360px] relative z-10">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight">Hardware Infrastructure</h2>
-          <p className="mt-6 text-lg text-slate-400">Reliable hardware for mission-critical business environments.</p>
-        </div>
+          <p className="mt-6 text-lg text-slate-400 max-w-[70ch]">Reliable hardware for mission-critical business environments.</p>
 
-        <div ref={horizontalTrackRef} className="horizontal-track flex px-8 md:px-24 lg:px-40 pb-52">
-          {hardwareProducts.map((product, i) => (
-            <div key={i} className="product-card relative overflow-hidden rounded-[40px] p-16 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_100px_rgba(59,130,246,0.18)]">
-              {/* Depth glow on hover */}
-              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
-              </div>
-              <div className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-8 opacity-60">Module 0{i + 1}</div>
-              <h3 className="text-3xl font-bold mb-8 tracking-tight">{product.title}</h3>
-              <p className="text-slate-300 leading-relaxed text-lg relative z-[2]">{product.desc}</p>
-            </div>
-          ))}
+          <div className="mt-16 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+            {hardwareProducts.map((product, i) => (
+              <article key={i} className="relative overflow-hidden rounded-[36px] p-10 xl:p-12 bg-black/90 border border-white/[0.06] backdrop-blur-2xl group hover:border-blue-500/30 transition-all duration-700 hover:shadow-[0_0_90px_rgba(59,130,246,0.16)]">
+                {/* Depth glow on hover */}
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none">
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-blue-500/[0.08] via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[80px] bg-gradient-to-t from-blue-600/5 to-transparent" />
+                </div>
+                <HardwareVisualPlaceholder index={i} />
+                <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.3em] mb-6 opacity-60">Module 0{i + 1}</p>
+                <h3 className="text-2xl xl:text-3xl font-bold mb-6 tracking-tight">{product.title}</h3>
+                <p className="text-slate-300 leading-relaxed text-lg relative z-[2] max-w-[56ch]">{product.desc}</p>
+              </article>
+            ))}
+          </div>
         </div>
-        <div className="section-divider opacity-50" />
+        <div className="section-divider opacity-50 mt-20" />
       </section>
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
@@ -624,7 +606,7 @@ export function HomePage() {
         {/* Enhanced ambient depth — purple/blue accent lighting */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/6 blur-[180px] rounded-full pointer-events-none" />
         <div className="absolute left-1/4 top-0 w-[400px] h-[400px] bg-blue-600/4 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1600px]">
+        <div className="mx-auto w-full max-w-[1360px]">
           <div className="grid lg:grid-cols-2 gap-32 items-center">
             {/* LEFT: Typography dominant */}
             <div>
@@ -722,7 +704,7 @@ export function HomePage() {
           driftX={-4} driftY={6} delay={3} duration={18} rotate={-6}
         />
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none" />
-        <div className="mx-auto w-full max-w-[1600px] relative z-10">
+        <div className="mx-auto w-full max-w-[1360px] relative z-10">
           {/* Header */}
           <div className="mb-16">
             <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-8">About SunEdge</h2>
@@ -802,7 +784,7 @@ export function HomePage() {
 
       {/* CONTACT SECTION - PREMIUM CORPORATE */}
       <section className="py-52 px-8 md:px-24 lg:px-40 relative bg-[#07070a]">
-        <div className="mx-auto w-full max-w-[1600px]">
+        <div className="mx-auto w-full max-w-[1360px]">
           <div className="grid lg:grid-cols-2 gap-32">
             <div className="space-y-12">
               <div>
@@ -909,7 +891,7 @@ export function HomePage() {
 
       {/* FINAL CTA SECTION */}
       <section className="py-40 px-8 md:px-24 lg:px-40 text-center relative overflow-hidden">
-        <div className="mx-auto w-full max-w-[1600px] relative z-10">
+        <div className="mx-auto w-full max-w-[1360px] relative z-10">
           <h2 className="text-4xl font-bold md:text-7xl tracking-tight mb-16">
             Let’s Build Your <br />
             <span className="text-blue-500 italic font-light">Technology Infrastructure</span>
