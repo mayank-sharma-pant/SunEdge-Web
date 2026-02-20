@@ -31,6 +31,17 @@
   --shadow-premium: 0 20px 80px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 60px rgba(59, 130, 246, 0.15);
 
+  /* ═══ Hardware slider luminance ladder ═══ */
+  --hardware-bg: #070d1b;
+  --hardware-section-surface: rgba(12, 21, 44, 0.78);
+  --hardware-card-surface: rgba(20, 36, 69, 0.9);
+  --hardware-card-surface-active: rgba(28, 49, 88, 0.95);
+  --hardware-card-border: rgba(117, 174, 245, 0.26);
+  --hardware-card-border-active: rgba(163, 214, 255, 0.52);
+  --hardware-card-rim: rgba(192, 228, 255, 0.22);
+  --hardware-card-shadow: 0 24px 68px rgba(3, 7, 18, 0.72), 0 8px 24px rgba(4, 13, 33, 0.55);
+  --hardware-card-shadow-active: 0 36px 92px rgba(2, 7, 18, 0.84), 0 0 28px rgba(82, 158, 255, 0.3);
+
   color-scheme: dark;
 }
 
@@ -295,8 +306,23 @@ img {
   will-change: transform;
 }
 
+.hardware-section {
+  background: linear-gradient(180deg, rgba(7, 13, 27, 0.96) 0%, var(--hardware-bg) 100%);
+}
+
+.hardware-slider-rail {
+  background: linear-gradient(180deg, var(--hardware-section-surface) 0%, rgba(10, 18, 37, 0.68) 100%);
+  border-top: 1px solid rgba(138, 191, 255, 0.14);
+  border-bottom: 1px solid rgba(95, 148, 221, 0.16);
+}
+
 .product-card {
   flex-shrink: 0;
+  background: linear-gradient(160deg, rgba(35, 62, 112, 0.18) 0%, transparent 40%), var(--hardware-card-surface);
+  border: 1px solid var(--hardware-card-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--hardware-card-shadow), inset 0 1px 0 var(--hardware-card-rim), inset 0 -1px 0 rgba(67, 112, 189, 0.32);
   transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.8s ease, opacity 0.8s ease, border-color 0.6s ease, box-shadow 0.6s ease, background-color 0.6s ease;
 }
 
@@ -306,9 +332,9 @@ img {
 }
 
 .product-card.is-active {
-  border-color: rgba(133, 200, 255, 0.48) !important;
-  box-shadow: 0 34px 110px rgba(4, 10, 25, 0.94), 0 0 38px rgba(80, 162, 255, 0.35), inset 0 1px 0 rgba(201, 232, 255, 0.3), inset 0 -1px 0 rgba(39, 86, 169, 0.78) !important;
-  background-color: rgba(23, 42, 82, 0.96) !important;
+  border-color: var(--hardware-card-border-active) !important;
+  box-shadow: var(--hardware-card-shadow-active), inset 0 1px 0 rgba(219, 240, 255, 0.4), inset 0 -1px 0 rgba(58, 108, 192, 0.72) !important;
+  background: linear-gradient(170deg, rgba(95, 158, 245, 0.25) 0%, transparent 44%), var(--hardware-card-surface-active) !important;
 }
 
 .product-card.is-active .active-card-glow {

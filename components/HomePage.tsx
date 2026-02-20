@@ -962,7 +962,7 @@ export function HomePage() {
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
-      <section ref={horizontalSectionRef} id="hardware" className="relative bg-[#080E1C] py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
+      <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
         <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-32 section-header relative z-20">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.03em] max-w-[15ch]">Hardware Infrastructure</h2>
@@ -970,17 +970,17 @@ export function HomePage() {
         </div>
 
         {/* Relaxed Container — No mask element, allowing full vertical breathing room for hovers/shadows */}
-        <div className="relative py-20">
-          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[800px] gap-24">
+        <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-24">
+          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[860px] gap-24 overflow-visible">
             {hardwareProducts.map((product, i) => (
               <motion.article
                 key={i}
-                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 bg-[#0D1630]/80 border border-[var(--border-normal)] backdrop-blur-[var(--blur-lg)] group flex flex-col transform-gpu min-h-[600px]"
+                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[600px]"
                 whileHover={{
                   y: -12,
                   scale: 1.01,
-                  borderColor: "var(--border-strong)",
-                  boxShadow: "var(--shadow-premium)"
+                  borderColor: "var(--hardware-card-border-active)",
+                  boxShadow: "var(--hardware-card-shadow-active)"
                 }}
                 transition={{
                   type: "spring",
@@ -989,7 +989,7 @@ export function HomePage() {
                   duration: 0.3
                 }}
               >
-                <div className="active-card-glow pointer-events-none absolute -inset-x-10 -inset-y-12 bg-[radial-gradient(ellipse_at_center,rgba(82,164,255,0.22)_0%,rgba(39,92,185,0.12)_42%,transparent_74%)] opacity-0 blur-3xl transition-opacity duration-500" />
+                <div className="active-card-glow pointer-events-none absolute -inset-x-12 -inset-y-14 bg-[radial-gradient(ellipse_at_center,rgba(102,177,255,0.25)_0%,rgba(47,110,198,0.14)_44%,transparent_76%)] opacity-0 blur-3xl transition-opacity duration-500" />
                 {/* Depth lighting */}
                 <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
                   <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
