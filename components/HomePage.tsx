@@ -390,133 +390,112 @@ function CinematicPreloader() {
   );
 }
 
-function HardwareVisualPlaceholder({ index }: { index: number }) {
-  const hardwareImages = [
-    { src: "/hardware/ram-modules.svg", alt: "RAM modules arranged on an enterprise memory board" },
-    { src: "/hardware/storage-devices.svg", alt: "Enterprise SSD and HDD storage device visualization" },
-    { src: "/hardware/server-hardware.svg", alt: "Rack server hardware with status indicators" },
-    { src: "/hardware/custom-setup.svg", alt: "Custom hardware system architecture diagram" },
-    { src: "/hardware/enterprise-solutions.svg", alt: "Connected enterprise hardware infrastructure nodes" },
-  ];
-  const visuals = [
-    // 0: RAM Modules
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <defs>
-        <linearGradient id={`ramGrad-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#38B6FF" stopOpacity="0.2" />
-          <stop offset="50%" stopColor="#38B6FF" stopOpacity="0.5" />
-          <stop offset="100%" stopColor="#38B6FF" stopOpacity="0.2" />
-        </linearGradient>
-      </defs>
-      <rect x="50" y="80" width="300" height="40" rx="4" fill="rgba(59,130,246,0.06)" stroke="rgba(59,130,246,0.25)" />
-      {[0, 1, 2, 3, 4, 5, 6, 7].map(i => (
-        <motion.rect
+// Hardware icon shapes for each product category
+const HARDWARE_ICONS = [
+  // RAM — grid of memory chips
+  (accent: string) => (
+    <div className="grid grid-cols-4 gap-1.5">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <motion.div
           key={i}
-          x={70 + i * 35} y="85" width="25" height="30" rx="2"
-          fill="rgba(56,182,255,0.1)"
-          initial={{ opacity: 0.3 }}
-          animate={{ opacity: [0.3, 0.8, 0.3] }}
-          transition={{ duration: 2, delay: i * 0.2, repeat: Infinity }}
+          className="h-3 rounded-[3px] border"
+          style={{ borderColor: `${accent}33`, background: `${accent}11` }}
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 2, delay: i * 0.15, repeat: Infinity }}
         />
       ))}
-      <path d="M 50 120 L 350 120" stroke={`url(#ramGrad-${index})`} strokeWidth="2" strokeDasharray="4 2" />
-    </svg>,
-
-    // 1: Storage Devices
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <rect x="100" y="40" width="200" height="120" rx="8" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
-      <motion.path
-        d="M 120 70 H 280 M 120 100 H 280 M 120 130 H 280"
-        stroke="rgba(56,182,255,0.3)" strokeWidth="1"
-        initial={{ pathLength: 0 }}
-        animate={{ pathLength: 1 }}
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <circle cx="250" cy="100" r="30" fill="none" stroke="rgba(56,182,255,0.1)" strokeWidth="0.5" />
-      <motion.circle
-        cx="250" cy="100" r="15"
-        fill="rgba(56,182,255,0.2)"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.8, 0.4] }}
+    </div>
+  ),
+  // Storage — concentric rings
+  (accent: string) => (
+    <div className="relative flex items-center justify-center h-full">
+      {[28, 20, 12].map((size, i) => (
+        <motion.div
+          key={i}
+          className="absolute rounded-full border"
+          style={{ width: size * 2, height: size * 2, borderColor: `${accent}${30 + i * 15}` }}
+          animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
+          transition={{ duration: 8 + i * 4, repeat: Infinity, ease: "linear" }}
+        />
+      ))}
+      <motion.div
+        className="w-3 h-3 rounded-full"
+        style={{ background: accent }}
+        animate={{ scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
         transition={{ duration: 2, repeat: Infinity }}
       />
-    </svg>,
-
-    // 2: Server Hardware
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      {[40, 80, 120].map((y, i) => (
-        <g key={i}>
-          <rect x="60" y={y} width="280" height="30" rx="2" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
-          <circle cx="80" cy={y + 15} r="3" fill="#38B6FF" opacity="0.6">
-            <animate attributeName="opacity" values="0.2;1;0.2" dur="1s" repeatCount="indefinite" begin={`${i * 0.3}s`} />
-          </circle>
-          <motion.rect
-            x="280" y={y + 12} width="40" height="6" rx="3"
-            fill="rgba(56,182,255,0.1)"
-            animate={{ width: [10, 40, 10] }}
-            transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
+    </div>
+  ),
+  // Server — stacked bars
+  (accent: string) => (
+    <div className="space-y-1.5">
+      {[0, 1, 2].map(i => (
+        <div key={i} className="flex items-center gap-2">
+          <motion.div
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: accent }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 1.2, delay: i * 0.3, repeat: Infinity }}
           />
-        </g>
+          <motion.div
+            className="h-2.5 rounded-full"
+            style={{ background: `${accent}22`, border: `1px solid ${accent}33` }}
+            animate={{ width: ["40%", "90%", "40%"] }}
+            transition={{ duration: 3, delay: i * 0.5, repeat: Infinity }}
+          />
+        </div>
       ))}
-    </svg>,
-
-    // 3: Custom Setup
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <path d="M 100 150 L 150 50 L 250 50 L 300 150 Z" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.22)" />
-      <motion.path
-        d="M 150 50 L 250 50" stroke="#38B6FF" strokeWidth="3"
-        animate={{ opacity: [0.2, 1, 0.2] }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-      <circle cx="200" cy="100" r="40" fill="none" stroke="rgba(56,182,255,0.05)" strokeWidth="1" />
-      <motion.path
-        d="M 160 100 A 40 40 0 0 1 240 100"
-        stroke="rgba(123,92,255,0.4)" strokeWidth="2" fill="none"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-        style={{ transformOrigin: "200px 100px" }}
-      />
-    </svg>,
-
-    // 4: Enterprise Solutions
-    <svg viewBox="0 0 400 200" className="w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-700">
-      <rect x="50" y="50" width="300" height="100" rx="12" fill="rgba(59,130,246,0.05)" stroke="rgba(59,130,246,0.18)" />
-      <motion.path
-        d="M 50 100 H 350" stroke="rgba(56,182,255,0.1)" strokeWidth="1" strokeDasharray="10 5"
-        animate={{ strokeDashoffset: [0, -30] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-      />
-      {[100, 150, 200, 250, 300].map((x, i) => (
-        <motion.circle
+    </div>
+  ),
+  // Custom Setup — hexagonal pattern
+  (accent: string) => (
+    <div className="grid grid-cols-3 gap-1">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <motion.div
           key={i}
-          cx={x} cy="100" r="4" fill="#38B6FF"
-          animate={{ r: [3, 5, 3], opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.5, delay: i * 0.3, repeat: Infinity }}
+          className="aspect-square rounded-md border"
+          style={{ borderColor: `${accent}33`, background: i % 2 === 0 ? `${accent}11` : "transparent" }}
+          animate={{ borderColor: [`${accent}22`, `${accent}55`, `${accent}22`] }}
+          transition={{ duration: 2.5, delay: i * 0.2, repeat: Infinity }}
         />
       ))}
-    </svg>
-  ];
+    </div>
+  ),
+  // Enterprise — network nodes
+  (accent: string) => (
+    <div className="relative flex items-center justify-center h-full">
+      {[0, 72, 144, 216, 288].map((deg, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full"
+          style={{
+            background: accent,
+            transform: `rotate(${deg}deg) translateY(-20px)`,
+          }}
+          animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+          transition={{ duration: 2, delay: i * 0.3, repeat: Infinity }}
+        />
+      ))}
+      <div className="w-2 h-2 rounded-full" style={{ background: accent, opacity: 0.8 }} />
+    </div>
+  ),
+];
 
-  const image = hardwareImages[index] || hardwareImages[0];
-
+function HardwareIcon({ index, accent = "#38B6FF" }: { index: number; accent?: string }) {
+  const IconRenderer = HARDWARE_ICONS[index % HARDWARE_ICONS.length];
   return (
-    <div className="relative mb-10 h-52 overflow-hidden rounded-[26px] border border-blue-300/20 bg-[#0a142c]">
-      <img
-        src={image.src}
-        alt={image.alt}
-        className="h-full w-full object-cover opacity-90 transition-all duration-500 group-hover:scale-[1.03] group-hover:opacity-100"
-        loading="lazy"
+    <div className="w-16 h-16 p-3 rounded-2xl border border-blue-400/15 bg-blue-500/[0.06] flex items-center justify-center mb-8 relative overflow-hidden">
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent"
+        animate={{ opacity: [0.3, 0.7, 0.3] }}
+        transition={{ duration: 4, repeat: Infinity }}
       />
-
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#4ea0ff]/10 via-transparent to-[#020713]/58" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/70 to-transparent" />
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-400/35 to-transparent" />
-      <div className="pointer-events-none absolute bottom-4 right-5 rounded-full border border-blue-200/40 px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider text-blue-100/75">
-        {`Visual_Module_${index + 1}`}
+      <div className="relative z-10 w-full h-full">
+        {IconRenderer(accent)}
       </div>
     </div>
   );
 }
-
 
 const solutions = [
 
@@ -699,54 +678,14 @@ export function HomePage() {
       });
       contactTL.fromTo("#contact .section-header", { opacity: 0, y: 32 }, { opacity: 1, y: 0, duration: MOTION.section.duration, ease: MOTION.section.ease });
 
-      // 3) Horizontal Scroll — Sliding Showcase
-      if (horizontalSectionRef.current && horizontalTrackRef.current) {
-        const track = horizontalTrackRef.current;
-        const scrollWidth = track.scrollWidth - window.innerWidth + 200;
-
-        const horizontalTween = gsap.to(track, {
-          x: -scrollWidth,
-          ease: "none",
-          scrollTrigger: {
-            trigger: horizontalSectionRef.current,
-            pin: true,
-            scrub: 2.2, // Higher scrub for momentum-based physics
-            start: "top top",
-            end: () => `+=${scrollWidth}`,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          }
-        });
-
-        // Cinematic Center Focus Logic
-        gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
-          gsap.fromTo(
-            card,
-            { scale: 0.97, filter: "saturate(0.92) brightness(0.86)", opacity: 0.82 },
-            {
-              scale: 1.03,
-              filter: "saturate(1.06) brightness(1.12)",
-              opacity: 1,
-              ease: MOTION.section.ease,
-              scrollTrigger: {
-                trigger: card,
-                containerAnimation: horizontalTween,
-                start: "left 72%",
-                end: "left 38%",
-                scrub: true,
-              }
-            }
-          );
-
-          ScrollTrigger.create({
-            trigger: card,
-            containerAnimation: horizontalTween,
-            start: "left 62%",
-            end: "right 38%",
-            onToggle: (self) => card.classList.toggle("is-active", self.isActive),
-          });
-        });
-      }
+      // 3) Hardware Section — Scroll Reveal (vertical grid, no horizontal pinning)
+      gsap.timeline({
+        scrollTrigger: {
+          trigger: "#hardware",
+          start: MOTION.section.trigger,
+          toggleActions: "play none none reverse"
+        }
+      }).fromTo("#hardware .section-header", { opacity: 0, y: 32, filter: "blur(4px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: MOTION.section.duration, ease: MOTION.section.ease });
 
       // Section HUD Logic
       ScrollTrigger.create({
@@ -958,58 +897,98 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
-      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
-      <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-16 min-h-screen overflow-visible z-40 w-full overflow-x-hidden">
-      <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
+      {/* HARDWARE INFRASTRUCTURE — STACKED GRID SHOWCASE */}
+      <section id="hardware" className="relative py-32 px-6 md:px-8 overflow-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-8 section-header relative z-20">
-          <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.03em] max-w-[15ch]">Hardware Infrastructure</h2>
-          <p className="text-lg text-slate-400 max-w-[55ch] leading-relaxed">Reliable hardware for mission-critical business environments.</p>
-        </div>
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(56,182,255,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Relaxed Container — No mask element, allowing full vertical breathing room for hovers/shadows */}
-        <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-8">
-          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[580px] gap-24 overflow-visible">
-            {hardwareProducts.map((product, i) => (
+        <div className="mx-auto w-full max-w-7xl relative z-10">
+          <div className="section-header mb-16">
+            <motion.p
+              className="text-xs font-bold uppercase tracking-[0.4em] text-blue-400/60 mb-4"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, ease: MOTION.section.framerEase }}
+            >
+              Infrastructure_Catalog
+            </motion.p>
+            <motion.h2
+              className="text-3xl font-bold md:text-5xl tracking-[-0.03em] max-w-[15ch] mb-6"
+              initial={{ opacity: 0, y: 20, filter: "blur(4px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, ease: MOTION.section.framerEase }}
+            >
+              <CinematicText>Hardware Infrastructure</CinematicText>
+            </motion.h2>
+            <motion.p
+              className="text-lg text-slate-400 max-w-[55ch] leading-relaxed"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: 0.1, ease: MOTION.section.framerEase }}
+            >
+              Reliable hardware for mission-critical business environments.
+            </motion.p>
+          </div>
+
+          {/* Asymmetric Grid: Featured card (first) + 2x2 grid (rest) */}
+          <div className="grid lg:grid-cols-5 gap-6">
+            {/* FEATURED CARD — spans 3 columns */}
+            <motion.article
+              className="lg:col-span-3 lg:row-span-2 relative rounded-[24px] p-10 md:p-12 group flex flex-col justify-between min-h-[420px] lg:min-h-[520px] overflow-hidden border border-blue-400/12 bg-gradient-to-br from-[#0C1A38]/90 via-[#0A1530]/95 to-[#060D1E]/98 backdrop-blur-xl transform-gpu"
+              initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
+              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.7, ease: MOTION.section.framerEase }}
+              whileHover={{ y: -6, borderColor: "rgba(56,182,255,0.25)", boxShadow: "0 20px 60px rgba(3,10,30,0.8), 0 0 30px rgba(56,182,255,0.08)" }}
+            >
+              {/* Top edge light */}
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-200/40 to-transparent" />
+              {/* Ambient glow on hover */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(56,182,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+              <div>
+                <HardwareIcon index={0} accent="#38B6FF" />
+                <p className="text-xs font-bold text-blue-400/50 uppercase tracking-[0.4em] mb-4">System_Module 01</p>
+                <h3 className="text-3xl md:text-4xl font-bold mb-6 tracking-[-0.02em] text-white leading-tight max-w-[18ch]">{hardwareProducts[0].title}</h3>
+                <p className="text-blue-100/45 leading-relaxed text-base max-w-[48ch]">{hardwareProducts[0].desc}</p>
+              </div>
+
+              <div className="flex items-center gap-3 mt-8">
+                <span className="w-2 h-2 rounded-full bg-emerald-400/60 animate-pulse" />
+                <span className="text-[10px] font-mono text-emerald-400/50 uppercase tracking-widest">Verified &amp; Active</span>
+              </div>
+            </motion.article>
+
+            {/* REMAINING 4 CARDS — each spans 1 col in a 2x2 grid */}
+            {hardwareProducts.slice(1).map((product, i) => (
               <motion.article
-                key={i}
-                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[500px]"
-        <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-24">
-          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[860px] gap-24 overflow-visible">
-            {hardwareProducts.map((product, i) => (
-              <motion.article
-                key={i}
-                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[600px]"
-                whileHover={{
-                  y: -12,
-                  scale: 1.01,
-                  borderColor: "var(--hardware-card-border-active)",
-                  boxShadow: "var(--hardware-card-shadow-active)"
-                }}
-                transition={{
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 30,
-                  duration: 0.3
-                }}
+                key={i + 1}
+                className="lg:col-span-2 relative rounded-[20px] p-8 group flex flex-col justify-between min-h-[240px] overflow-hidden border border-blue-400/10 bg-gradient-to-br from-[#0A1530]/85 to-[#060D1E]/95 backdrop-blur-lg transform-gpu"
+                initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
+                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.6, delay: (i + 1) * 0.08, ease: MOTION.section.framerEase }}
+                whileHover={{ y: -4, borderColor: "rgba(56,182,255,0.2)", boxShadow: "0 16px 48px rgba(3,10,30,0.7), 0 0 20px rgba(56,182,255,0.06)" }}
               >
-                <div className="active-card-glow pointer-events-none absolute -inset-x-12 -inset-y-14 bg-[radial-gradient(ellipse_at_center,rgba(102,177,255,0.25)_0%,rgba(47,110,198,0.14)_44%,transparent_76%)] opacity-0 blur-3xl transition-opacity duration-500" />
-                {/* Depth lighting */}
-                <div className="absolute inset-0 opacity-100 transition-opacity duration-700 pointer-events-none">
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-100/65 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-blue-300/[0.1] via-transparent to-[#070d1d]/44" />
-                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-blue-200/40 via-blue-300/10 to-transparent" />
+                {/* Top edge light */}
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-200/30 to-transparent" />
+                {/* Hover glow */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(56,182,255,0.04),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                <div>
+                  <HardwareIcon index={i + 1} accent="#38B6FF" />
+                  <p className="text-[10px] font-bold text-blue-400/40 uppercase tracking-[0.35em] mb-3">System_Module 0{i + 2}</p>
+                  <h3 className="text-xl font-bold mb-3 tracking-tight text-white leading-snug">{product.title}</h3>
+                  <p className="text-blue-100/35 leading-relaxed text-sm max-w-[36ch]">{product.desc}</p>
                 </div>
 
-                <HardwareVisualPlaceholder index={i} />
-                <p className="text-xs font-bold text-blue-500 uppercase tracking-[0.4em] mb-8 opacity-60">System_Module 0{i + 1}</p>
-                <h3 className="text-2xl font-bold mb-8 tracking-tighter text-white leading-tight">{product.title}</h3>
-                <p className="text-blue-100/40 leading-relaxed text-base relative z-[2] max-w-[32ch]">{product.desc}</p>
-
-                <div className="mt-auto pt-12 flex items-center gap-4 text-[10px] font-mono text-blue-400/50 uppercase tracking-widest">
-                  <span className="w-2 h-2 rounded-full bg-blue-500/40 animate-pulse" />
-                  <span>Verification_Active</span>
+                <div className="flex items-center gap-2 mt-6">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400/40 animate-pulse" />
+                  <span className="text-[9px] font-mono text-blue-400/40 uppercase tracking-widest">Active</span>
                 </div>
               </motion.article>
             ))}
