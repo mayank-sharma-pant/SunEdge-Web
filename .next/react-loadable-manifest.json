@@ -1,6 +1,6 @@
 {
-  "components\\HomePage.tsx -> ./HeroOrb": {
-    "id": "components\\HomePage.tsx -> ./HeroOrb",
+  "components\\home\\Hero.tsx -> ../HeroOrb": {
+    "id": "components\\home\\Hero.tsx -> ../HeroOrb",
     "files": [
       "static/chunks/_app-pages-browser_components_HeroOrb_tsx.js"
     ]
