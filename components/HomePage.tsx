@@ -722,7 +722,7 @@ export function HomePage() {
         gsap.utils.toArray<HTMLElement>(".product-card").forEach((card) => {
           gsap.fromTo(
             card,
-            { scale: 0.95, filter: "saturate(0.88) brightness(0.7)", opacity: 0.58 },
+            { scale: 0.97, filter: "saturate(0.92) brightness(0.86)", opacity: 0.82 },
             {
               scale: 1.03,
               filter: "saturate(1.06) brightness(1.12)",
@@ -741,8 +741,6 @@ export function HomePage() {
           ScrollTrigger.create({
             trigger: card,
             containerAnimation: horizontalTween,
-            start: "left 60%",
-            end: "right 40%",
             start: "left 62%",
             end: "right 38%",
             onToggle: (self) => card.classList.toggle("is-active", self.isActive),
@@ -962,14 +960,21 @@ export function HomePage() {
 
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
+      <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-16 min-h-screen overflow-visible z-40 w-full overflow-x-hidden">
       <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-32 section-header relative z-20">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-8 section-header relative z-20">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.03em] max-w-[15ch]">Hardware Infrastructure</h2>
           <p className="text-lg text-slate-400 max-w-[55ch] leading-relaxed">Reliable hardware for mission-critical business environments.</p>
         </div>
 
         {/* Relaxed Container — No mask element, allowing full vertical breathing room for hovers/shadows */}
+        <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-8">
+          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[580px] gap-24 overflow-visible">
+            {hardwareProducts.map((product, i) => (
+              <motion.article
+                key={i}
+                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[500px]"
         <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-24">
           <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[860px] gap-24 overflow-visible">
             {hardwareProducts.map((product, i) => (
