@@ -113,19 +113,7 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      <section id="hardware" className="relative py-32 overflow-hidden">
-        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
-          <div className="section-header mb-16">
-            <p className="text-xs font-bold uppercase tracking-[0.4em] text-blue-400/60 mb-4">
-              Infrastructure_Catalog
-            </p>
-            <h2 className="text-3xl font-bold md:text-5xl tracking-[-0.03em] max-w-[15ch] mb-6">
-              Hardware Infrastructure
-            </h2>
-          </div>
-        </div>
-        <HardwareSlider />
-      </section>
+      <HardwareSlider />
 
       <MemorySolutions />
 
@@ -139,3 +127,5 @@ export function HomePage() {
     </main>
   );
 }
+
+export default HomePage;

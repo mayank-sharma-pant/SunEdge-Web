@@ -101,7 +101,7 @@ const hardwareProducts = [
     { title: "Enterprise Hardware Solutions", desc: "Comprehensive hardware procurement and deployment services covering networking, compute, and peripheral systems." }
 ];
 
-export function HardwareSlider() {
+export function HardwareSlider({ id = "hardware" }: { id?: string }) {
     const trackRef = useRef<HTMLDivElement>(null);
     const cardRefs = useRef<(HTMLElement | null)[]>([]);
     const [activeIndex, setActiveIndex] = useState(0);
@@ -139,10 +139,13 @@ export function HardwareSlider() {
     }, []);
 
     return (
-        <section className="relative py-32 overflow-hidden bg-[#050A18]">
+        <section id={id} className="relative py-32 overflow-hidden bg-[#050A18]">
             <div className="container mx-auto px-8 md:px-16 mb-20 relative z-10">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
                     <div className="max-w-2xl">
+                        <p className="text-xs font-bold uppercase tracking-[0.4em] text-blue-400/60 mb-4">
+                            Infrastructure_Catalog
+                        </p>
                         <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-6 uppercase italic">
                             Hardware Infrastructure
                         </h2>
