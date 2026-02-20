@@ -497,6 +497,259 @@ function HardwareIcon({ index, accent = "#38B6FF" }: { index: number; accent?: s
   );
 }
 
+const FOCUS = {
+  active: {
+    bg: "rgba(10,22,50,0.97)",
+    border: "rgba(56,182,255,0.4)", // Stronger border for definition
+    shadow: "0 2px 4px rgba(0,0,0,0.4), 0 12px 32px rgba(2,6,18,0.7), 0 0 0 1px rgba(56,182,255,0.1)",
+    y: -6,
+    rimOpacity: 0.9, // Bright rim for active
+    glowOpacity: 0.55, // Stronger, structured spotlight
+    titleColor: "rgba(255,255,255,1)",
+    bodyColor: "rgba(219,234,254,0.8)", // Highly readable body (blue-100/80)
+    iconBorder: "rgba(56,182,255,0.2)", // Softer icon border
+    statusColor: "rgba(52,211,153,0.9)",
+    topHighlight: "inset 0 1px 0 0 rgba(255,255,255,0.25)", // Mechanical top edge
+  },
+  inactive: {
+    bg: "rgba(7,14,28,0.94)",
+    border: "rgba(56,182,255,0.08)",
+    shadow: "0 1px 2px rgba(0,0,0,0.3), 0 4px 12px rgba(2,6,18,0.45)",
+    y: 0,
+    rimOpacity: 0.15, // Subtle but visible
+    glowOpacity: 0.06, // Ambient atmosphere (never zero)
+    titleColor: "rgba(255,255,255,0.5)", // Dimmer inactive title
+    bodyColor: "rgba(191,219,255,0.3)", // Receded body
+    iconBorder: "rgba(56,182,255,0.04)",
+    statusColor: "rgba(56,182,255,0.2)",
+    topHighlight: "inset 0 1px 0 0 rgba(255,255,255,0.03)",
+  },
+  // Physical settle for Y, smooth ease for colors
+  transition: { type: "spring", stiffness: 180, damping: 24, mass: 1 },
+} as const;
+
+function HardwareSlider() {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // IntersectionObserver to track centered card
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let maxRatio = 0;
+        let maxIndex = activeIndex;
+        entries.forEach((entry) => {
+          const idx = Number(entry.target.getAttribute("data-index"));
+          if (entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            maxIndex = idx;
+          }
+        });
+        if (maxRatio > 0.4) setActiveIndex(maxIndex);
+      },
+      {
+        root: track,
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      }
+    );
+
+    cardRefs.current.forEach((card) => {
+      if (card) observer.observe(card);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToCard = useCallback((index: number) => {
+    const card = cardRefs.current[index];
+    if (card) {
+      card.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, []);
+
+  const scrollPrev = useCallback(() => {
+    if (activeIndex > 0) scrollToCard(activeIndex - 1);
+  }, [activeIndex, scrollToCard]);
+
+  const scrollNext = useCallback(() => {
+    if (activeIndex < hardwareProducts.length - 1) scrollToCard(activeIndex + 1);
+  }, [activeIndex, scrollToCard]);
+
+  return (
+    <div className="relative">
+      {/* Arrow Navigation */}
+      <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-4 z-30">
+        <button
+          onClick={scrollPrev}
+          disabled={activeIndex === 0}
+          className="w-10 h-10 rounded-full border border-blue-400/15 bg-[#0a1530]/95 flex items-center justify-center text-blue-300/60 hover:text-blue-200 hover:border-blue-400/30 transition-all duration-300 disabled:opacity-20 disabled:cursor-default"
+          aria-label="Previous card"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8L10 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+        </button>
+      </div>
+      <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 right-4 z-30">
+        <button
+          onClick={scrollNext}
+          disabled={activeIndex === hardwareProducts.length - 1}
+          className="w-10 h-10 rounded-full border border-blue-400/15 bg-[#0a1530]/95 flex items-center justify-center text-blue-300/60 hover:text-blue-200 hover:border-blue-400/30 transition-all duration-300 disabled:opacity-20 disabled:cursor-default"
+          aria-label="Next card"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
+        </button>
+      </div>
+
+      {/* Slider Track — overflow-x-auto for scroll, generous vertical padding for shadow clearance */}
+      <div
+        ref={trackRef}
+        className="flex gap-8 overflow-x-auto px-8 md:px-16 py-12 scroll-smooth snap-x snap-mandatory"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <style>{`div[class*="snap-x"]::-webkit-scrollbar { display: none; }`}</style>
+
+        {hardwareProducts.map((product, i) => {
+          const isActive = i === activeIndex;
+          const f = isActive ? FOCUS.active : FOCUS.inactive;
+
+          return (
+            /* Layer 1: Static scroll target — no transforms, provides snap anchor */
+            <div
+              key={i}
+              ref={(el) => { cardRefs.current[i] = el as HTMLElement; }}
+              data-index={i}
+              className="relative flex-shrink-0 w-[85vw] md:w-[420px] snap-center cursor-pointer"
+              onClick={() => scrollToCard(i)}
+            >
+              {/* Glow — sits OUTSIDE the plate so it can't be clipped. Top-down spotlight with arrival stabilization. */}
+              <motion.div
+                className="absolute -inset-12 bg-[radial-gradient(circle_at_50%_-20%,rgba(56,182,255,0.32),transparent_70%)] pointer-events-none"
+                animate={{
+                  opacity: isActive ? [0.4, 0.55] : 0.06,
+                  scale: isActive ? [1.02, 1] : 0.9
+                }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                style={{ filter: "blur(20px)" }} // Controlled blur on the background glow only (not card)
+              />
+
+              {/* Layer 2: Visual plate — ONLY handles elevation + shadow, no filter */}
+              <motion.div
+                className="relative rounded-[20px] p-10 flex flex-col justify-between min-h-[440px] overflow-hidden"
+                animate={{
+                  y: f.y,
+                  backgroundColor: f.bg,
+                  borderColor: f.border,
+                  boxShadow: `${f.shadow}, ${f.topHighlight}`, // Compose shadow + highlight
+                }}
+                transition={FOCUS.transition}
+                style={{
+                  border: "1px solid transparent",
+                  backgroundImage: "linear-gradient(165deg, rgba(20,36,72,0.3) 0%, transparent 40%, rgba(6,12,24,0.2) 100%)",
+                }}
+              >
+                {/* Edge Lighting — Strong top chamfer with arrival flash */}
+                <motion.div
+                  className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-blue-100 to-transparent pointer-events-none"
+                  animate={{ opacity: isActive ? [0.6, 1, 0.9] : 0.15 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+
+                {/* Side highlight — Balanced vertical rim with arrival flash */}
+                <motion.div
+                  className="absolute top-[2px] right-0 bottom-0 w-[1px] bg-gradient-to-b from-blue-300/50 via-blue-400/20 to-transparent pointer-events-none"
+                  animate={{ opacity: isActive ? [0.5, 0.8, 0.6] : 0.1 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+                <motion.div
+                  className="absolute top-[2px] left-0 bottom-0 w-[1px] bg-gradient-to-b from-blue-300/30 via-blue-400/10 to-transparent pointer-events-none"
+                  animate={{ opacity: isActive ? [0.3, 0.5, 0.4] : 0.05 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                />
+
+                {/* Layer 3: Static content — no transforms, text renders crisply */}
+                <div className="relative z-10">
+                  {/* Module label — moved to top for metadata grouping */}
+                  <p className="text-[10px] font-mono text-blue-400/60 uppercase tracking-[0.2em] mb-4">
+                    System_Module 0{i + 1}
+                  </p>
+
+                  {/* Title — Primary Anchor */}
+                  <motion.h3
+                    className="text-3xl font-semibold mb-6 tracking-tight leading-none"
+                    animate={{ color: f.titleColor }}
+                    transition={FOCUS.transition}
+                  >
+                    {product.title}
+                  </motion.h3>
+
+                  {/* Icon — Visual Support (Diagrammatic) */}
+                  <motion.div
+                    className="w-12 h-12 p-2.5 rounded-xl bg-blue-500/[0.04] flex items-center justify-center mb-6 relative overflow-hidden"
+                    animate={{ borderColor: f.iconBorder }}
+                    transition={FOCUS.transition}
+                    style={{ border: "1px solid transparent" }}
+                  >
+                    <div className="w-full h-full opacity-90">
+                      {HARDWARE_ICONS[i % HARDWARE_ICONS.length]("#38B6FF")}
+                    </div>
+                  </motion.div>
+
+                  {/* Body — High Readability */}
+                  <motion.p
+                    className="leading-relaxed text-[15px] font-medium max-w-[36ch]"
+                    animate={{ color: f.bodyColor }}
+                    transition={FOCUS.transition}
+                  >
+                    {product.desc}
+                  </motion.p>
+                </div>
+
+                {/* Status indicator */}
+                <div className="relative z-10 flex items-center gap-3 mt-auto pt-10">
+                  <motion.span
+                    className="w-2 h-2 rounded-full"
+                    animate={{ backgroundColor: f.statusColor }}
+                    transition={FOCUS.transition}
+                  />
+                  <span className="text-[10px] font-mono text-blue-400/40 uppercase tracking-widest">
+                    {isActive ? "Focused" : "Standby"}
+                  </span>
+                </div>
+              </motion.div>
+            </div>
+          );
+        })}
+      </div>
+
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center gap-2.5 mt-8">
+        {hardwareProducts.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => scrollToCard(i)}
+            aria-label={`Go to card ${i + 1}`}
+            className="group relative p-1"
+          >
+            <motion.div
+              className="rounded-full"
+              animate={{
+                width: i === activeIndex ? 28 : 8,
+                height: 8,
+                backgroundColor: i === activeIndex ? "rgba(56,182,255,0.6)" : "rgba(56,182,255,0.15)",
+              }}
+              transition={FOCUS.transition}
+            />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const solutions = [
 
   { title: "Software Solutions", desc: "Scalable cloud platforms and custom CRM systems." },
@@ -897,13 +1150,12 @@ export function HomePage() {
 
       <div className="section-divider" />
 
-      {/* HARDWARE INFRASTRUCTURE — STACKED GRID SHOWCASE */}
-      <section id="hardware" className="relative py-32 px-6 md:px-8 overflow-hidden">
+      {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDER WITH FOCUS SYSTEM */}
+      <section id="hardware" className="relative py-32 overflow-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
-        {/* Subtle grid pattern overlay */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, rgba(56,182,255,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+        <div className="absolute inset-0 pointer-events-none opacity-[0.025]" style={{ backgroundImage: 'radial-gradient(circle, rgba(56,182,255,0.5) 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        <div className="mx-auto w-full max-w-7xl relative z-10">
+        <div className="mx-auto w-full max-w-7xl px-6 md:px-8 relative z-10">
           <div className="section-header mb-16">
             <motion.p
               className="text-xs font-bold uppercase tracking-[0.4em] text-blue-400/60 mb-4"
@@ -933,68 +1185,12 @@ export function HomePage() {
               Reliable hardware for mission-critical business environments.
             </motion.p>
           </div>
-
-          {/* Asymmetric Grid: Featured card (first) + 2x2 grid (rest) */}
-          <div className="grid lg:grid-cols-5 gap-6">
-            {/* FEATURED CARD — spans 3 columns */}
-            <motion.article
-              className="lg:col-span-3 lg:row-span-2 relative rounded-[24px] p-10 md:p-12 group flex flex-col justify-between min-h-[420px] lg:min-h-[520px] overflow-hidden border border-blue-400/12 bg-gradient-to-br from-[#0C1A38]/90 via-[#0A1530]/95 to-[#060D1E]/98 backdrop-blur-xl transform-gpu"
-              initial={{ opacity: 0, y: 30, filter: "blur(6px)" }}
-              whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.7, ease: MOTION.section.framerEase }}
-              whileHover={{ y: -6, borderColor: "rgba(56,182,255,0.25)", boxShadow: "0 20px 60px rgba(3,10,30,0.8), 0 0 30px rgba(56,182,255,0.08)" }}
-            >
-              {/* Top edge light */}
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-200/40 to-transparent" />
-              {/* Ambient glow on hover */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(56,182,255,0.06),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-
-              <div>
-                <HardwareIcon index={0} accent="#38B6FF" />
-                <p className="text-xs font-bold text-blue-400/50 uppercase tracking-[0.4em] mb-4">System_Module 01</p>
-                <h3 className="text-3xl md:text-4xl font-bold mb-6 tracking-[-0.02em] text-white leading-tight max-w-[18ch]">{hardwareProducts[0].title}</h3>
-                <p className="text-blue-100/45 leading-relaxed text-base max-w-[48ch]">{hardwareProducts[0].desc}</p>
-              </div>
-
-              <div className="flex items-center gap-3 mt-8">
-                <span className="w-2 h-2 rounded-full bg-emerald-400/60 animate-pulse" />
-                <span className="text-[10px] font-mono text-emerald-400/50 uppercase tracking-widest">Verified &amp; Active</span>
-              </div>
-            </motion.article>
-
-            {/* REMAINING 4 CARDS — each spans 1 col in a 2x2 grid */}
-            {hardwareProducts.slice(1).map((product, i) => (
-              <motion.article
-                key={i + 1}
-                className="lg:col-span-2 relative rounded-[20px] p-8 group flex flex-col justify-between min-h-[240px] overflow-hidden border border-blue-400/10 bg-gradient-to-br from-[#0A1530]/85 to-[#060D1E]/95 backdrop-blur-lg transform-gpu"
-                initial={{ opacity: 0, y: 24, filter: "blur(4px)" }}
-                whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6, delay: (i + 1) * 0.08, ease: MOTION.section.framerEase }}
-                whileHover={{ y: -4, borderColor: "rgba(56,182,255,0.2)", boxShadow: "0 16px 48px rgba(3,10,30,0.7), 0 0 20px rgba(56,182,255,0.06)" }}
-              >
-                {/* Top edge light */}
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-200/30 to-transparent" />
-                {/* Hover glow */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(56,182,255,0.04),transparent_60%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-
-                <div>
-                  <HardwareIcon index={i + 1} accent="#38B6FF" />
-                  <p className="text-[10px] font-bold text-blue-400/40 uppercase tracking-[0.35em] mb-3">System_Module 0{i + 2}</p>
-                  <h3 className="text-xl font-bold mb-3 tracking-tight text-white leading-snug">{product.title}</h3>
-                  <p className="text-blue-100/35 leading-relaxed text-sm max-w-[36ch]">{product.desc}</p>
-                </div>
-
-                <div className="flex items-center gap-2 mt-6">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400/40 animate-pulse" />
-                  <span className="text-[9px] font-mono text-blue-400/40 uppercase tracking-widest">Active</span>
-                </div>
-              </motion.article>
-            ))}
-          </div>
         </div>
+
+        {/* Horizontal Slider Track */}
+        <HardwareSlider />
       </section>
+
 
       {/* MEMORY SOLUTIONS - ENTERPRISE RAM */}
       <section id="memory" className="py-24 px-6 md:px-8 relative overflow-hidden">
