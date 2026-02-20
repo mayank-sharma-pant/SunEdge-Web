@@ -961,6 +961,7 @@ export function HomePage() {
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE */}
       {/* HARDWARE INFRASTRUCTURE — HORIZONTAL SLIDING SHOWCASE — PREMIUM PHYSICS & VERTICAL CLEARANCE */}
       <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-16 min-h-screen overflow-visible z-40 w-full overflow-x-hidden">
+      <section ref={horizontalSectionRef} id="hardware" className="hardware-section relative py-40 min-h-[140vh] overflow-visible z-10 w-full overflow-x-hidden">
         <AtmosphericDepth color="blue" position="center" opacity={0.5} className="top-1/2 scale-150" />
         <div className="mx-auto w-full max-w-7xl px-6 md:px-8 mb-8 section-header relative z-20">
           <h2 className="text-3xl font-bold md:text-5xl tracking-tight mb-6 tracking-[-0.03em] max-w-[15ch]">Hardware Infrastructure</h2>
@@ -974,6 +975,12 @@ export function HomePage() {
               <motion.article
                 key={i}
                 className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[500px]"
+        <div className="hardware-slider-rail relative overflow-visible rounded-[32px] py-24">
+          <div ref={horizontalTrackRef} className="horizontal-track flex px-6 md:px-8 items-start transform-gpu min-h-[860px] gap-24 overflow-visible">
+            {hardwareProducts.map((product, i) => (
+              <motion.article
+                key={i}
+                className="product-card flex-shrink-0 w-[450px] relative rounded-[var(--radius-lg)] p-10 group flex flex-col transform-gpu min-h-[600px]"
                 whileHover={{
                   y: -12,
                   scale: 1.01,
